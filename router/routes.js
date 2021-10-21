@@ -1,6 +1,6 @@
 
 const fs = require( 'fs' );
-const { HTML_CONTENT_TYPE, CSS_CONTENT_TYPE } = require( './content-types' );
+const { HTML_CONTENT_TYPE, CSS_CONTENT_TYPE, JS_CONTENT_TYPE } = require( './content-types' );
 const templatesRoute = 'public/templates';
 
 exports.renderHome = ( res, req ) =>
@@ -81,7 +81,7 @@ exports.render404 = ( res, req ) =>
 exports.renderCSS = ( res, req ) =>
 {
   res.setHeader( 'Content-Type', CSS_CONTENT_TYPE );
-  fs.readFile( `${ __dirname }/../public/${ path }`, ( err, data ) =>
+  fs.readFile( `${ __dirname }/../public/${ req.url }`, ( err, data ) =>
   {
     if ( err ) {
       const msgError = "Error en la carga del css"
@@ -91,4 +91,20 @@ exports.renderCSS = ( res, req ) =>
     }
     res.end( data )
   } )
+}
+
+exports.renderJS = ( res, req ) =>
+{
+  res.setHeader( 'Content-Type', JS_CONTENT_TYPE );
+  const file = fs.readFile( `${ __dirname }/../public/${ req.url }`, ( err, data ) =>
+  {
+    if ( err ) {
+      const msgError = "Error en la carga del js"
+      console.log( msgError );
+      res.end( msgError )
+      return;
+    }
+    res.end( data )
+  } )
+
 }

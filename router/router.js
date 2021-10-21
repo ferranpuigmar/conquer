@@ -1,6 +1,6 @@
 //Móudulos de enrutado
 const fs = require( 'fs' );
-const { renderHome, renderRegister, renderRooms, renderLogin, renderCSS, render404 } = require( './routes' );
+const { renderHome, renderRegister, renderRooms, renderLogin, renderCSS, render404, renderJS } = require( './routes' );
 
 exports.init = ( req, res ) =>
 {
@@ -9,25 +9,21 @@ exports.init = ( req, res ) =>
   //Path
   const path = req.url;
   console.log( 'path: ', path )
+
   //Enrutado
-  switch ( path ) {
-    case "/":
-      renderHome( res );
-      break;
-    case "/register":
-      renderRegister( res );
-      break;
-    case "/rooms":
-      renderRooms( res );
-      break;
-    case "/login":
-      renderLogin( res );
-      break;
-    case path.match( "\.css$" ):
-      renderCSS( res );
-      break;
-    default:
-      render404( res );
-      break;
+  if ( path.match( ".js$" ) ) {
+    renderJS( res, req );
+  } else if ( path.match( ".css$" ) ) {
+    renderCSS( res, req );
+  } else if ( path === "/" ) {
+    renderHome( res, req );
+  } else if ( path === "/register" ) {
+    renderRegister( res, req );
+  } else if ( path === "/rooms" ) {
+    renderRooms( res, req );
+  } else if ( path === "/login" ) {
+    renderLogin( res, req );
+  } else {
+    render404( res, req );
   }
 }
