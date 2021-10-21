@@ -1,33 +1,24 @@
 const path = require( 'path' );
-const HtmlWebpackPlugin = require( 'html-webpack-plugin' );
+const MiniCssExtractPlugin = require( 'mini-css-extract-plugin' );
 
 module.exports = {
-  entry: path.resolve( __dirname, './server.js' ),
-  devtool: 'inline-source-map',
-  devServer: {
-    static: './dist',
-    hot: true,
-  },
+  entry: './src/sass/style.scss',
   output: {
-    filename: '[name].bundle.js',
-    path: path.resolve( __dirname, './dist' ),
-    clean: true,
+    filename: 'bundle.js',
+    path: path.resolve( __dirname, 'public' )
   },
   plugins: [
-    new HtmlWebpackPlugin( {
-      title: 'Hot Module Replacement',
-    } ),
+    new MiniCssExtractPlugin( { filename: 'css/style.css' } )
   ],
   module: {
     rules: [
       {
-        test: /\.(js)$/,
-        exclude: /node_modules/,
-        use: [ 'babel-loader' ]
+        test: /\.s[ac]ss$/i,
+        use: [ MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader' ],
+        exclude: /node_modules/
       }
     ]
   },
-  resolve: {
-    extensions: [ '*', '.js' ]
-  }
+  devtool: 'source-map',
+  mode: 'development'
 };
