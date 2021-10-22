@@ -1,5 +1,6 @@
 const path = require( 'path' );
 const MiniCssExtractPlugin = require( 'mini-css-extract-plugin' );
+const npm_package = require('./package.json')
 
 module.exports = {
   entry: './src/sass/style.scss',
