@@ -11152,6 +11152,7 @@ textarea.form-control-lg {
   height: 50px;
   margin: 5px;
   border-radius: 100px;
+  border: 1px solid transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -11190,6 +11191,9 @@ textarea.form-control-lg {
 .a-avatar.mod8 {
   color: #808080;
   background-color: #e6e6e6;
+}
+.a-avatar.active {
+  border-color: #ced4da;
 }
 
 /*# sourceMappingURL=style.css.map*/

@@ -16,6 +16,7 @@ border-radius: 50px;
     height: 50px;
     margin: 5px;
     border-radius: 100px;
+    border: 1px solid transparent;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -54,6 +55,10 @@ border-radius: 50px;
     &.mod8{
         color: #808080;
         background-color: #e6e6e6;
+    }
+
+    &.active{
+        border-color: #ced4da;
     }
 }
 
