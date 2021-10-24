@@ -8,5 +8,33 @@
 </head>
 <body>
   <h1>Soy la página rooms</h1>
+  <div id="grid" class="grid"></div>
+  <style>
+    .grid{
+      display: flex;
+      flex-flow: column;
+      width: auto;
+    }
+
+    .grid .row{
+      display: flex;
+      
+    }
+    .grid .cell{
+      background-color: grey;
+      height: 40px;
+      width: 40px;
+      border: 2px solid white;
+    }
+  </style>
+  <script src="../bundle.js" type="text/javascript"></script>
+  <script>
+    const player1 = new Conquer.Player('Peter', 'avatar-red');
+    const player2 = new Conquer.Player('John', 'avatar-green');
+    const players = [player1, player2];
+    const game = new Conquer.Game(players, 20);
+    game.getPlayers();
+    game.createGrid('grid');
+  </script>
 </body>
 </html>
