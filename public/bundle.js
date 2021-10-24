@@ -141,6 +141,40 @@ function validate(uuid) {
 
 /***/ }),
 
+/***/ "./src/js/DashBoard.js":
+/*!*****************************!*\
+  !*** ./src/js/DashBoard.js ***!
+  \*****************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+class Dashboard{
+  constructor(initData){
+    this.boxRooms = initData.boxRooms;
+  }
+
+  init(){
+    this.generateRoomBoxes();
+  }
+
+  generateRoomBoxes(){
+    this.boxRooms.forEach((box, index) => {
+
+      const boxDiv = document.getElementById(box.id);
+      // Añadir clase para pintar caja
+      boxDiv.classList.add(`room${index+1}`);
+      // Añadir títulos
+      const title = `Room ${index + 1}`;
+      const boxDivHeader = document.querySelector(`#${box.id} .m-room-drop-item__header h3`);
+      boxDivHeader.innerHTML = title;
+    })
+  }
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Dashboard);
+
+/***/ }),
+
 /***/ "./src/js/Game.js":
 /*!************************!*\
   !*** ./src/js/Game.js ***!
@@ -366,6 +400,10 @@ class Game
 
     return Math.floor( totalCells / numPlayers ) + 1
   }
+
+  init(){
+    this.createDomGrid();
+  }
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Game);
@@ -411,9 +449,26 @@ class Player {
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
+
+
 class Room {
-  constructor(name){
+  capacity = 4;
+  status = true;
+  players = [];
+  roomBox = "";
+
+  constructor(id, name, capacity){
     this.name = name;
+    this.capacity = capacity;
+    this.roomBox = id;
+  }
+
+  addPlayer(player){
+    this.players.push(player)
+  }
+
+  getPlayers(){
+    return players;
   }
 }
 
@@ -497,11 +552,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Game": function() { return /* reexport safe */ _Game__WEBPACK_IMPORTED_MODULE_0__["default"]; },
 /* harmony export */   "Player": function() { return /* reexport safe */ _Player__WEBPACK_IMPORTED_MODULE_1__["default"]; },
-/* harmony export */   "Room": function() { return /* reexport safe */ _Room__WEBPACK_IMPORTED_MODULE_2__["default"]; }
+/* harmony export */   "Room": function() { return /* reexport safe */ _Room__WEBPACK_IMPORTED_MODULE_2__["default"]; },
+/* harmony export */   "Dashboard": function() { return /* reexport safe */ _DashBoard__WEBPACK_IMPORTED_MODULE_3__["default"]; }
 /* harmony export */ });
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Game */ "./src/js/Game.js");
 /* harmony import */ var _Player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Player */ "./src/js/Player.js");
 /* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
+/* harmony import */ var _DashBoard__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./DashBoard */ "./src/js/DashBoard.js");
+
 
 
 

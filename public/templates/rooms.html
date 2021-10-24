@@ -60,7 +60,7 @@
             <div class="o-rooms-container">
               <div class="row d-flex flex-wrap justify-content-space-between">
                 <div class="col-6 mb-3">
-                  <article class="m-room-drop-item  room1">
+                  <article id="red-room-box" class="m-room-drop-item">
                     <div class="m-room-drop-item__header">
                       <h3 class="m-room-drop-item__name">ROOM 1</h3>
                       <div class="m-room-drop-item__total">
@@ -76,7 +76,7 @@
                   </article>
                 </div>
                 <div class="col-6 mb-3">
-                  <article class="m-room-drop-item  room2">
+                  <article id="blue-room-box" class="m-room-drop-item">
                     <div class="m-room-drop-item__header">
                       <h3 class="m-room-drop-item__name">ROOM 2</h3>
                       <div class="m-room-drop-item__total">
@@ -92,7 +92,7 @@
                   </article>
                 </div>
                 <div class="col-6 mb-3">
-                  <article class="m-room-drop-item  room3">
+                  <article id="green-room-box" class="m-room-drop-item">
                     <div class="m-room-drop-item__header">
                       <h3 class="m-room-drop-item__name">ROOM 3</h3>
                       <div class="m-room-drop-item__total">
@@ -108,18 +108,18 @@
                   </article>
                 </div>
                 <div class="col-6 mb-3">
-                  <article class="m-room-drop-item  room4">
+                  <article id="orange-room-box" class="m-room-drop-item ¡">
                     <div class="m-room-drop-item__header">
                       <h3 class="m-room-drop-item__name">ROOM 4</h3>
                       <div class="m-room-drop-item__total">
                         <p><span class="total">0</span>J</p>
-                        
                       </div>
                     </div>
                     <div class="m-room-drop-item__image">
-                      <div class="image drop-item">
-                      
-                      </div>
+                      <div class="image drop-item"></div>
+                      <div class="image drop-item"></div>
+                      <div class="image drop-item"></div>
+                      <div class="image drop-item"></div>
                     </div>
                   </article>
                 </div>
@@ -132,13 +132,23 @@
   </main>
   <script src="../bundle.js" type="text/javascript"></script>
   <script>
+    const dashBoardInitData = {
+      boxRooms: [
+        {id: 'red-room-box'}, 
+        {id: 'blue-room-box'}, 
+        {id: 'green-room-box'},
+        {id: 'orange-room-box'}
+      ]
+    }
+    const dasboard = new Conquer.Dashboard(dashBoardInitData);
+    dasboard.init()
+
     const player1 = new Conquer.Player('Peter', 'avatar-red');
     const player2 = new Conquer.Player('John', 'avatar-green');
     const players = [player1, player2];
     const gridSize = 20;
     const game = new Conquer.Game('grid', players, gridSize);
-    game.getPlayers();
-    game.createDomGrid();
+    game.init();
   </script>
 </body>
 </html>

@@ -215,6 +215,10 @@ class Game
 
     return Math.floor( totalCells / numPlayers ) + 1
   }
+
+  init(){
+    this.createDomGrid();
+  }
 }
 
 export default Game;
