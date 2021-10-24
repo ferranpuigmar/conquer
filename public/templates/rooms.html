@@ -135,9 +135,10 @@
     const player1 = new Conquer.Player('Peter', 'avatar-red');
     const player2 = new Conquer.Player('John', 'avatar-green');
     const players = [player1, player2];
-    const game = new Conquer.Game(players, 20);
+    const gridSize = 20;
+    const game = new Conquer.Game('grid', players, gridSize);
     game.getPlayers();
-    game.createDomGrid('grid');
+    game.createDomGrid();
   </script>
 </body>
 </html>

@@ -5,7 +5,10 @@ class Game
 {
   colors = [ 'red', 'blue', 'green', 'brown' ];
   grid = []
+  wrapper = "";
+
   constructor (
+    wrapper,
     players,
     gameSize
   )
@@ -16,6 +19,7 @@ class Game
     this.totalCellsToWin = this.calculateTotalCellsToWin( this.totalCells, this.players )
     this.round = { turn: 1, roundNumber: 1, player: this.players[ 0 ] }
     this.grid = this.generateGrid(gameSize);
+    this.wrapper = wrapper;
   }
 
   getPlayers ()
@@ -142,10 +146,10 @@ class Game
     })
   }
 
-  createDomGrid ( targetDomElement )
+  createDomGrid ()
   {
     const size = this.gridSize;
-    const wrapper = document.getElementById( targetDomElement );
+    const wrapper = document.getElementById( this.wrapper );
     let rowCounter = 1;
     let cellCounter = 1;
     let cells = []
