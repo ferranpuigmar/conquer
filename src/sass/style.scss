@@ -1,2 +1,7 @@
-@import './theme';
-@import './components';
+@import './_01tools.scss';
+@import './02base.scss';
+@import './03vendor.scss';
+@import './04atoms.scss';
+@import './05molecules.scss';
+@import './06organisms.scss';
+@import './07pages.scss';
