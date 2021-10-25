@@ -2,7 +2,9 @@ class Game
 {
   colors = [ 'red', 'blue', 'green', 'brown' ];
   grid = []
+  defeatedPlayers = [];
   wrapper = "";
+  totalCellsToWin = 0;
 
   constructor (
     wrapper,
@@ -13,7 +15,6 @@ class Game
     this.players = this.buildToGamePlayers( players );
     this.gridSize = gameSize;
     this.totalCells = gameSize * gameSize;
-    this.totalCellsToWin = this.calculateTotalCellsToWin( this.totalCells, this.players )
     this.round = { turn: 1, roundNumber: 1, player: this.players[ 0 ] }
     this.grid = this.generateGrid(gameSize);
     this.wrapper = wrapper;
@@ -209,12 +210,14 @@ class Game
   calculateTotalCellsToWin ( totalCells, players )
   {
     const numPlayers = players.length;
+    const otherConqueredCells = this.defeatedPlayers.reduce((acc, player) => acc.cellsConquered + player.cellsConquered, 0); // X casillas conquistadas por otros jugadores
 
-    return Math.floor( totalCells / numPlayers ) + 1
+    this.totalCellsToWin =  Math.floor( (totalCells-otherConqueredCells) / numPlayers ) + 1
   }
 
   init(){
     this.createDomGrid();
+    this.calculateTotalCellsToWin(this.totalCells, this.players)
   }
 }
 

@@ -61,7 +61,9 @@ class Game
 {
   colors = [ 'red', 'blue', 'green', 'brown' ];
   grid = []
+  defeatedPlayers = [];
   wrapper = "";
+  totalCellsToWin = 0;
 
   constructor (
     wrapper,
@@ -72,7 +74,6 @@ class Game
     this.players = this.buildToGamePlayers( players );
     this.gridSize = gameSize;
     this.totalCells = gameSize * gameSize;
-    this.totalCellsToWin = this.calculateTotalCellsToWin( this.totalCells, this.players )
     this.round = { turn: 1, roundNumber: 1, player: this.players[ 0 ] }
     this.grid = this.generateGrid(gameSize);
     this.wrapper = wrapper;
@@ -268,12 +269,14 @@ class Game
   calculateTotalCellsToWin ( totalCells, players )
   {
     const numPlayers = players.length;
+    const otherConqueredCells = this.defeatedPlayers.reduce((acc, player) => acc.cellsConquered + player.cellsConquered, 0); // X casillas conquistadas por otros jugadores
 
-    return Math.floor( totalCells / numPlayers ) + 1
+    this.totalCellsToWin =  Math.floor( (totalCells-otherConqueredCells) / numPlayers ) + 1
   }
 
   init(){
     this.createDomGrid();
+    this.calculateTotalCellsToWin(this.totalCells, this.players)
   }
 }
 
@@ -319,8 +322,6 @@ class Player {
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-
-
 class Room {
   capacity = 4;
   isOpen = true;
@@ -335,6 +336,7 @@ class Room {
   }
 
   onDraggPlayer(user){
+
     if(this.players.length === this.capacity){
       this.isOpen = false;
       disableRoom(this.id)
@@ -351,7 +353,8 @@ class Room {
   }
 
   addToRoom(user){
-    const draggedPlayer = new Player(this.user.id, this.user.name, this.user.avatar);
+    // Creamos jugador que recoge los datos del usuario arrastrado
+    const draggedPlayer = new Player(user.id, user.name, user.avatar);
     this.players.push(draggedPlayer)
     // Mostrar mensaje que se ha añadido un nuevo jugador
 
