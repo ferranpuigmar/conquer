@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
-
 class Room {
   capacity = 4;
   isOpen = true;
@@ -14,6 +12,7 @@ class Room {
   }
 
   onDraggPlayer(user){
+
     if(this.players.length === this.capacity){
       this.isOpen = false;
       disableRoom(this.id)
@@ -30,7 +29,8 @@ class Room {
   }
 
   addToRoom(user){
-    const draggedPlayer = new Player(this.user.id, this.user.name, this.user.avatar);
+    // Creamos jugador que recoge los datos del usuario arrastrado
+    const draggedPlayer = new Player(user.id, user.name, user.avatar);
     this.players.push(draggedPlayer)
     // Mostrar mensaje que se ha añadido un nuevo jugador
 
