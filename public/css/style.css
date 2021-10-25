@@ -11152,13 +11152,16 @@ textarea.form-control-lg {
   height: 50px;
   margin: 5px;
   border-radius: 100px;
-  border: 1px solid transparent;
+  border: 1px solid #333;
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0.3;
+  transition: opacity 0.5s ease-in-out;
 }
 .a-avatar i {
   font-size: 30px;
+  pointer-events: none;
 }
 .a-avatar.mod1 {
   color: #f24726;
@@ -11193,7 +11196,9 @@ textarea.form-control-lg {
   background-color: #e6e6e6;
 }
 .a-avatar.active {
-  border-color: #ced4da;
+  border-color: #333;
+  border-style: dashed;
+  opacity: 1;
 }
 
 .m-user-item {
@@ -11215,6 +11220,7 @@ textarea.form-control-lg {
   display: inline-flex;
   border: 3px dashed #495057;
   border-radius: 50%;
+  pointer-events: none;
 }
 .m-user-item__image .small {
   font-size: 10px;

@@ -103,6 +103,9 @@ class Game
 
   checkTurn ()
   {
+    // Me descargo los updates del juego
+
+    // Seteo las propiedades del juego con esa info
     this.round = this.getRoundInfo();
   }
 
@@ -186,7 +189,6 @@ class Game
 
     // cambiamos el turno
     this.checkTurn()
-
   }
 
   AddConqueredCell(playerId, cellId){
@@ -277,6 +279,8 @@ class Game
   init(){
     this.createDomGrid();
     this.calculateTotalCellsToWin(this.totalCells, this.players)
+
+    // Generamos listener para manejar cambios en el localStorage
   }
 }
 
@@ -312,6 +316,178 @@ class Player {
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Player);
+
+/***/ }),
+
+/***/ "./src/js/Register.js":
+/*!****************************!*\
+  !*** ./src/js/Register.js ***!
+  \****************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+class Register {
+
+  fields = {}
+  errors = {}
+
+  constructor(registerFields){
+    this.form = document.getElementById(registerFields.formId)
+    this.emailInput = document.getElementById(registerFields.emailId);
+    this.passwordInput = document.getElementById(registerFields.passwordId);
+    this.favouriteRoom = document.getElementById(registerFields.favouriteRoomId);
+    this.avatarWrapper = document.getElementById(registerFields.avatarWrapperId);
+    this.registerSubmitBtn = document.getElementById(registerFields.submtBtn);
+  }
+
+  onSelectAvatar(e){
+    const avatarMod = e.target.dataset.mod;
+    const avatarId = e.target.id;
+    const avatarDiv = document.getElementById(avatarId);
+
+    const avatars = this.avatarWrapper.querySelectorAll('.a-avatar');
+    avatars.forEach(avatar => {
+      avatar.classList.remove('active')
+    })
+
+    avatarDiv.classList.add('active');
+  }
+
+  assignListeners(){
+    const avatars = this.avatarWrapper.querySelectorAll('.a-avatar');
+    avatars.forEach(avatar => {
+      avatar.addEventListener('click', this.onSelectAvatar.bind(this));
+    })
+
+    this.form.addEventListener('submit', this.send.bind(this));
+  }
+
+  validateEmail(name, element, value){
+    let message, isValid;
+
+    if(value === ""){
+      message = "El email no puede estar vacío"
+      isValid = false;
+    }
+
+    if(value !== ""){
+      const regex = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+      isValid = regex.test(value);
+      message = isValid ? "" : "El email no es válido"
+    }
+
+    if(isValid) {
+      delete this.errors[name];
+      element.classList.remove('is-invalid')
+      document.getElementById(`${element.id}_error`).innerHTML = "";
+      this.fields[name].value = value;
+      return;
+    } else {
+      this.fields[name].value = '';
+    }
+
+    this.errors[name] = {
+      element: element,
+      message
+    }
+  }
+
+  validatePassword(name, element, value){
+
+    const isValid = value !== "";
+    const message = isValid ? '' : "El password no puede estar vacío";
+
+    if(isValid) {
+      delete this.errors[name];
+      element.classList.remove('is-invalid')
+      document.getElementById(`${element.id}_error`).innerHTML = "";
+      this.fields[name].value = value
+      return;
+    } else {
+      this.fields[name].value = '';
+    }
+
+    this.errors[name] = {
+      element: element,
+      message
+    }
+  }
+
+  validateFavouriteRoom(name, element, value){
+    const isValid = value !== "0";
+    const message = isValid ? '' : "Debes seleccionar una sala";
+
+    if(isValid) {
+      delete this.errors[name];
+      element.classList.remove('is-invalid')
+      document.getElementById(`${element.id}_error`).innerHTML = "";
+      this.fields[name].value = value;
+      return;
+    } else {
+      this.fields[name].value = '';
+    }
+
+    this.errors[name] = {
+      element: element,
+      message
+    }
+  }
+
+  registerFields(){
+    const requiredFields = [
+      {name: 'emailInput', element: this.emailInput, validate: this.validateEmail.bind(this)},
+      {name: 'passwordInput', element: this.passwordInput, validate: this.validatePassword.bind(this)},
+      {name: 'favouriteRoom', element: this.favouriteRoom, validate: this.validateFavouriteRoom.bind(this)}
+    ]
+    requiredFields.forEach(field => {
+      this.fields[field.name] = {
+        name: field.name,
+        validate: field.validate,
+        element: field.element,
+        value: ''
+      }
+    })
+  }
+
+  init(){
+    this.assignListeners();
+    this.registerFields();
+  }
+
+  send(e){
+    e.preventDefault();
+    const fields = this.fields;
+
+    Object.keys(fields).forEach(field => {
+      this.fields[field].validate(fields[field].name, fields[field].element, fields[field].element.value)
+    })
+
+    const existErrors = Object.keys(this.errors).length !== 0;
+
+    if(existErrors){
+      Object.keys(this.errors).forEach(error => {
+        const inputElement = this.errors[error].element;
+        const msgErrorElement = `${inputElement.id}_error`;
+        inputElement.classList.add('is-invalid');
+        document.getElementById(msgErrorElement).innerHTML = this.errors[error].message;
+      })
+      return;
+    }
+
+    const data  = {
+      email: this.fields.emailInput.value,
+      password: this.fields.passwordInput.value,
+      avatar: `mod${this.avatarWrapper.querySelector('.active').dataset.mod}`,
+      favouriteRoom: this.fields.favouriteRoom.value
+    };
+
+    // Evento para enviar la información al localStorage, al apartado de usuaros registrados
+
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Register);
 
 /***/ }),
 
@@ -465,12 +641,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "Game": function() { return /* reexport safe */ _Game__WEBPACK_IMPORTED_MODULE_0__["default"]; },
 /* harmony export */   "Player": function() { return /* reexport safe */ _Player__WEBPACK_IMPORTED_MODULE_1__["default"]; },
 /* harmony export */   "Room": function() { return /* reexport safe */ _Room__WEBPACK_IMPORTED_MODULE_2__["default"]; },
-/* harmony export */   "Dashboard": function() { return /* reexport safe */ _DashBoard__WEBPACK_IMPORTED_MODULE_3__["default"]; }
+/* harmony export */   "Dashboard": function() { return /* reexport safe */ _DashBoard__WEBPACK_IMPORTED_MODULE_3__["default"]; },
+/* harmony export */   "Register": function() { return /* reexport safe */ _Register__WEBPACK_IMPORTED_MODULE_4__["default"]; }
 /* harmony export */ });
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Game */ "./src/js/Game.js");
 /* harmony import */ var _Player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Player */ "./src/js/Player.js");
 /* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
 /* harmony import */ var _DashBoard__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./DashBoard */ "./src/js/DashBoard.js");
+/* harmony import */ var _Register__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Register */ "./src/js/Register.js");
+
 
 
 

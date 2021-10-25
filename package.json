@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack --mode development && node server.js"
+    "dev": "webpack --watch & node server.js"
   },
   "keywords": [],
   "author": "",

@@ -17,6 +17,7 @@
       display: inline-flex;
       border: 3px dashed $gray-700;
       border-radius: 50%;
+      pointer-events: none;
     }
 
     .small {
