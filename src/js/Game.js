@@ -44,6 +44,9 @@ class Game
 
   checkTurn ()
   {
+    // Me descargo los updates del juego
+
+    // Seteo las propiedades del juego con esa info
     this.round = this.getRoundInfo();
   }
 
@@ -127,7 +130,6 @@ class Game
 
     // cambiamos el turno
     this.checkTurn()
-
   }
 
   AddConqueredCell(playerId, cellId){
@@ -218,6 +220,8 @@ class Game
   init(){
     this.createDomGrid();
     this.calculateTotalCellsToWin(this.totalCells, this.players)
+
+    // Generamos listener para manejar cambios en el localStorage
   }
 }
 
