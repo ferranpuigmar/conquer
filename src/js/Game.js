@@ -1,6 +1,3 @@
-
-import { v4 as uuidv4 } from 'uuid';
-
 class Game
 {
   colors = [ 'red', 'blue', 'green', 'brown' ];
@@ -202,7 +199,7 @@ class Game
   buildToGamePlayers ( players )
   {
     return players.map( ( player, index ) => ( {
-      id: uuidv4(),
+      id: player.id,
       name: player.getName(),
       cellsConquered: 0,
       color: this.colors[ index ]
