@@ -18,7 +18,7 @@
         <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
           <ul class="navbar-nav  mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/login">Sign Up</a>
+              <a class="nav-link active" aria-current="page" href="/register">Sign Up</a>
             </li>
           </ul>
         </div>
@@ -28,26 +28,46 @@
   <main class="min-vh-100 d-flex justify-content-center">
     <div class="m-auto" style="max-width: 18rem;">
       <div class="card bg-gray-100">
-        <div class="card-body">
-          <form>
-            <div class="form-group my-2">
-              <input type="email" class="form-control text-center" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+        <form id="loginForm">
+          <div class="card-body">
+              <div class="form-group my-2">
+                <input id="loginEmail" type="email" class="form-control text-center" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+                <div id="loginEmail_error" class="invalid-feedback"></div>
+              </div>
+              <div class="form-group  my-2">
+                <input id="loginPassword" type="password" class="form-control text-center" id="exampleInputPassword1" placeholder="Password">
+                <div id="loginPassword_error" class="invalid-feedback"></div>
+              </div>
+          </div>
+          <div class="card-footer text-center py-4">
+            <div class="row">
+              <div class="col-12">
+                <div id="errorMessage" class="alert alert-danger mb-4 d-none" role="alert"></div>
+              </div>
             </div>
-            <div class="form-group  my-2">
-              <input type="password" class="form-control text-center" id="exampleInputPassword1" placeholder="Password">
+            <div class="row">
+              <div class="col-12">
+                <button id="loginSubmitBtn" type="submit" class="btn btn-primary btn-rounded px-4 w-100">Inicia sesión</button>
+              </div>
             </div>
-            <div class="text-center  my-2">
-              <button type="submit" class="btn btn-grey btn-rounded">ACCESS</button>
-            </div>
-  
-          </form>
-        </div>        
+          </div>
+        </form>
       </div>
       <div class="text-center fs-small my-2">
         Don't you have an account? <a href="/register">CREATE ONE</a>
       </div>
-
     </div>
   </main>
+  <script src="../bundle.js" type="text/javascript"></script>
+  <script>
+    const assignElements = {
+      formId: 'loginForm',
+      emailId: 'loginEmail',
+      passwordId: 'loginPassword',
+      submitBtn: 'loginSubmitBtn'
+    }
+    const login = new Conquer.Login(assignElements);
+    login.init();
+  </script>
 </body>
 </html>

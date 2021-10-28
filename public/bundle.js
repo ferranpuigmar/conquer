@@ -426,6 +426,167 @@ class Game
 
 /***/ }),
 
+/***/ "./src/js/Login.js":
+/*!*************************!*\
+  !*** ./src/js/Login.js ***!
+  \*************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
+
+
+
+class Login {
+
+  fields = {}
+  errors = {}
+  local = new _utils__WEBPACK_IMPORTED_MODULE_0__["default"]();
+
+  constructor(loginFields){
+    this.form = document.getElementById(loginFields.formId)
+    this.emailInput = document.getElementById(loginFields.emailId);
+    this.passwordInput = document.getElementById(loginFields.passwordId);
+    this.registerSubmitBtn = document.getElementById(loginFields.submtBtn);
+  }
+
+  validateEmail(name, element, value){
+    let message, isValid;
+
+    if(value === ""){
+      message = "El email no puede estar vacío"
+      isValid = false;
+    }
+
+    if(value !== ""){
+      const regex = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+      isValid = regex.test(value);
+      message = isValid ? "" : "El email no es válido"
+    }
+
+    if(isValid) {
+      delete this.errors[name];
+      element.classList.remove('is-invalid')
+      document.getElementById(`${element.id}_error`).innerHTML = "";
+      this.fields[name].value = value;
+      return;
+    } else {
+      this.fields[name].value = '';
+    }
+
+    this.errors[name] = {
+      element: element,
+      message
+    }
+  }
+
+  validatePassword(name, element, value){
+
+    const isValid = value !== "";
+    const message = isValid ? '' : "El password no puede estar vacío";
+
+    if(isValid) {
+      delete this.errors[name];
+      element.classList.remove('is-invalid')
+      document.getElementById(`${element.id}_error`).innerHTML = "";
+      this.fields[name].value = value
+      return;
+    } else {
+      this.fields[name].value = '';
+    }
+
+    this.errors[name] = {
+      element: element,
+      message
+    }
+  }
+
+  registerLoginFields(){
+    const requiredFields = [
+      {name: 'emailInput', element: this.emailInput, validate: this.validateEmail.bind(this)},
+      {name: 'passwordInput', element: this.passwordInput, validate: this.validatePassword.bind(this)}
+    ]
+    requiredFields.forEach(field => {
+      this.fields[field.name] = {
+        name: field.name,
+        validate: field.validate,
+        element: field.element,
+        value: ''
+      }
+    })
+  }
+
+  assignListeners(){
+    this.form.addEventListener('submit', this.send.bind(this));
+  }
+
+  init(){
+    this.registerLoginFields();
+    this.assignListeners();
+  }
+
+  loginUser(data){
+    const allUSers = this.local.getLocalStorage('users');
+
+    const user = allUSers.find(user => user.email === newUser.email);
+    if(!user){
+      this.showErrorMessage("No existe nadie con este email")
+      return;
+    }
+    const passWordIsValid = allUSers.find(user => user.password === newUser.password);
+    if(!passWordIsValid){
+      this.showErrorMessage("La contraseña no es válida")
+      return;
+    }
+
+    // Aqui va la lógica para poner al "user" (línea 95) dentro de los usuarios conectados
+    // También se tiene que redirigir al usuario a la ruta /rooms
+  }
+
+  showErrorMessage(message){
+    const messageElement = document.getElementById('errorMessage');
+    messageElement.innerHTML = message;
+    messageElement.classList.remove('d-none');
+  }
+
+  send(e){
+    e.preventDefault();
+    const fields = this.fields;
+
+    const errorMessageElement = document.getElementById('errorMessage');
+    errorMessageElement.classList.add('d-none');
+
+    Object.keys(fields).forEach(field => {
+      this.fields[field].validate(fields[field].name, fields[field].element, fields[field].element.value)
+    })
+
+    const existErrors = Object.keys(this.errors).length !== 0;
+
+    if(existErrors){
+      Object.keys(this.errors).forEach(error => {
+        const inputElement = this.errors[error].element;
+        const msgErrorElement = `${inputElement.id}_error`;
+        inputElement.classList.add('is-invalid');
+        document.getElementById(msgErrorElement).innerHTML = this.errors[error].message;
+      })
+      return;
+    }
+
+    const data  = {
+      email: this.fields.emailInput.value,
+      password: this.fields.passwordInput.value,
+    };
+
+    // Método para enviar la información al localStorage, al apartado de usuaros conectados
+    this.loginUser(data);
+  }
+
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (Login);
+
+/***/ }),
+
 /***/ "./src/js/Player.js":
 /*!**************************!*\
   !*** ./src/js/Player.js ***!
@@ -877,13 +1038,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "Player": function() { return /* reexport safe */ _Player__WEBPACK_IMPORTED_MODULE_1__["default"]; },
 /* harmony export */   "Room": function() { return /* reexport safe */ _Room__WEBPACK_IMPORTED_MODULE_2__["default"]; },
 /* harmony export */   "Dashboard": function() { return /* reexport safe */ _DashBoard__WEBPACK_IMPORTED_MODULE_3__["default"]; },
-/* harmony export */   "Register": function() { return /* reexport safe */ _Register__WEBPACK_IMPORTED_MODULE_4__["default"]; }
+/* harmony export */   "Register": function() { return /* reexport safe */ _Register__WEBPACK_IMPORTED_MODULE_4__["default"]; },
+/* harmony export */   "Login": function() { return /* reexport safe */ _Login__WEBPACK_IMPORTED_MODULE_5__["default"]; }
 /* harmony export */ });
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Game */ "./src/js/Game.js");
 /* harmony import */ var _Player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Player */ "./src/js/Player.js");
 /* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
 /* harmony import */ var _DashBoard__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./DashBoard */ "./src/js/DashBoard.js");
 /* harmony import */ var _Register__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Register */ "./src/js/Register.js");
+/* harmony import */ var _Login__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Login */ "./src/js/Login.js");
+
 
 
 
