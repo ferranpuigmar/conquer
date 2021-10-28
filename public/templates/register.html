@@ -65,11 +65,20 @@
             </div>
           </div>
           <div class="row">
-            <div class="text-center my-2">
-              <button type="submit" class="btn btn-grey btn-rounded">ACCESS</button>
+            <div class="col-12">
+              <div id="successMessage" class="alert alert-success mt-3 d-none" role="alert"></div>
+              <div id="errorMessage" class="alert alert-danger mt-3 d-none" role="alert"></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="text-center">
+              <button id="submitButton" type="submit" class="btn btn-grey btn-rounded btn-lg px-4 mt-4 mb-2">¡Regístrate!</button>
             </div>
           </div>
         </form>
+      </div>
+      <div id="successButton" class="card-footer text-center py-4 d-none">
+        <a href="./login.html" class="btn btn-primary btn-rounded btn-lg px-4">Inicia sesión en la aplicación</a>
       </div>
     </div>
   </main>

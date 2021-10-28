@@ -1,7 +1,11 @@
+import LocalStorage from "./utils";
+import { v4 as uuidv4 } from 'uuid';
+
 class Register {
 
   fields = {}
   errors = {}
+  local = new LocalStorage();
 
   constructor(registerFields){
     this.form = document.getElementById(registerFields.formId)
@@ -13,16 +17,18 @@ class Register {
   }
 
   onSelectAvatar(e){
-    const avatarMod = e.target.dataset.mod;
     const avatarId = e.target.id;
     const avatarDiv = document.getElementById(avatarId);
+    this.selectAvatar(avatarDiv)
+  }
 
+  selectAvatar(selected){
     const avatars = this.avatarWrapper.querySelectorAll('.a-avatar');
     avatars.forEach(avatar => {
       avatar.classList.remove('active')
     })
 
-    avatarDiv.classList.add('active');
+    selected.classList.add('active');
   }
 
   assignListeners(){
@@ -32,6 +38,21 @@ class Register {
     })
 
     this.form.addEventListener('submit', this.send.bind(this));
+  }
+
+  resetForm(){
+    for(let field in this.fields){
+      const fieldEl = this.fields[field];
+      fieldEl.value = "";
+      if(fieldEl.name === 'favouriteRoom'){
+        fieldEl.element.value = "0"
+      } else {
+        fieldEl.element.value = "";
+      }
+    }
+
+    const defaultAvatar = document.getElementById('avatar1');
+    this.selectAvatar(defaultAvatar)
   }
 
   validateEmail(name, element, value){
@@ -126,9 +147,55 @@ class Register {
     this.registerFields();
   }
 
+  saveUser(data){
+    const allUSers = this.local.getLocalStorage('users');
+    const newUser = data;
+
+    if(!allUSers || allUSers.length === 0){
+      this.local.setLocalStorage('users', [newUser])
+      return;
+    }
+
+    const existUSer = allUSers.find(user => user.email === newUser.email);
+    if(existUSer){
+      this.showErrorMessage("Ya existe un usuario con este email")
+      return;
+    }
+
+    allUSers.push(newUser);
+    this.local.setLocalStorage('users', allUSers)
+    this.resetForm();
+    this.showSuccesMessage();
+  }
+
+  showErrorMessage(message){
+    const messageElement = document.getElementById('errorMessage');
+    messageElement.innerHTML = message;
+    messageElement.classList.remove('d-none');
+  }
+
+  showSuccesMessage(){
+    const message = "Tu usuario se ha registrado correctamente.";
+    const messageElement = document.getElementById('successMessage');
+    const loginButton = document.getElementById('successButton');
+    const submitButton = document.getElementById('submitButton');
+    messageElement.innerHTML = message;
+    messageElement.classList.remove('d-none');
+    loginButton.classList.remove('d-none');
+    submitButton.classList.add('d-none');
+
+    setTimeout(()=> {
+      messageElement.classList.add('d-none');
+      submitButton.classList.remove('d-none');
+    }, 2000)
+  }
+
   send(e){
     e.preventDefault();
     const fields = this.fields;
+
+    const errorMessageElement = document.getElementById('errorMessage');
+    errorMessageElement.classList.add('d-none');
 
     Object.keys(fields).forEach(field => {
       this.fields[field].validate(fields[field].name, fields[field].element, fields[field].element.value)
@@ -147,14 +214,16 @@ class Register {
     }
 
     const data  = {
+      id: uuidv4(),
       email: this.fields.emailInput.value,
       password: this.fields.passwordInput.value,
       avatar: `mod${this.avatarWrapper.querySelector('.active').dataset.mod}`,
-      favouriteRoom: this.fields.favouriteRoom.value
+      favouriteRoom: this.fields.favouriteRoom.value,
+      color: `mod${this.avatarWrapper.querySelector('.active').dataset.mod}`
     };
 
     // Evento para enviar la información al localStorage, al apartado de usuaros registrados
-
+    this.saveUser(data);
   }
 
 }
