@@ -11312,5 +11312,14 @@ textarea.form-control-lg {
 .m-game-grid .m-game-grid__cell.isFilled {
   pointer-events: none;
 }
+.m-game-grid .m-game-grid__cell__image .image {
+  margin: 3px auto;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 1px solid #495057;
+  transition: all 0.4s;
+}
 
 /*# sourceMappingURL=style.css.map*/

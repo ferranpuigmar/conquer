@@ -1,7 +1,9 @@
+import DragAndDrop from "./DragAndDrop";
 import Room from "./Room";
 
 class Dashboard{
   rooms = [];
+  dragAndDrop = new DragAndDrop();
 
   constructor(initData){
     this.boxRooms = initData.boxRooms;
@@ -9,6 +11,7 @@ class Dashboard{
 
   init(){
     this.generateRooms();
+    this.dragAndDrop.init();
   }
 
   generateRooms(){

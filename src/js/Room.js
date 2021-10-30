@@ -1,9 +1,12 @@
+import DragAndDrop from "./DragAndDrop";
+
 class Room {
   capacity = 4;
   isOpen = true;
   players = [];
   roomBox = "";
   game = "";
+  
 
   constructor(id, name, capacity){
     this.id = id;
@@ -49,13 +52,17 @@ class Room {
   }
 
   initGame(){
+  
     // Quitamos botón de play
 
     // Inicializamos juego
     const gridSize = 20;
     this.game = Game('grid', this.players, gridSize);
     this.game.init();
+
   }
+
+  
 
 
 }
