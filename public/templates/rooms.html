@@ -42,7 +42,7 @@
             <div class="m-user-item">
                 <div class="m-user-item__image">
                   <div class="image">
-                    <div class="a-avatar mod1 drag-item"><i class="fas fa-user"></i></div>
+                    <div class="a-avatar mod1 drag-item" id="avatarMobile" draggable='true'><i class="fas fa-user"></i></div>
                   </div>
                   <p class="small text-center">Please drag<br>to room</p>
                 </div>
@@ -66,7 +66,7 @@
                       </div>
                     </div>
                     <div class="m-room-drop-item__image">
-                      <div class="image drop-item">
+                      <div class="image drop-item" id="itemDrop">
                       
                       </div>
                     </div>
@@ -82,7 +82,7 @@
                       </div>
                     </div>
                     <div class="m-room-drop-item__image">
-                      <div class="image drop-item">
+                      <div class="image drop-item" id="itemDrop">
                       
                       </div>
                     </div>
@@ -98,7 +98,7 @@
                       </div>
                     </div>
                     <div class="m-room-drop-item__image">
-                        <div class="image drop-item">
+                        <div class="image drop-item" id="itemDrop">
                       
                         </div>
                     </div>
@@ -114,7 +114,7 @@
                       </div>
                     </div>
                     <div class="m-room-drop-item__image">
-                      <div class="image drop-item">
+                      <div class="image drop-item" id="itemDrop">
                       
                       </div>
                     </div>
@@ -127,5 +127,58 @@
       </div>
     </div>
   </main>
+  <script>
+    window.addEventListener('load',init);
+    function init(){
+    let avatarMobile = document.querySelector('#a-avatar');
+    avatarMobile.addEventListener('dragstart', dragIniciado, false);
+    avatarMobile-item.addEventListener('dragend', dragFinalizado, false);
+    avatarMobile-item.addEventListener('drag', drageando, false);
+    let contenedor;
+    contenedor = document.querySelector('#m-room-drop-item__image .image');
+    contenedor.addEventListener('dragenter', dragEntraContenedor,false);
+    contenedor.addEventListener('dragover', dragSobreContenedor,false);
+    contenedor.addEventListener('dragleave', dragFueraContenedor,false);
+    contenedor.addEventListener('drop', controlDrop,false);
+    }
+
+    function drageando(ev){
+      ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    function dragIniciado(e){
+      this.style.opacity:0.25;
+      let padre = document.createElement('p');
+      let clon = this.cloneNode(true);
+      padre.appendChild(clon);
+      e.dataTransfer.setData('text',padre.innerHTML);
+    } 
+       
+    function dragFinalizado(e){
+      this.style.opacity:0.25;
+    }
+
+    function dragEntraContenedor(e){
+      //e.preventDefault();
+    }
+
+    function dragSobreContenedor(e){
+      e.preventDefault();
+      this.classList.add('over');
+      return false;
+    }
+
+    function dragFueraContenedor(e){
+      this.classList.remove('over');
+    }
+
+    function controlDrop(e){
+      //recuperar datos usuario de sesionStorage
+      contenedor.appendChild(avatarMobile);
+      let datos = e.dataTransfer.getData('text');
+      this.innerHTML += datos;
+    }
+
+  </script>
 </body>
 </html>
