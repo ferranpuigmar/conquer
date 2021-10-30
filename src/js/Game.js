@@ -128,8 +128,12 @@ class Game
     this.checkOtherPlayerLoss(currentPlayerTurn.id);
 
     // Comprobamos si ha ganado
-    if(this.totalCellsToWin === currentPlayerTurn.cellsConquered || this.players.length == 1){
+    if(this.totalCellsToWin === currentPlayerTurn.cellsConquered){
       console.log(`El jugador ${currentPlayerTurn.name} ha ganado!!!`);
+    }
+
+    if(this.players.length == 1){
+      console.log(`El jugador ${this.players[0].name} ha ganado!!!`);
     }
 
     // cambiamos el turno
@@ -142,7 +146,6 @@ class Game
       let defeated = [];
       otherPlayers.forEach((player) => {
         let aux = true;
-        console.log(player);
           let conqueredCells = this.grid.filter((c)=> c.playerId == player.id);
 
           if(conqueredCells.length > 0){
@@ -160,7 +163,6 @@ class Game
 
       if(defeated.length > 0){
         defeated.forEach((player)=>{
-          console.log(player);
           this.defeatedPlayers.push(player);
           this.players = this.players.filter(oplayer => oplayer.id !== player.id);
         });
