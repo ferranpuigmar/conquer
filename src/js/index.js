@@ -4,6 +4,7 @@ import Room from './Room';
 import Dashboard from './DashBoard';
 import Register from './Register';
 import Login from './Login';
+import CustomHeader from './CustomHeader';
 
 export {
   Game,
@@ -11,5 +12,6 @@ export {
   Room,
   Dashboard,
   Register,
-  Login
+  Login,
+  CustomHeader
 }
