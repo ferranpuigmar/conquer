@@ -337,8 +337,6 @@ class Game
 
     // cambiamos el turno
     this.checkTurn()
-<<<<<<< HEAD
-=======
   }
 
   checkOtherPlayerLoss(currentPlayerId){
@@ -373,7 +371,6 @@ class Game
         return true;
       }
       return false;
->>>>>>> develop
   }
 
   AddConqueredCell(playerId, cellId){
@@ -1092,19 +1089,10 @@ __webpack_require__.r(__webpack_exports__);
   \*************************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-<<<<<<< HEAD
-/* harmony export */   "Game": function() { return /* reexport safe */ _Game__WEBPACK_IMPORTED_MODULE_0__["default"]; },
-/* harmony export */   "Player": function() { return /* reexport safe */ _Player__WEBPACK_IMPORTED_MODULE_1__["default"]; },
-/* harmony export */   "Room": function() { return /* reexport safe */ _Room__WEBPACK_IMPORTED_MODULE_2__["default"]; },
-/* harmony export */   "Dashboard": function() { return /* reexport safe */ _DashBoard__WEBPACK_IMPORTED_MODULE_3__["default"]; },
-/* harmony export */   "Register": function() { return /* reexport safe */ _Register__WEBPACK_IMPORTED_MODULE_4__["default"]; },
-/* harmony export */   "Login": function() { return /* reexport safe */ _Login__WEBPACK_IMPORTED_MODULE_5__["default"]; }
-=======
 /* harmony export */   "Game": () => (/* reexport safe */ _Game__WEBPACK_IMPORTED_MODULE_0__["default"]),
 /* harmony export */   "Player": () => (/* reexport safe */ _Player__WEBPACK_IMPORTED_MODULE_1__["default"]),
 /* harmony export */   "Room": () => (/* reexport safe */ _Room__WEBPACK_IMPORTED_MODULE_2__["default"]),
 /* harmony export */   "Dashboard": () => (/* reexport safe */ _DashBoard__WEBPACK_IMPORTED_MODULE_3__["default"])
->>>>>>> develop
 /* harmony export */ });
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Game */ "./src/js/Game.js");
 /* harmony import */ var _Player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Player */ "./src/js/Player.js");
