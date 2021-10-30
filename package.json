@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack --mode development && node server.js"
+    "dev_m": "webpack --watch & node server.js",
+    "dev_w": "webpack --mode development & node server.js & open http://localhost:3000/",
+    "build": "webpack --mode development & node server.js"
   },
   "keywords": [],
   "author": "",

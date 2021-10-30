@@ -50,7 +50,7 @@ class Game
     this.round = this.getRoundInfo();
   }
 
-  checkValidCellClick (cellObj, currentPlayer){
+  checkValidCellClick (cellObj, id){
     // row de la casilla clickada
     const row = Number(cellObj.row);
     // celda de la casilla clickada
@@ -76,7 +76,7 @@ class Game
       const targetCell = this.grid.find(cell => cell.id === nearCells[i]);
       // Si la celda existe en el gri y además está registrado a nombre del jugador
       // añadimos una celda válida dentro de las posibles celdas adyacentes
-      if(targetCell && targetCell.playerId === currentPlayer.id){
+      if(targetCell && targetCell.playerId === id){
         validClick.push({validCell: true})
       }
     }
@@ -108,7 +108,7 @@ class Game
       // comprobamos si está llena
       isCellFilled = cell.classList.contains('isFilled')
       // comprobamos si el click está en una casilla adjacente que pertenece al jugador
-      isAValidCellClick = this.checkValidCellClick(cellObj, currentPlayerTurn);
+      isAValidCellClick = this.checkValidCellClick(cellObj, currentPlayerTurn.id);
 
       if(isCellFilled || !isAValidCellClick) {
         return
@@ -123,13 +123,51 @@ class Game
     // y registramos la id de la celda como última posición
     this.AddConqueredCell(currentPlayerTurn.id, cellId);
 
+    // Comprobamos que ninguno de los otros jugadores 
+    // ha perdido.
+    this.checkOtherPlayerLoss(currentPlayerTurn.id);
+
     // Comprobamos si ha ganado
-    if(this.totalCellsToWin === currentPlayerTurn.cellsConquered){
-      console.log('El jugador 1 ha ganado!!!')
+    if(this.totalCellsToWin === currentPlayerTurn.cellsConquered || this.players.length == 1){
+      console.log(`El jugador ${currentPlayerTurn.name} ha ganado!!!`);
     }
 
     // cambiamos el turno
     this.checkTurn()
+  }
+
+  checkOtherPlayerLoss(currentPlayerId){
+      console.log(currentPlayerId);
+      let otherPlayers = this.players.filter((o)=> o.id !== currentPlayerId);
+      let defeated = [];
+      otherPlayers.forEach((player) => {
+        let aux = true;
+        console.log(player);
+          let conqueredCells = this.grid.filter((c)=> c.playerId == player.id);
+
+          if(conqueredCells.length > 0){
+            conqueredCells.forEach((cellObj)=>{
+              console.log(cellObj);
+              if(this.checkValidCellClick(cellObj, null)){
+                aux = false;
+              }
+            })
+          }else{
+            aux= false;
+          }
+        if(aux){ defeated.push(player); };
+      });
+
+      if(defeated.length > 0){
+        defeated.forEach((player)=>{
+          console.log(player);
+          this.defeatedPlayers.push(player);
+          this.players = this.players.filter(oplayer => oplayer.id !== player.id);
+        });
+
+        return true;
+      }
+      return false;
   }
 
   AddConqueredCell(playerId, cellId){
@@ -158,6 +196,8 @@ class Game
       let cellId = `cell${ rowCounter }-${ cellCounter }`;
       let cell = document.createElement( 'div' );
       cell.id = cellId;
+      cell.row = rowCounter;
+      cell.cell = cellCounter;
       cell.className = `m-game-grid__cell cell-${rowCounter}-${cellCounter}`;
       cell.dataset.cell = cellCounter;
       cell.dataset.row = rowCounter;
@@ -190,6 +230,8 @@ class Game
       // registamos la id de la casilla en nuestro registro de grid
       this.grid[i-1] = {
         id: cell.id,
+        row: cell.row,
+        cell: cell.cell,
         playerId: null
       }
     }
