@@ -1,5 +1,5 @@
 var Conquer;
-/******/ (() => { // webpackBootstrap
+/******/ (function() { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
@@ -7,13 +7,10 @@ var Conquer;
 /*!*****************************************************!*\
   !*** ./node_modules/uuid/dist/esm-browser/regex.js ***!
   \*****************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (/^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i);
+/* harmony default export */ __webpack_exports__["default"] = (/^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i);
 
 /***/ }),
 
@@ -21,11 +18,11 @@ __webpack_require__.r(__webpack_exports__);
 /*!***************************************************!*\
   !*** ./node_modules/uuid/dist/esm-browser/rng.js ***!
   \***************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ rng)
+/* harmony export */   "default": function() { return /* binding */ rng; }
 /* harmony export */ });
 // Unique ID creation requires a high quality random # generator. In the browser we therefore
 // require the crypto API and do not support built-in fallback to lower quality random number
@@ -53,12 +50,9 @@ function rng() {
 /*!*********************************************************!*\
   !*** ./node_modules/uuid/dist/esm-browser/stringify.js ***!
   \*********************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _validate_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./validate.js */ "./node_modules/uuid/dist/esm-browser/validate.js");
 
 /**
@@ -89,7 +83,7 @@ function stringify(arr) {
   return uuid;
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (stringify);
+/* harmony default export */ __webpack_exports__["default"] = (stringify);
 
 /***/ }),
 
@@ -97,12 +91,9 @@ function stringify(arr) {
 /*!**************************************************!*\
   !*** ./node_modules/uuid/dist/esm-browser/v4.js ***!
   \**************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _rng_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./rng.js */ "./node_modules/uuid/dist/esm-browser/rng.js");
 /* harmony import */ var _stringify_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./stringify.js */ "./node_modules/uuid/dist/esm-browser/stringify.js");
 
@@ -128,7 +119,7 @@ function v4(options, buf, offset) {
   return (0,_stringify_js__WEBPACK_IMPORTED_MODULE_1__["default"])(rnds);
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (v4);
+/* harmony default export */ __webpack_exports__["default"] = (v4);
 
 /***/ }),
 
@@ -136,12 +127,9 @@ function v4(options, buf, offset) {
 /*!********************************************************!*\
   !*** ./node_modules/uuid/dist/esm-browser/validate.js ***!
   \********************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _regex_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./regex.js */ "./node_modules/uuid/dist/esm-browser/regex.js");
 
 
@@ -149,7 +137,7 @@ function validate(uuid) {
   return typeof uuid === 'string' && _regex_js__WEBPACK_IMPORTED_MODULE_0__["default"].test(uuid);
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (validate);
+/* harmony default export */ __webpack_exports__["default"] = (validate);
 
 /***/ }),
 
@@ -157,12 +145,9 @@ function validate(uuid) {
 /*!*****************************!*\
   !*** ./src/js/DashBoard.js ***!
   \*****************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _DragAndDrop__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DragAndDrop */ "./src/js/DragAndDrop.js");
 /* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
@@ -207,30 +192,31 @@ class Dashboard {
       boxDivHeader.innerHTML = title;
     });
 
-<<<<<<< HEAD
-      nameDiv.innerText         = player.name;
-      roomDiv.innerText         = roomName;
-      avatarDiv.dataset.id      = player.id;
-      avatarDiv.dataset.avatar  = player.avatar;
-      avatarDiv.dataset.color   = player.color;
-=======
-    // Generamos localStorage inicial para las rooms
-    const roomDataToStorage = this.rooms.map((room) => ({
-      id: room.id,
-      userRooms: [],
-      game: {
-        grid: [],
-        players: [],
-        defeatedPlaters: [],
-        totalCellsToWin: 0,
-        round: {
-          turn: 0,
-          roundNumber: 0,
-          player: null,
+    this.generateStorageRooms();
+  }
+
+  generateStorageRooms() {
+    // Comprobamos si ya hay rooms en el LocalStorage
+    const existRooms = this.localStorage.getLocalStorage("rooms");
+    if (!existRooms) {
+      // Generamos localStorage inicial para las rooms
+      const roomDataToStorage = this.rooms.map((room) => ({
+        id: room.id,
+        userRooms: [],
+        game: {
+          grid: [],
+          players: [],
+          defeatedPlaters: [],
+          totalCellsToWin: 0,
+          round: {
+            turn: 0,
+            roundNumber: 0,
+            player: null,
+          },
         },
-      },
-    }));
-    this.localStorage.setLocalStorage("rooms", roomDataToStorage);
+      }));
+      this.localStorage.setLocalStorage("rooms", roomDataToStorage);
+    }
 
     //Temporal, añadimos user a la priemra sala
     const currentUserData = this.localStorage.getLocalStorage("me", "session");
@@ -254,7 +240,6 @@ class Dashboard {
       avatarDiv.dataset.id = player.id;
       avatarDiv.dataset.avatar = player.avatar;
       avatarDiv.dataset.color = player.color;
->>>>>>> c6c62664e2d9a186fd3e8e81fcb10522fe62cc49
       avatarDiv.classList.add(player.avatar);
 
       if (this.isPlayerInRooms(player)) {
@@ -289,7 +274,7 @@ class Dashboard {
   }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Dashboard);
+/* harmony default export */ __webpack_exports__["default"] = (Dashboard);
 
 
 /***/ }),
@@ -298,12 +283,9 @@ class Dashboard {
 /*!*******************************!*\
   !*** ./src/js/DragAndDrop.js ***!
   \*******************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 class DragAndDrop {
   drageando(ev) {
     console.log("c");
@@ -361,7 +343,7 @@ class DragAndDrop {
   }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (DragAndDrop);
+/* harmony default export */ __webpack_exports__["default"] = (DragAndDrop);
 
 
 /***/ }),
@@ -370,12 +352,9 @@ class DragAndDrop {
 /*!************************!*\
   !*** ./src/js/Game.js ***!
   \************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 class Game
 {
   colors = [ 'red', 'blue', 'green', 'brown' ];
@@ -647,7 +626,7 @@ class Game
   }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Game);
+/* harmony default export */ __webpack_exports__["default"] = (Game);
 
 /***/ }),
 
@@ -655,12 +634,9 @@ class Game
 /*!*************************!*\
   !*** ./src/js/Login.js ***!
   \*************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
 
@@ -826,7 +802,7 @@ class Login {
   }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Login);
+/* harmony default export */ __webpack_exports__["default"] = (Login);
 
 
 /***/ }),
@@ -835,12 +811,9 @@ class Login {
 /*!**************************!*\
   !*** ./src/js/Player.js ***!
   \**************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 class Player {
   constructor(
     id,
@@ -861,7 +834,7 @@ class Player {
   }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Player);
+/* harmony default export */ __webpack_exports__["default"] = (Player);
 
 /***/ }),
 
@@ -869,12 +842,9 @@ class Player {
 /*!****************************!*\
   !*** ./src/js/Register.js ***!
   \****************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 /* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! uuid */ "./node_modules/uuid/dist/esm-browser/v4.js");
 
@@ -1155,7 +1125,7 @@ class Register {
   }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Register);
+/* harmony default export */ __webpack_exports__["default"] = (Register);
 
 
 /***/ }),
@@ -1164,18 +1134,13 @@ class Register {
 /*!************************!*\
   !*** ./src/js/Room.js ***!
   \************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-<<<<<<< HEAD
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _DragAndDrop__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DragAndDrop */ "./src/js/DragAndDrop.js");
-=======
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/js/constants.js");
-/* harmony import */ var _Player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Player */ "./src/js/Player.js");
->>>>>>> c6c62664e2d9a186fd3e8e81fcb10522fe62cc49
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
+/* harmony import */ var _Player__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Player */ "./src/js/Player.js");
+
 
 
 class Room {
@@ -1184,6 +1149,7 @@ class Room {
   players = [];
   roomBox = "";
   game = "";
+  storage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
 
   constructor(id, name, capacity) {
     this.id = id;
@@ -1208,12 +1174,34 @@ class Room {
   }
 
   addToRoom(user) {
+    //! Esto se tiene que poner dentro del forEach línea 44 para actualizar
+    //! la class Room a lo que tenga el localStorage de esta room
     // Creamos jugador que recoge los datos del usuario arrastrado
-    const draggedPlayer = new _Player__WEBPACK_IMPORTED_MODULE_1__["default"](user.id, user.name, user.avatar);
+    const draggedPlayer = new _Player__WEBPACK_IMPORTED_MODULE_2__["default"](user.id, user.name, user.avatar);
     this.players.push(draggedPlayer);
 
-    // Mostrar mensaje que se ha añadido un nuevo jugador
-    this.showRoomMessage(_constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.CONNECTED_TO_ROOM, user);
+    // Añadir jugador al LocalStorage rooms, en userRooms
+    const currentRoomId = this.id;
+    const rooms = this.storage.getLocalStorage("rooms");
+
+    rooms.forEach((room) => {
+      if (room.id === currentRoomId) {
+        // Añadimos el usuario al array de userRooms de la sala que corresponde
+        // siempre y cuando que no estuviese conectado
+        const existUser = room.userRooms.find(
+          (userRoom) => userRoom.id === user.id
+        );
+        !existUser && room.userRooms.push(user);
+
+        // Modificamos contador jugadores caja
+        const roomBoxDiv = document.getElementById(this.id);
+        roomBoxDiv.querySelector(".m-room-drop-item__total span").innerHTML =
+          room.userRooms.length;
+      }
+    });
+
+    // Añadimos rooms actualizado al localStorage
+    this.storage.setLocalStorage("rooms", rooms);
 
     if (this.players > 1) {
       // Mostrar posibilidad de empezar a jugar
@@ -1222,7 +1210,7 @@ class Room {
 
   showRoomMessage(type, user) {
     let message;
-    const messageDiv = document.querySelector("#roomMessage h3");
+    const messageDiv = document.querySelector("#roomMessage");
     switch (type) {
       case _constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.CONNECTED_TO_ROOM:
         message = `El usuario ${user.name} se ha conectado a esta sala`;
@@ -1230,7 +1218,12 @@ class Room {
       default:
         return "";
     }
-    messageDiv.innerHTML = message;
+
+    const messageContentDiv = `<div class="alert alert-info alert-dismissible fade show" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <span id="roomMessageContent">${message}</span>
+              </div>`;
+    messageDiv.innerHTML = messageContentDiv;
   }
 
   disableRoom(id) {
@@ -1243,10 +1236,11 @@ class Room {
   }
 
   initStorageEvents() {
-    window.addEventListener("storage", () => {
+    window.addEventListener("storage", (e) => {
       // When local storage changes, dump the list to
       // the console.
-      console.log(JSON.parse(window.localStorage.getItem("rooms")));
+      // console.log("e: ", e);
+      // console.log(JSON.parse(window.localStorage.getItem("rooms")));
     });
   }
 
@@ -1260,7 +1254,7 @@ class Room {
   }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Room);
+/* harmony default export */ __webpack_exports__["default"] = (Room);
 
 
 /***/ }),
@@ -1287,11 +1281,11 @@ const MESSAGE_TYPES = {
 /*!*************************!*\
   !*** ./src/js/utils.js ***!
   \*************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ LocalStorage)
+/* harmony export */   "default": function() { return /* binding */ LocalStorage; }
 /* harmony export */ });
 class LocalStorage {
   localStorage = window.localStorage;
@@ -1350,37 +1344,37 @@ class LocalStorage {
 /******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
+/******/ 	!function() {
 /******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 		__webpack_require__.d = function(exports, definition) {
 /******/ 			for(var key in definition) {
 /******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
 /******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
 /******/ 				}
 /******/ 			}
 /******/ 		};
-/******/ 	})();
+/******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
+/******/ 	!function() {
+/******/ 		__webpack_require__.o = function(obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
+/******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
+/******/ 	!function() {
 /******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
+/******/ 		__webpack_require__.r = function(exports) {
 /******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
 /******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 /******/ 			}
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
-/******/ 	})();
+/******/ 	}();
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other entry modules.
-(() => {
+!function() {
 var __webpack_exports__ = {};
 /*!*****************************!*\
   !*** ./src/sass/style.scss ***!
@@ -1388,21 +1382,20 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 // extracted by mini-css-extract-plugin
 
-})();
-
+}();
 // This entry need to be wrapped in an IIFE because it need to be isolated against other entry modules.
-(() => {
+!function() {
 /*!*************************!*\
   !*** ./src/js/index.js ***!
   \*************************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Game": () => (/* reexport safe */ _Game__WEBPACK_IMPORTED_MODULE_0__["default"]),
-/* harmony export */   "Player": () => (/* reexport safe */ _Player__WEBPACK_IMPORTED_MODULE_1__["default"]),
-/* harmony export */   "Room": () => (/* reexport safe */ _Room__WEBPACK_IMPORTED_MODULE_2__["default"]),
-/* harmony export */   "Dashboard": () => (/* reexport safe */ _DashBoard__WEBPACK_IMPORTED_MODULE_3__["default"]),
-/* harmony export */   "Register": () => (/* reexport safe */ _Register__WEBPACK_IMPORTED_MODULE_4__["default"]),
-/* harmony export */   "Login": () => (/* reexport safe */ _Login__WEBPACK_IMPORTED_MODULE_5__["default"])
+/* harmony export */   "Game": function() { return /* reexport safe */ _Game__WEBPACK_IMPORTED_MODULE_0__["default"]; },
+/* harmony export */   "Player": function() { return /* reexport safe */ _Player__WEBPACK_IMPORTED_MODULE_1__["default"]; },
+/* harmony export */   "Room": function() { return /* reexport safe */ _Room__WEBPACK_IMPORTED_MODULE_2__["default"]; },
+/* harmony export */   "Dashboard": function() { return /* reexport safe */ _DashBoard__WEBPACK_IMPORTED_MODULE_3__["default"]; },
+/* harmony export */   "Register": function() { return /* reexport safe */ _Register__WEBPACK_IMPORTED_MODULE_4__["default"]; },
+/* harmony export */   "Login": function() { return /* reexport safe */ _Login__WEBPACK_IMPORTED_MODULE_5__["default"]; }
 /* harmony export */ });
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Game */ "./src/js/Game.js");
 /* harmony import */ var _Player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Player */ "./src/js/Player.js");
@@ -1418,8 +1411,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-})();
-
+}();
 Conquer = __webpack_exports__;
 /******/ })()
 ;

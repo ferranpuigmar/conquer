@@ -104,44 +104,54 @@
   }
 }
 
-.m-game-grid {
-  display: flex;
-  flex-flow: column;
-  width: auto;
+.m-game {
+  position: relative;
 
-  .m-game-grid__row {
-    display: flex;
-    height: 30px;
+  &--preparing-game {
+    width: 100%;
+    height: calc(20px * 30);
+    background-color: $gray-100;
+    border: 1px solid $gray-500;
+    border-radius: 5px;
   }
 
-  .m-game-grid__cell {
-    background-color: grey;
-    height: 100%;
-    width: 100%;
-    border: 2px solid white;
-    cursor: pointer;
+  &-message {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 
-    &.isFilled {
-      pointer-events: none;
+  &-grid {
+    display: flex;
+    flex-flow: column;
+    width: auto;
+
+    .m-game-grid__row {
+      display: flex;
+      height: 30px;
     }
-    &__image {
-      .image {
-        margin: 3px auto;
-        width: 52px;
-        height: 52px;
-        border-radius: 50%;
-        background-color: $white;
-        border: 1px solid $gray-700;
-        transition: all 0.4s;
+
+    .m-game-grid__cell {
+      background-color: grey;
+      height: 100%;
+      width: 100%;
+      border: 2px solid white;
+      cursor: pointer;
+
+      &.isFilled {
+        pointer-events: none;
+      }
+      &__image {
+        .image {
+          margin: 3px auto;
+          width: 52px;
+          height: 52px;
+          border-radius: 50%;
+          background-color: $white;
+          border: 1px solid $gray-700;
+          transition: all 0.4s;
+        }
       }
     }
   }
-}
-
-.m-game-intro {
-  width: 100%;
-  height: calc(20px * 30);
-  background-color: $gray-100;
-  border: 1px solid $gray-500;
-  border-radius: 5px;
 }

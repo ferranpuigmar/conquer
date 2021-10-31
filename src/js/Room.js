@@ -1,4 +1,5 @@
 import { MESSAGE_TYPES } from "./constants";
+import LocalStorage from "./utils";
 import Player from "./Player";
 class Room {
   capacity = 4;
@@ -6,6 +7,7 @@ class Room {
   players = [];
   roomBox = "";
   game = "";
+  storage = new LocalStorage();
 
   constructor(id, name, capacity) {
     this.id = id;
@@ -30,12 +32,34 @@ class Room {
   }
 
   addToRoom(user) {
+    //! Esto se tiene que poner dentro del forEach línea 44 para actualizar
+    //! la class Room a lo que tenga el localStorage de esta room
     // Creamos jugador que recoge los datos del usuario arrastrado
     const draggedPlayer = new Player(user.id, user.name, user.avatar);
     this.players.push(draggedPlayer);
 
-    // Mostrar mensaje que se ha añadido un nuevo jugador
-    this.showRoomMessage(MESSAGE_TYPES.CONNECTED_TO_ROOM, user);
+    // Añadir jugador al LocalStorage rooms, en userRooms
+    const currentRoomId = this.id;
+    const rooms = this.storage.getLocalStorage("rooms");
+
+    rooms.forEach((room) => {
+      if (room.id === currentRoomId) {
+        // Añadimos el usuario al array de userRooms de la sala que corresponde
+        // siempre y cuando que no estuviese conectado
+        const existUser = room.userRooms.find(
+          (userRoom) => userRoom.id === user.id
+        );
+        !existUser && room.userRooms.push(user);
+
+        // Modificamos contador jugadores caja
+        const roomBoxDiv = document.getElementById(this.id);
+        roomBoxDiv.querySelector(".m-room-drop-item__total span").innerHTML =
+          room.userRooms.length;
+      }
+    });
+
+    // Añadimos rooms actualizado al localStorage
+    this.storage.setLocalStorage("rooms", rooms);
 
     if (this.players > 1) {
       // Mostrar posibilidad de empezar a jugar
@@ -44,7 +68,7 @@ class Room {
 
   showRoomMessage(type, user) {
     let message;
-    const messageDiv = document.querySelector("#roomMessage h3");
+    const messageDiv = document.querySelector("#roomMessage");
     switch (type) {
       case MESSAGE_TYPES.CONNECTED_TO_ROOM:
         message = `El usuario ${user.name} se ha conectado a esta sala`;
@@ -52,7 +76,12 @@ class Room {
       default:
         return "";
     }
-    messageDiv.innerHTML = message;
+
+    const messageContentDiv = `<div class="alert alert-info alert-dismissible fade show" role="alert">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <span id="roomMessageContent">${message}</span>
+              </div>`;
+    messageDiv.innerHTML = messageContentDiv;
   }
 
   disableRoom(id) {
@@ -65,10 +94,11 @@ class Room {
   }
 
   initStorageEvents() {
-    window.addEventListener("storage", () => {
+    window.addEventListener("storage", (e) => {
       // When local storage changes, dump the list to
       // the console.
-      console.log(JSON.parse(window.localStorage.getItem("rooms")));
+      // console.log("e: ", e);
+      // console.log(JSON.parse(window.localStorage.getItem("rooms")));
     });
   }
 

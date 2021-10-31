@@ -11296,6 +11296,21 @@ textarea.form-control-lg {
   transform: translateX(-19px);
 }
 
+.m-game {
+  position: relative;
+}
+.m-game--preparing-game {
+  width: 100%;
+  height: 600px;
+  background-color: #f8f9fa;
+  border: 1px solid #adb5bd;
+  border-radius: 5px;
+}
+.m-game-message {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 .m-game-grid {
   display: flex;
   flex-flow: column;
@@ -11323,14 +11338,6 @@ textarea.form-control-lg {
   background-color: #fff;
   border: 1px solid #495057;
   transition: all 0.4s;
-}
-
-.m-game-intro {
-  width: 100%;
-  height: 600px;
-  background-color: #f8f9fa;
-  border: 1px solid #adb5bd;
-  border-radius: 5px;
 }
 
 /*# sourceMappingURL=style.css.map*/

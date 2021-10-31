@@ -39,23 +39,31 @@ class Dashboard {
       boxDivHeader.innerHTML = title;
     });
 
-    // Generamos localStorage inicial para las rooms
-    const roomDataToStorage = this.rooms.map((room) => ({
-      id: room.id,
-      userRooms: [],
-      game: {
-        grid: [],
-        players: [],
-        defeatedPlaters: [],
-        totalCellsToWin: 0,
-        round: {
-          turn: 0,
-          roundNumber: 0,
-          player: null,
+    this.generateStorageRooms();
+  }
+
+  generateStorageRooms() {
+    // Comprobamos si ya hay rooms en el LocalStorage
+    const existRooms = this.localStorage.getLocalStorage("rooms");
+    if (!existRooms) {
+      // Generamos localStorage inicial para las rooms
+      const roomDataToStorage = this.rooms.map((room) => ({
+        id: room.id,
+        userRooms: [],
+        game: {
+          grid: [],
+          players: [],
+          defeatedPlaters: [],
+          totalCellsToWin: 0,
+          round: {
+            turn: 0,
+            roundNumber: 0,
+            player: null,
+          },
         },
-      },
-    }));
-    this.localStorage.setLocalStorage("rooms", roomDataToStorage);
+      }));
+      this.localStorage.setLocalStorage("rooms", roomDataToStorage);
+    }
 
     //Temporal, añadimos user a la priemra sala
     const currentUserData = this.localStorage.getLocalStorage("me", "session");
