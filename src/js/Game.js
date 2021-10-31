@@ -141,7 +141,6 @@ class Game
   }
 
   checkOtherPlayerLoss(currentPlayerId){
-      console.log(currentPlayerId);
       let otherPlayers = this.players.filter((o)=> o.id !== currentPlayerId);
       let defeated = [];
       otherPlayers.forEach((player) => {
@@ -165,6 +164,7 @@ class Game
         defeated.forEach((player)=>{
           this.defeatedPlayers.push(player);
           this.players = this.players.filter(oplayer => oplayer.id !== player.id);
+          console.log(`El jugador ${player.name} ha perdido!!!`);
         });
 
         return true;
