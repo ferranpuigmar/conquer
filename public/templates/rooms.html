@@ -31,11 +31,13 @@
       <div class="row">
         <div class="col-lg-8">
           <section class="my-3">
-            <div class="card"></div>
-          </section>
-          <section class="my-3">
-            <div id="roundTitle" class="m-game-round-title">
-              <h3>Round 1</h3>
+            <div id="roundTitle" class="m-game-round-title d-none">
+              <h3></h3>
+            </div>
+            <div class="m-game-intro">
+              <div id="roomMessage">
+                <h3></h3>
+              </div>
             </div>
             <div id="grid" class="m-game-grid"></div>
           </section>
@@ -65,12 +67,10 @@
                       <h3 class="m-room-drop-item__name">ROOM 1</h3>
                       <div class="m-room-drop-item__total">
                         <p><span class="total">0</span>J</p>
-                        
                       </div>
                     </div>
                     <div class="m-room-drop-item__image">
                       <div class="image drop-item" id="itemDrop">
-                      
                       </div>
                     </div>
                   </article>
@@ -81,12 +81,10 @@
                       <h3 class="m-room-drop-item__name">ROOM 2</h3>
                       <div class="m-room-drop-item__total">
                         <p><span class="total">0</span>J</p>
-                        
                       </div>
                     </div>
                     <div class="m-room-drop-item__image">
                       <div class="image drop-item" id="itemDrop">
-                      
                       </div>
                     </div>
                   </article>
@@ -102,7 +100,6 @@
                     </div>
                     <div class="m-room-drop-item__image">
                         <div class="image drop-item" id="itemDrop">
-                      
                         </div>
                     </div>
                   </article>
@@ -134,21 +131,14 @@
   <script>
     const dashBoardInitData = {
       boxRooms: [
-        {id: 'red-room-box'}, 
-        {id: 'blue-room-box'}, 
+        {id: 'red-room-box'},
+        {id: 'blue-room-box'},
         {id: 'green-room-box'},
         {id: 'orange-room-box'}
       ]
     }
     const dasboard = new Conquer.Dashboard(dashBoardInitData);
     dasboard.init()
-
-    const player1 = new Conquer.Player(21312312, 'Peter', 'avatar-red');
-    const player2 = new Conquer.Player(123123123, 'John', 'avatar-green');
-    const players = [player1, player2];
-    const gridSize = 20;
-    const game = new Conquer.Game('grid', players, gridSize);
-    game.init();
 
   </script>
 </body>
