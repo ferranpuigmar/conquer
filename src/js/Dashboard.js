@@ -49,7 +49,7 @@ class Dashboard {
       const roomDiv   = boxDiv.querySelector('.m-user-item__room');
       const roomName  = this.getRoomName(player.favouriteRoom);
 
-      nameDiv.innerText         = player.email;
+      nameDiv.innerText         = player.name;
       roomDiv.innerText         = roomName;
       avatarDiv.dataset.id      = player.id;
       avatarDiv.dataset.avatar  = player.avatar;
