@@ -92,6 +92,7 @@ class Login {
   }
 
   init() {
+    this.redirectToRooms();
     this.registerLoginFields();
     this.assignListeners();
   }
@@ -122,6 +123,13 @@ class Login {
     const messageElement = document.getElementById("errorMessage");
     messageElement.innerHTML = message;
     messageElement.classList.remove("d-none");
+  }
+
+  redirectToRooms(){
+    let user = this.local.getLocalStorage("me", "session");
+    if(user){
+      window.location.href = "/rooms";
+    }
   }
 
   send(e) {

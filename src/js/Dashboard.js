@@ -12,8 +12,10 @@ class Dashboard {
   }
 
   init() {
+    this.redirectToLogin();
     this.generateRooms();
     this.generatePlayerBox();
+    this.generateLogout();
     this.dragAndDrop.init();
   }
 
@@ -92,6 +94,17 @@ class Dashboard {
     }
   }
 
+  generateLogout(){
+      const logoutBtn = document.getElementById('logout');
+      const player = this.localStorage.getLocalStorage("me", "session");
+
+      logoutBtn.addEventListener('click', function(){
+          this.rooms.takeOutFromRoom(player);
+          this.localStorage.setLocalStorage("me", null, "session");
+          this.redirectToLogin();
+      });
+  }
+
   isPlayerInRooms(player) {
     let allPlayers = [];
     this.rooms.forEach((room) => {
@@ -101,16 +114,23 @@ class Dashboard {
   }
 
   getRoomName(id) {
-    var index = -1;
-    var room = this.boxRooms.find(function (item, i) {
+    let index = -1;
+    this.boxRooms.find(function (item, i) {
       if (item.id === id) {
         index = i;
         return i;
       }
     });
-    console.log(room, index);
     return "ROOM " + (index + 1);
   }
+
+  redirectToLogin(){
+    let user = this.localStorage.getLocalStorage("me", "session");
+    if(!user){
+      window.location.href = "/";
+    }
+  }
+
 }
 
 export default Dashboard;

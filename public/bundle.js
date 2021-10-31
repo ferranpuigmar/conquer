@@ -180,8 +180,10 @@ class Dashboard {
   }
 
   init() {
+    this.redirectToLogin();
     this.generateRooms();
     this.generatePlayerBox();
+    this.generateLogout();
     this.dragAndDrop.init();
   }
 
@@ -260,6 +262,19 @@ class Dashboard {
     }
   }
 
+  generateLogout(){
+      const logoutBtn = document.getElementById('logout');
+      const player = this.localStorage.getLocalStorage("me", "session");
+
+      logoutBtn.addEventListener('click', function(){
+          this.rooms.takeout(player);
+      });
+
+      this.localStorage.setLocalStorage("me", null, "session");
+
+      this.redirectToLogin();
+  }
+
   isPlayerInRooms(player) {
     let allPlayers = [];
     this.rooms.forEach((room) => {
@@ -269,16 +284,23 @@ class Dashboard {
   }
 
   getRoomName(id) {
-    var index = -1;
-    var room = this.boxRooms.find(function (item, i) {
+    let index = -1;
+    this.boxRooms.find(function (item, i) {
       if (item.id === id) {
         index = i;
         return i;
       }
     });
-    console.log(room, index);
     return "ROOM " + (index + 1);
   }
+
+  redirectToLogin(){
+    let user = this.localStorage.getLocalStorage("me", "session");
+    if(!user){
+      window.location.href = "/";
+    }
+  }
+
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Dashboard);
@@ -370,7 +392,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 class Game
 {
-  colors = [ 'red', 'blue', 'green', 'brown' ];
+  colors = [ 'Purple', 'Aquamarine', 'CadetBlue', 'DeepPink' ];
   grid = []
   defeatedPlayers = [];
   wrapper = "";
@@ -519,7 +541,6 @@ class Game
 
           if(conqueredCells.length > 0){
             conqueredCells.forEach((cellObj)=>{
-              console.log(cellObj);
               if(this.checkValidCellClick(cellObj, null)){
                 aux = false;
               }
@@ -532,11 +553,8 @@ class Game
 
       if(defeated.length > 0){
         defeated.forEach((player)=>{
-          this.defeatedPlayers.push(player);
-          this.players = this.players.filter(oplayer => oplayer.id !== player.id);
-          console.log(`El jugador ${player.name} ha perdido!!!`);
+          this.defeatPlayer(player);
         });
-
         return true;
       }
       return false;
@@ -554,6 +572,19 @@ class Game
         cell.playerId = this.round.player.id
       }
     })
+  }
+
+  defeatPlayer(player){
+    this.defeatedPlayers.push(player);
+    this.players = this.players.filter(oplayer => oplayer.id !== player.id);
+    console.log(`El jugador ${player.name} ha perdido!!!`);
+  }
+
+  takeOutFromGame(player){
+    let is_in = this.players.find(current_player => current_player.id === player.id);
+    if(!is_in){
+      this.defeatPlayer(player);
+    }
   }
 
   createDomGrid ()
@@ -748,6 +779,7 @@ class Login {
   }
 
   init() {
+    this.redirectToRooms();
     this.registerLoginFields();
     this.assignListeners();
   }
@@ -778,6 +810,13 @@ class Login {
     const messageElement = document.getElementById("errorMessage");
     messageElement.innerHTML = message;
     messageElement.classList.remove("d-none");
+  }
+
+  redirectToRooms(){
+    let user = this.local.getLocalStorage("me", "session");
+    if(user){
+      window.location.href = "/rooms";
+    }
   }
 
   send(e) {
@@ -1055,6 +1094,7 @@ class Register {
   }
 
   init() {
+    this.redirectToRooms();
     this.assignListeners();
     this.registerFields();
   }
@@ -1145,6 +1185,13 @@ class Register {
     // Evento para enviar la información al localStorage, al apartado de usuaros registrados
     this.saveUser(data);
   }
+
+  redirectToRooms(){
+    let user = this.local.getLocalStorage("me", "session");
+    if(user){
+      window.location.href = "/rooms";
+    }
+  }
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Register);
@@ -1228,6 +1275,13 @@ class Room {
 
   getPlayers() {
     return players;
+  }
+
+  takeOutFromRoom(player){
+      let is_in = this.players.find((room_player)=> room_player.id === player.id);
+      if(!!is_in){
+        this.Game.takeOutFromGame(player);
+      }
   }
 
   initStorageEvents() {

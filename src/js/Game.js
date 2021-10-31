@@ -1,6 +1,6 @@
 class Game
 {
-  colors = [ 'red', 'blue', 'green', 'brown' ];
+  colors = [ 'Purple', 'Aquamarine', 'CadetBlue', 'DeepPink' ];
   grid = []
   defeatedPlayers = [];
   wrapper = "";
@@ -149,7 +149,6 @@ class Game
 
           if(conqueredCells.length > 0){
             conqueredCells.forEach((cellObj)=>{
-              console.log(cellObj);
               if(this.checkValidCellClick(cellObj, null)){
                 aux = false;
               }
@@ -162,11 +161,8 @@ class Game
 
       if(defeated.length > 0){
         defeated.forEach((player)=>{
-          this.defeatedPlayers.push(player);
-          this.players = this.players.filter(oplayer => oplayer.id !== player.id);
-          console.log(`El jugador ${player.name} ha perdido!!!`);
+          this.defeatPlayer(player);
         });
-
         return true;
       }
       return false;
@@ -184,6 +180,19 @@ class Game
         cell.playerId = this.round.player.id
       }
     })
+  }
+
+  defeatPlayer(player){
+    this.defeatedPlayers.push(player);
+    this.players = this.players.filter(oplayer => oplayer.id !== player.id);
+    console.log(`El jugador ${player.name} ha perdido!!!`);
+  }
+
+  takeOutFromGame(player){
+    let is_in = this.players.find(current_player => current_player.id === player.id);
+    if(!is_in){
+      this.defeatPlayer(player);
+    }
   }
 
   createDomGrid ()

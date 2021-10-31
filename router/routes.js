@@ -6,7 +6,7 @@ const templatesRoute = 'public/templates';
 exports.renderHome = ( res, req ) =>
 {
   res.setHeader( 'Content-Type', HTML_CONTENT_TYPE );
-  fs.readFile( `${ __dirname }/../${ templatesRoute }/index.html`, ( err, data ) =>
+  fs.readFile( `${ __dirname }/../${ templatesRoute }/login.html`, ( err, data ) =>
   {
     if ( err ) {
       const msgError = "Error en la carga del index.html"

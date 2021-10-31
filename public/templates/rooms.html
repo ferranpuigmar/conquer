@@ -19,7 +19,7 @@
         <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
           <ul class="navbar-nav  mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/login">Log Out</a>
+              <a class="nav-link active" id="logout" aria-current="page">Log Out</a>
             </li>
           </ul>
         </div>
@@ -139,6 +139,13 @@
     }
     const dasboard = new Conquer.Dashboard(dashBoardInitData);
     dasboard.init()
+
+    const player1 = new Conquer.Player(21312312, 'Peter', 'avatar-red');
+    const player2 = new Conquer.Player(123123123, 'John', 'avatar-green');
+    const players = [player1, player2];
+    const gridSize = 20;
+    const game = new Conquer.Game('grid', players, gridSize);
+    game.init();
 
   </script>
 </body>
