@@ -11321,4 +11321,12 @@ textarea.form-control-lg {
   transition: all 0.4s;
 }
 
+.m-game-intro {
+  width: 100%;
+  height: 600px;
+  background-color: #f8f9fa;
+  border: 1px solid #adb5bd;
+  border-radius: 5px;
+}
+
 /*# sourceMappingURL=style.css.map*/

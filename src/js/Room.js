@@ -1,5 +1,5 @@
-import DragAndDrop from "./DragAndDrop";
-
+import { MESSAGE_TYPES } from "./constants";
+import Player from "./Player";
 class Room {
   capacity = 4;
   isOpen = true;
@@ -33,11 +33,26 @@ class Room {
     // Creamos jugador que recoge los datos del usuario arrastrado
     const draggedPlayer = new Player(user.id, user.name, user.avatar);
     this.players.push(draggedPlayer);
+
     // Mostrar mensaje que se ha añadido un nuevo jugador
+    this.showRoomMessage(MESSAGE_TYPES.CONNECTED_TO_ROOM, user);
 
     if (this.players > 1) {
       // Mostrar posibilidad de empezar a jugar
     }
+  }
+
+  showRoomMessage(type, user) {
+    let message;
+    const messageDiv = document.querySelector("#roomMessage h3");
+    switch (type) {
+      case MESSAGE_TYPES.CONNECTED_TO_ROOM:
+        message = `El usuario ${user.name} se ha conectado a esta sala`;
+        break;
+      default:
+        return "";
+    }
+    messageDiv.innerHTML = message;
   }
 
   disableRoom(id) {
@@ -47,6 +62,14 @@ class Room {
 
   getPlayers() {
     return players;
+  }
+
+  initStorageEvents() {
+    window.addEventListener("storage", () => {
+      // When local storage changes, dump the list to
+      // the console.
+      console.log(JSON.parse(window.localStorage.getItem("rooms")));
+    });
   }
 
   initGame() {

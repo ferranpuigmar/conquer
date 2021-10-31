@@ -5,7 +5,7 @@ import LocalStorage from "./utils";
 class Dashboard {
   rooms = [];
   dragAndDrop = new DragAndDrop();
-  local = new LocalStorage();
+  localStorage = new LocalStorage();
 
   constructor(initData) {
     this.boxRooms = initData.boxRooms;
@@ -20,6 +20,8 @@ class Dashboard {
     this.boxRooms.forEach((box, index) => {
       // Generamos las instancias de las salas
       this.rooms[index] = new Room(box.id, `Room${index}`, 4);
+      // Iniciamos listeners para eventos del tipo storage
+      this.rooms[index].initStorageEvents();
 
       const boxDiv = document.getElementById(box.id);
 
@@ -35,6 +37,29 @@ class Dashboard {
       );
       boxDivHeader.innerHTML = title;
     });
+
+    // Generamos localStorage inicial para las rooms
+    const roomDataToStorage = this.rooms.map((room) => ({
+      id: room.id,
+      userRooms: [],
+      game: {
+        grid: [],
+        players: [],
+        defeatedPlaters: [],
+        totalCellsToWin: 0,
+        round: {
+          turn: 0,
+          roundNumber: 0,
+          player: null,
+        },
+      },
+    }));
+    this.localStorage.setLocalStorage("rooms", roomDataToStorage);
+
+    //Temporal, añadimos user a la priemra sala
+    const currentUserData = this.localStorage.getLocalStorage("me", "session");
+    const currentRoom = this.rooms[0];
+    currentRoom.addToRoom(currentUserData);
   }
 
   generatePlayerBox() {
