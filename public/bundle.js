@@ -173,7 +173,7 @@ __webpack_require__.r(__webpack_exports__);
 class Dashboard {
   rooms = [];
   dragAndDrop = new _DragAndDrop__WEBPACK_IMPORTED_MODULE_0__["default"]();
-  local = new _utils__WEBPACK_IMPORTED_MODULE_2__["default"]();
+  localStorage = new _utils__WEBPACK_IMPORTED_MODULE_2__["default"]();
 
   constructor(initData) {
     this.boxRooms = initData.boxRooms;
@@ -189,6 +189,8 @@ class Dashboard {
     this.boxRooms.forEach((box, index) => {
       // Generamos las instancias de las salas
       this.rooms[index] = new _Room__WEBPACK_IMPORTED_MODULE_1__["default"](box.id, `Room${index}`, 4);
+      // Iniciamos listeners para eventos del tipo storage
+      this.rooms[index].initStorageEvents();
 
       const boxDiv = document.getElementById(box.id);
 
@@ -204,51 +206,86 @@ class Dashboard {
       );
       boxDivHeader.innerHTML = title;
     });
-  }
 
-  generatePlayerBox(){
-    const data = this.local.getLocalStorage('me','session');
-
-    if(data){
-      const player    = data;
-      const boxDiv    = document.getElementById('my-user-box');
-      const avatarDiv = boxDiv.querySelector('.a-avatar');
-      const nameDiv   = boxDiv.querySelector('.m-user-item__name');
-      const roomDiv   = boxDiv.querySelector('.m-user-item__room');
-      const roomName  = this.getRoomName(player.favouriteRoom);
-
+<<<<<<< HEAD
       nameDiv.innerText         = player.name;
       roomDiv.innerText         = roomName;
       avatarDiv.dataset.id      = player.id;
       avatarDiv.dataset.avatar  = player.avatar;
       avatarDiv.dataset.color   = player.color;
+=======
+    // Generamos localStorage inicial para las rooms
+    const roomDataToStorage = this.rooms.map((room) => ({
+      id: room.id,
+      userRooms: [],
+      game: {
+        grid: [],
+        players: [],
+        defeatedPlaters: [],
+        totalCellsToWin: 0,
+        round: {
+          turn: 0,
+          roundNumber: 0,
+          player: null,
+        },
+      },
+    }));
+    this.localStorage.setLocalStorage("rooms", roomDataToStorage);
+
+    //Temporal, añadimos user a la priemra sala
+    const currentUserData = this.localStorage.getLocalStorage("me", "session");
+    const currentRoom = this.rooms[0];
+    currentRoom.addToRoom(currentUserData);
+  }
+
+  generatePlayerBox() {
+    const data = this.localStorage.getLocalStorage("me", "session");
+
+    if (data) {
+      const player = data;
+      const boxDiv = document.getElementById("my-user-box");
+      const avatarDiv = boxDiv.querySelector(".a-avatar");
+      const nameDiv = boxDiv.querySelector(".m-user-item__name");
+      const roomDiv = boxDiv.querySelector(".m-user-item__room");
+      const roomName = this.getRoomName(player.favouriteRoom);
+
+      nameDiv.innerText = player.name;
+      roomDiv.innerText = roomName;
+      avatarDiv.dataset.id = player.id;
+      avatarDiv.dataset.avatar = player.avatar;
+      avatarDiv.dataset.color = player.color;
+>>>>>>> c6c62664e2d9a186fd3e8e81fcb10522fe62cc49
       avatarDiv.classList.add(player.avatar);
 
-      if(this.isPlayerInRooms(player)){
-        avatarDiv.classList.add('hidden');
-      }else{
-        avatarDiv.classList.remove('hidden');
-      };
-
-    }else{
+      if (this.isPlayerInRooms(player)) {
+        avatarDiv.classList.add("hidden");
+      } else {
+        avatarDiv.classList.remove("hidden");
+      }
+    } else {
       // Aquí va la redicción si el usuario no esta conectado;
       console.log("usuario no conectado");
     }
   }
 
-  isPlayerInRooms(player){
-      let allPlayers = [];
-      this.rooms.forEach((room)=>{ allPlayers.concat(room.players); });
-      return !!allPlayers.find((pl)=>pl.id === player.id);
+  isPlayerInRooms(player) {
+    let allPlayers = [];
+    this.rooms.forEach((room) => {
+      allPlayers.concat(room.players);
+    });
+    return !!allPlayers.find((pl) => pl.id === player.id);
   }
 
-  getRoomName(id){
+  getRoomName(id) {
     var index = -1;
-    var room = this.boxRooms.find(
-      function(item, i){ if(item.id === id){ index = i; return i;}
+    var room = this.boxRooms.find(function (item, i) {
+      if (item.id === id) {
+        index = i;
+        return i;
+      }
     });
     console.log(room, index);
-    return 'ROOM '+(index + 1);
+    return "ROOM " + (index + 1);
   }
 }
 
@@ -844,235 +881,282 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class Register {
-
-  fields = {}
-  errors = {}
+  fields = {};
+  errors = {};
   local = new _utils__WEBPACK_IMPORTED_MODULE_0__["default"]();
 
-  constructor(registerFields){
-    this.form = document.getElementById(registerFields.formId)
+  constructor(registerFields) {
+    this.form = document.getElementById(registerFields.formId);
+    this.nameInput = document.getElementById(registerFields.nameId);
     this.emailInput = document.getElementById(registerFields.emailId);
     this.passwordInput = document.getElementById(registerFields.passwordId);
-    this.favouriteRoom = document.getElementById(registerFields.favouriteRoomId);
-    this.avatarWrapper = document.getElementById(registerFields.avatarWrapperId);
+    this.favouriteRoom = document.getElementById(
+      registerFields.favouriteRoomId
+    );
+    this.avatarWrapper = document.getElementById(
+      registerFields.avatarWrapperId
+    );
     this.registerSubmitBtn = document.getElementById(registerFields.submtBtn);
   }
 
-  onSelectAvatar(e){
+  onSelectAvatar(e) {
     const avatarId = e.target.id;
     const avatarDiv = document.getElementById(avatarId);
-    this.selectAvatar(avatarDiv)
+    this.selectAvatar(avatarDiv);
   }
 
-  selectAvatar(selected){
-    const avatars = this.avatarWrapper.querySelectorAll('.a-avatar');
-    avatars.forEach(avatar => {
-      avatar.classList.remove('active')
-    })
+  selectAvatar(selected) {
+    const avatars = this.avatarWrapper.querySelectorAll(".a-avatar");
+    avatars.forEach((avatar) => {
+      avatar.classList.remove("active");
+    });
 
-    selected.classList.add('active');
+    selected.classList.add("active");
   }
 
-  assignListeners(){
-    const avatars = this.avatarWrapper.querySelectorAll('.a-avatar');
-    avatars.forEach(avatar => {
-      avatar.addEventListener('click', this.onSelectAvatar.bind(this));
-    })
+  assignListeners() {
+    const avatars = this.avatarWrapper.querySelectorAll(".a-avatar");
+    avatars.forEach((avatar) => {
+      avatar.addEventListener("click", this.onSelectAvatar.bind(this));
+    });
 
-    this.form.addEventListener('submit', this.send.bind(this));
+    this.form.addEventListener("submit", this.send.bind(this));
   }
 
-  resetForm(){
-    for(let field in this.fields){
+  resetForm() {
+    for (let field in this.fields) {
       const fieldEl = this.fields[field];
       fieldEl.value = "";
-      if(fieldEl.name === 'favouriteRoom'){
-        fieldEl.element.value = "0"
+      if (fieldEl.name === "favouriteRoom") {
+        fieldEl.element.value = "0";
       } else {
         fieldEl.element.value = "";
       }
     }
 
-    const defaultAvatar = document.getElementById('avatar1');
-    this.selectAvatar(defaultAvatar)
+    const defaultAvatar = document.getElementById("avatar1");
+    this.selectAvatar(defaultAvatar);
   }
 
-  validateEmail(name, element, value){
+  validateName(name, element, value) {
+    const isValid = value !== "";
+    const message = isValid ? "" : "El nombre no puede estar vacío";
+
+    if (isValid) {
+      delete this.errors[name];
+      element.classList.remove("is-invalid");
+      document.getElementById(`${element.id}_error`).innerHTML = "";
+      this.fields[name].value = value;
+      return;
+    } else {
+      this.fields[name].value = "";
+    }
+
+    this.errors[name] = {
+      element: element,
+      message,
+    };
+  }
+
+  validateEmail(name, element, value) {
     let message, isValid;
 
-    if(value === ""){
-      message = "El email no puede estar vacío"
+    if (value === "") {
+      message = "El email no puede estar vacío";
       isValid = false;
     }
 
-    if(value !== ""){
-      const regex = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    if (value !== "") {
+      const regex =
+        /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
       isValid = regex.test(value);
-      message = isValid ? "" : "El email no es válido"
+      message = isValid ? "" : "El email no es válido";
     }
 
-    if(isValid) {
+    if (isValid) {
       delete this.errors[name];
-      element.classList.remove('is-invalid')
+      element.classList.remove("is-invalid");
       document.getElementById(`${element.id}_error`).innerHTML = "";
       this.fields[name].value = value;
       return;
     } else {
-      this.fields[name].value = '';
+      this.fields[name].value = "";
     }
 
     this.errors[name] = {
       element: element,
-      message
-    }
+      message,
+    };
   }
 
-  validatePassword(name, element, value){
-
+  validatePassword(name, element, value) {
     const isValid = value !== "";
-    const message = isValid ? '' : "El password no puede estar vacío";
+    const message = isValid ? "" : "El password no puede estar vacío";
 
-    if(isValid) {
+    if (isValid) {
       delete this.errors[name];
-      element.classList.remove('is-invalid')
-      document.getElementById(`${element.id}_error`).innerHTML = "";
-      this.fields[name].value = value
-      return;
-    } else {
-      this.fields[name].value = '';
-    }
-
-    this.errors[name] = {
-      element: element,
-      message
-    }
-  }
-
-  validateFavouriteRoom(name, element, value){
-    const isValid = value !== "0";
-    const message = isValid ? '' : "Debes seleccionar una sala";
-
-    if(isValid) {
-      delete this.errors[name];
-      element.classList.remove('is-invalid')
+      element.classList.remove("is-invalid");
       document.getElementById(`${element.id}_error`).innerHTML = "";
       this.fields[name].value = value;
       return;
     } else {
-      this.fields[name].value = '';
+      this.fields[name].value = "";
     }
 
     this.errors[name] = {
       element: element,
-      message
-    }
+      message,
+    };
   }
 
-  registerFields(){
+  validateFavouriteRoom(name, element, value) {
+    const isValid = value !== "0";
+    const message = isValid ? "" : "Debes seleccionar una sala";
+
+    if (isValid) {
+      delete this.errors[name];
+      element.classList.remove("is-invalid");
+      document.getElementById(`${element.id}_error`).innerHTML = "";
+      this.fields[name].value = value;
+      return;
+    } else {
+      this.fields[name].value = "";
+    }
+
+    this.errors[name] = {
+      element: element,
+      message,
+    };
+  }
+
+  registerFields() {
     const requiredFields = [
-      {name: 'emailInput', element: this.emailInput, validate: this.validateEmail.bind(this)},
-      {name: 'passwordInput', element: this.passwordInput, validate: this.validatePassword.bind(this)},
-      {name: 'favouriteRoom', element: this.favouriteRoom, validate: this.validateFavouriteRoom.bind(this)}
-    ]
-    requiredFields.forEach(field => {
+      {
+        name: "nameInput",
+        element: this.nameInput,
+        validate: this.validateName.bind(this),
+      },
+      {
+        name: "emailInput",
+        element: this.emailInput,
+        validate: this.validateEmail.bind(this),
+      },
+      {
+        name: "passwordInput",
+        element: this.passwordInput,
+        validate: this.validatePassword.bind(this),
+      },
+      {
+        name: "favouriteRoom",
+        element: this.favouriteRoom,
+        validate: this.validateFavouriteRoom.bind(this),
+      },
+    ];
+    requiredFields.forEach((field) => {
       this.fields[field.name] = {
         name: field.name,
         validate: field.validate,
         element: field.element,
-        value: ''
-      }
-    })
+        value: "",
+      };
+    });
   }
 
-  init(){
+  init() {
     this.assignListeners();
     this.registerFields();
   }
 
-  saveUser(data){
-    const allUSers = this.local.getLocalStorage('users');
+  saveUser(data) {
+    const allUSers = this.local.getLocalStorage("users");
     const newUser = data;
 
-    if(!allUSers || allUSers.length === 0){
-      this.local.setLocalStorage('users', [newUser])
+    if (!allUSers || allUSers.length === 0) {
+      this.local.setLocalStorage("users", [newUser]);
       this.resetForm();
       this.showSuccesMessage();
       return;
     }
 
-    const existUSer = allUSers.find(user => user.email === newUser.email);
-    if(existUSer){
-      this.showErrorMessage("Ya existe un usuario con este email")
+    const existUSer = allUSers.find((user) => user.email === newUser.email);
+    if (existUSer) {
+      this.showErrorMessage("Ya existe un usuario con este email");
       return;
     }
 
     allUSers.push(newUser);
-    this.local.setLocalStorage('users', allUSers)
+    this.local.setLocalStorage("users", allUSers);
     this.resetForm();
     this.showSuccesMessage();
   }
 
-  showErrorMessage(message){
-    const messageElement = document.getElementById('errorMessage');
+  showErrorMessage(message) {
+    const messageElement = document.getElementById("errorMessage");
     messageElement.innerHTML = message;
-    messageElement.classList.remove('d-none');
+    messageElement.classList.remove("d-none");
   }
 
-  showSuccesMessage(){
+  showSuccesMessage() {
     const message = "Tu usuario se ha registrado correctamente.";
-    const messageElement = document.getElementById('successMessage');
-    const loginButton = document.getElementById('successButton');
-    const submitButton = document.getElementById('submitButton');
+    const messageElement = document.getElementById("successMessage");
+    const loginButton = document.getElementById("successButton");
+    const submitButton = document.getElementById("submitButton");
     messageElement.innerHTML = message;
-    messageElement.classList.remove('d-none');
-    loginButton.classList.remove('d-none');
-    submitButton.classList.add('d-none');
+    messageElement.classList.remove("d-none");
+    loginButton.classList.remove("d-none");
+    submitButton.classList.add("d-none");
 
-    setTimeout(()=> {
-      messageElement.classList.add('d-none');
-      submitButton.classList.remove('d-none');
-    }, 2000)
+    setTimeout(() => {
+      messageElement.classList.add("d-none");
+      submitButton.classList.remove("d-none");
+    }, 2000);
   }
 
-  send(e){
+  send(e) {
     e.preventDefault();
     const fields = this.fields;
 
-    const errorMessageElement = document.getElementById('errorMessage');
-    errorMessageElement.classList.add('d-none');
+    const errorMessageElement = document.getElementById("errorMessage");
+    errorMessageElement.classList.add("d-none");
 
-    Object.keys(fields).forEach(field => {
-      this.fields[field].validate(fields[field].name, fields[field].element, fields[field].element.value)
-    })
+    Object.keys(fields).forEach((field) => {
+      this.fields[field].validate(
+        fields[field].name,
+        fields[field].element,
+        fields[field].element.value
+      );
+    });
 
     const existErrors = Object.keys(this.errors).length !== 0;
 
-    if(existErrors){
-      Object.keys(this.errors).forEach(error => {
+    if (existErrors) {
+      Object.keys(this.errors).forEach((error) => {
         const inputElement = this.errors[error].element;
         const msgErrorElement = `${inputElement.id}_error`;
-        inputElement.classList.add('is-invalid');
-        document.getElementById(msgErrorElement).innerHTML = this.errors[error].message;
-      })
+        inputElement.classList.add("is-invalid");
+        document.getElementById(msgErrorElement).innerHTML =
+          this.errors[error].message;
+      });
       return;
     }
 
-    const data  = {
+    const data = {
       id: (0,uuid__WEBPACK_IMPORTED_MODULE_1__["default"])(),
+      name: this.fields.nameInput.value,
       email: this.fields.emailInput.value,
       password: this.fields.passwordInput.value,
-      avatar: `mod${this.avatarWrapper.querySelector('.active').dataset.mod}`,
+      avatar: `mod${this.avatarWrapper.querySelector(".active").dataset.mod}`,
       favouriteRoom: this.fields.favouriteRoom.value,
-      color: `mod${this.avatarWrapper.querySelector('.active').dataset.mod}`
+      color: `mod${this.avatarWrapper.querySelector(".active").dataset.mod}`,
     };
 
     // Evento para enviar la información al localStorage, al apartado de usuaros registrados
     this.saveUser(data);
   }
-
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Register);
+
 
 /***/ }),
 
@@ -1083,10 +1167,15 @@ class Register {
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
+<<<<<<< HEAD
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _DragAndDrop__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DragAndDrop */ "./src/js/DragAndDrop.js");
+=======
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/js/constants.js");
+/* harmony import */ var _Player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Player */ "./src/js/Player.js");
+>>>>>>> c6c62664e2d9a186fd3e8e81fcb10522fe62cc49
 
 
 class Room {
@@ -1120,13 +1209,28 @@ class Room {
 
   addToRoom(user) {
     // Creamos jugador que recoge los datos del usuario arrastrado
-    const draggedPlayer = new Player(user.id, user.name, user.avatar);
+    const draggedPlayer = new _Player__WEBPACK_IMPORTED_MODULE_1__["default"](user.id, user.name, user.avatar);
     this.players.push(draggedPlayer);
+
     // Mostrar mensaje que se ha añadido un nuevo jugador
+    this.showRoomMessage(_constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.CONNECTED_TO_ROOM, user);
 
     if (this.players > 1) {
       // Mostrar posibilidad de empezar a jugar
     }
+  }
+
+  showRoomMessage(type, user) {
+    let message;
+    const messageDiv = document.querySelector("#roomMessage h3");
+    switch (type) {
+      case _constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.CONNECTED_TO_ROOM:
+        message = `El usuario ${user.name} se ha conectado a esta sala`;
+        break;
+      default:
+        return "";
+    }
+    messageDiv.innerHTML = message;
   }
 
   disableRoom(id) {
@@ -1136,6 +1240,14 @@ class Room {
 
   getPlayers() {
     return players;
+  }
+
+  initStorageEvents() {
+    window.addEventListener("storage", () => {
+      // When local storage changes, dump the list to
+      // the console.
+      console.log(JSON.parse(window.localStorage.getItem("rooms")));
+    });
   }
 
   initGame() {
@@ -1149,6 +1261,24 @@ class Room {
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Room);
+
+
+/***/ }),
+
+/***/ "./src/js/constants.js":
+/*!*****************************!*\
+  !*** ./src/js/constants.js ***!
+  \*****************************/
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "MESSAGE_TYPES": function() { return /* binding */ MESSAGE_TYPES; }
+/* harmony export */ });
+const MESSAGE_TYPES = {
+  CONNECTED_TO_ROOM: "connected_to_room",
+  DISCONNECTED_FROM_ROOM: "disconnected_from_room",
+};
 
 
 /***/ }),

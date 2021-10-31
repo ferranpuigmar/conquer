@@ -66,6 +66,11 @@ web_modules/
 # Output of 'npm pack'
 *.tgz
 
+# Output webpack
+public/css/
+public/bundle.js
+public/bundle.js.map
+
 # Yarn Integrity file
 .yarn-integrity
 

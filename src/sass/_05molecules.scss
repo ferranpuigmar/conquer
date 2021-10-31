@@ -137,3 +137,11 @@
     }
   }
 }
+
+.m-game-intro {
+  width: 100%;
+  height: calc(20px * 30);
+  background-color: $gray-100;
+  border: 1px solid $gray-500;
+  border-radius: 5px;
+}
