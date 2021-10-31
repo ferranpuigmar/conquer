@@ -181,6 +181,7 @@ class Dashboard{
 
   init(){
     this.generateRooms();
+    this.generatePlayerBox();
     //this.dragAndDrop.init();
   }
 
@@ -207,11 +208,47 @@ class Dashboard{
 
   generatePlayerBox(){
     const data = this.local.getLocalStorage('me','session');
+
     if(data){
+      const player    = data;
+      const boxDiv    = document.getElementById('my-user-box');
+      const avatarDiv = boxDiv.querySelector('.a-avatar');
+      const nameDiv   = boxDiv.querySelector('.m-user-item__name');
+      const roomDiv   = boxDiv.querySelector('.m-user-item__room');
+      const roomName  = this.getRoomName(player.favouriteRoom);
+
+      nameDiv.innerText         = player.email;
+      roomDiv.innerText         = roomName;
+      avatarDiv.dataset.id      = player.id;
+      avatarDiv.dataset.avatar  = player.avatar;
+      avatarDiv.dataset.color   = player.color;
+      avatarDiv.classList.add(player.avatar);
+
+      if(this.isPlayerInRooms(player)){
+        avatarDiv.classList.add('hidden');
+      }else{
+        avatarDiv.classList.remove('hidden');
+      };
 
     }else{
-      console.log(data);
+      // Aquí va la redicción si el usuario no esta conectado;
+      console.log("usuario no conectado");
     }
+  }
+
+  isPlayerInRooms(player){
+      let allPlayers = [];
+      this.rooms.forEach((room)=>{ allPlayers.concat(room.players); });
+      return !!allPlayers.find((pl)=>pl.id === player.id);
+  }
+
+  getRoomName(id){
+    var index = -1;
+    var room = this.boxRooms.find(
+      function(item, i){ if(item.id === id){ index = i; return i;}
+    });
+    console.log(room, index);
+    return 'ROOM '+(index + 1);
   }
 }
 

@@ -11200,6 +11200,10 @@ textarea.form-control-lg {
   border-style: dashed;
   opacity: 1;
 }
+.a-avatar.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
 
 .m-user-item {
   display: flex;
