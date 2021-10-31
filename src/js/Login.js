@@ -89,7 +89,7 @@ class Login {
     this.assignListeners();
   }
 
-  loginUser(data){
+  loginUser(newUser){
     const allUSers = this.local.getLocalStorage('users');
 
     const user = allUSers.find(user => user.email === newUser.email);
@@ -104,7 +104,7 @@ class Login {
     }
 
     // Aqui va la lógica para poner al "user" (línea 95) dentro de los usuarios conectados
-    this.local.setLocalStorage('me', user, 'sessionStorage');
+    this.local.setLocalStorage('me', user, 'session');
     // También se tiene que redirigir al usuario a la ruta /rooms
     window.location.href = '/rooms';
   }

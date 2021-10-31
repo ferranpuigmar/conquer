@@ -1,57 +1,64 @@
-class DragAndDrop{
-    
-   
-    init(){
-        let avatarMobile = document.querySelector('#avatarMobile');
-        avatarMobile.addEventListener('dragstart', dragIniciado, false);
-        avatarMobile-item.addEventListener('dragend', dragFinalizado, false);
-        avatarMobile-item.addEventListener('drag', drageando, false);
-        
-        document.querySelectorAll('.m-room-drop-item__image').forEach((el)=>{
-            el.addEventListener('dragenter', dragEntraContenedor,false);
-            el.addEventListener('dragover', dragSobreContenedor,false);
-            el.addEventListener('dragleave', dragFueraContenedor,false);
-            el.addEventListener('drop', controlDrop,false);            
-         });
-        
-    }
+class DragAndDrop {
+  init() {
+    let avatarMobile = document.querySelector("#avatarMobile");
+    avatarMobile.addEventListener(
+      "dragstart",
+      this.dragIniciado.bind(this),
+      false
+    );
+    avatarMobile.addEventListener(
+      "dragend",
+      this.dragFinalizado.bind(this),
+      false
+    );
+    avatarMobile.addEventListener("drag", this.drageando.bind(this), false);
 
-    drageando(ev){
-      ev.dataTransfer.setData("text", ev.target.id);
-    }
+    document.querySelectorAll(".m-room-drop-item__image").forEach((el) => {
+      el.addEventListener("dragenter", this.dragEntraContenedor, false);
+      el.addEventListener("dragover", this.dragSobreContenedor, false);
+      el.addEventListener("dragleave", this.dragFueraContenedor, false);
+      el.addEventListener("drop", this.controlDrop, false);
+    });
+  }
 
-    dragIniciado(e){
-      this.style.opacity=0.25;
-      let padre = document.createElement('p');
-      let clon = this.cloneNode(true);
-      padre.appendChild(clon);
-      e.dataTransfer.setData('text',padre.innerHTML);
-    } 
-       
-    dragFinalizado(e){
-      this.style.opacity=0.25;
-    }
+  drageando(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+  }
 
-    dragEntraContenedor(e){
-      //e.preventDefault();
-    }
+  dragIniciado(e) {
+    console.log("a");
+    this.style.opacity = 0.25;
+    let padre = document.createElement("p");
+    let clon = this.cloneNode(true);
+    padre.appendChild(clon);
+    e.dataTransfer.setData("text", padre.innerHTML);
+  }
 
-    dragSobreContenedor(e){
-      e.preventDefault();
-      this.classList.add('over');
-      return false;
-    }
+  dragFinalizado(e) {
+    console.log("b");
+    this.style.opacity = 0.25;
+  }
 
-    dragFueraContenedor(e){
-      this.classList.remove('over');
-    }
+  dragEntraContenedor(e) {
+    //e.preventDefault();
+  }
 
-    controlDrop(e){
-      //recuperar datos usuario de sesionStorage
-      contenedor.appendChild(avatarMobile);
-      let datos = e.dataTransfer.getData('text');
-      this.innerHTML += datos;
-    }
+  dragSobreContenedor(e) {
+    e.preventDefault();
+    this.classList.add("over");
+    return false;
+  }
+
+  dragFueraContenedor(e) {
+    this.classList.remove("over");
+  }
+
+  controlDrop(e) {
+    //recuperar datos usuario de sesionStorage
+    contenedor.appendChild(avatarMobile);
+    let datos = e.dataTransfer.getData("text");
+    this.innerHTML += datos;
+  }
 }
 
 export default DragAndDrop;

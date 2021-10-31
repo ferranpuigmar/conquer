@@ -153,6 +153,8 @@ class Register {
 
     if(!allUSers || allUSers.length === 0){
       this.local.setLocalStorage('users', [newUser])
+      this.resetForm();
+      this.showSuccesMessage();
       return;
     }
 
