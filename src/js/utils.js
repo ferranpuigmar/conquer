@@ -4,7 +4,7 @@ export default class LocalStorage {
 
   setLocalStorage(key, data, type){
     const dataToLocaltorage = JSON.stringify(data);
-    if(type.includes('session')){
+    if(type && type.includes('session')){
       this.sessionStorage.setItem(key, dataToLocaltorage)
     }else{
 
@@ -15,7 +15,7 @@ export default class LocalStorage {
   getLocalStorage(key, type){
     let data;
 
-    if(type.includes('session')){
+    if(type && type.includes('session')){
         data = this.sessionStorage.getItem(key);
     }else{
         data = this.localStorage.getItem(key);
