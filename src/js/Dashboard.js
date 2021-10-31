@@ -1,9 +1,11 @@
 import DragAndDrop from "./DragAndDrop";
 import Room from "./Room";
+import LocalStorage from "./utils";
 
 class Dashboard{
   rooms = [];
-  dragAndDrop = new DragAndDrop();
+  //dragAndDrop = new DragAndDrop();
+  local = new LocalStorage();
 
   constructor(initData){
     this.boxRooms = initData.boxRooms;
@@ -11,7 +13,7 @@ class Dashboard{
 
   init(){
     this.generateRooms();
-    this.dragAndDrop.init();
+    //this.dragAndDrop.init();
   }
 
   generateRooms(){
@@ -33,6 +35,15 @@ class Dashboard{
 
 
     })
+  }
+
+  generatePlayerBox(){
+    const data = this.local.getLocalStorage('me','session');
+    if(data){
+
+    }else{
+      console.log(data);
+    }
   }
 }
 

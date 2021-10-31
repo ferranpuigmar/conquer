@@ -3,15 +3,15 @@ class DragAndDrop{
    
     init(){
         let avatarMobile = document.querySelector('#avatarMobile');
-        avatarMobile.addEventListener('dragstart', dragIniciado, false);
-        avatarMobile-item.addEventListener('dragend', dragFinalizado, false);
-        avatarMobile-item.addEventListener('drag', drageando, false);
+        avatarMobile.addEventListener('dragstart', this.dragIniciado, false);
+        avatarMobile-item.addEventListener('dragend', this.dragFinalizado, false);
+        avatarMobile-item.addEventListener('drag', this.drageando, false);
         
         document.querySelectorAll('.m-room-drop-item__image').forEach((el)=>{
-            el.addEventListener('dragenter', dragEntraContenedor,false);
-            el.addEventListener('dragover', dragSobreContenedor,false);
-            el.addEventListener('dragleave', dragFueraContenedor,false);
-            el.addEventListener('drop', controlDrop,false);            
+            el.addEventListener('dragenter', this.dragEntraContenedor,false);
+            el.addEventListener('dragover', this.dragSobreContenedor,false);
+            el.addEventListener('dragleave', this.dragFueraContenedor,false);
+            el.addEventListener('drop', this.controlDrop,false);            
          });
         
     }

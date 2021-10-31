@@ -165,12 +165,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _DragAndDrop__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DragAndDrop */ "./src/js/DragAndDrop.js");
 /* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
+
 
 
 
 class Dashboard{
   rooms = [];
-  dragAndDrop = new _DragAndDrop__WEBPACK_IMPORTED_MODULE_0__["default"]();
+  //dragAndDrop = new DragAndDrop();
+  local = new _utils__WEBPACK_IMPORTED_MODULE_2__["default"]();
 
   constructor(initData){
     this.boxRooms = initData.boxRooms;
@@ -178,7 +181,7 @@ class Dashboard{
 
   init(){
     this.generateRooms();
-    this.dragAndDrop.init();
+    //this.dragAndDrop.init();
   }
 
   generateRooms(){
@@ -201,6 +204,15 @@ class Dashboard{
 
     })
   }
+
+  generatePlayerBox(){
+    const data = this.local.getLocalStorage('me','session');
+    if(data){
+
+    }else{
+      console.log(data);
+    }
+  }
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Dashboard);
@@ -222,15 +234,15 @@ class DragAndDrop{
    
     init(){
         let avatarMobile = document.querySelector('#avatarMobile');
-        avatarMobile.addEventListener('dragstart', dragIniciado, false);
-        avatarMobile-item.addEventListener('dragend', dragFinalizado, false);
-        avatarMobile-item.addEventListener('drag', drageando, false);
+        avatarMobile.addEventListener('dragstart', this.dragIniciado, false);
+        avatarMobile-item.addEventListener('dragend', this.dragFinalizado, false);
+        avatarMobile-item.addEventListener('drag', this.drageando, false);
         
         document.querySelectorAll('.m-room-drop-item__image').forEach((el)=>{
-            el.addEventListener('dragenter', dragEntraContenedor,false);
-            el.addEventListener('dragover', dragSobreContenedor,false);
-            el.addEventListener('dragleave', dragFueraContenedor,false);
-            el.addEventListener('drop', controlDrop,false);            
+            el.addEventListener('dragenter', this.dragEntraContenedor,false);
+            el.addEventListener('dragover', this.dragSobreContenedor,false);
+            el.addEventListener('dragleave', this.dragFueraContenedor,false);
+            el.addEventListener('drop', this.controlDrop,false);            
          });
         
     }
@@ -430,7 +442,6 @@ class Game
   }
 
   checkOtherPlayerLoss(currentPlayerId){
-      console.log(currentPlayerId);
       let otherPlayers = this.players.filter((o)=> o.id !== currentPlayerId);
       let defeated = [];
       otherPlayers.forEach((player) => {
@@ -454,6 +465,7 @@ class Game
         defeated.forEach((player)=>{
           this.defeatedPlayers.push(player);
           this.players = this.players.filter(oplayer => oplayer.id !== player.id);
+          console.log(`El jugador ${player.name} ha perdido!!!`);
         });
 
         return true;
@@ -679,7 +691,7 @@ class Login {
     }
 
     // Aqui va la lógica para poner al "user" (línea 95) dentro de los usuarios conectados
-    this.local.setLocalStorage('me', user, 'sessionStorage');
+    this.local.setLocalStorage('me', user, 'session');
     // También se tiene que redirigir al usuario a la ruta /rooms
     window.location.href = '/rooms';
   }
