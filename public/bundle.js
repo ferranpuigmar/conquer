@@ -207,13 +207,6 @@ class Dashboard {
       boxDivHeader.innerHTML = title;
     });
 
-<<<<<<< HEAD
-      nameDiv.innerText         = player.name;
-      roomDiv.innerText         = roomName;
-      avatarDiv.dataset.id      = player.id;
-      avatarDiv.dataset.avatar  = player.avatar;
-      avatarDiv.dataset.color   = player.color;
-=======
     // Generamos localStorage inicial para las rooms
     const roomDataToStorage = this.rooms.map((room) => ({
       id: room.id,
@@ -254,7 +247,6 @@ class Dashboard {
       avatarDiv.dataset.id = player.id;
       avatarDiv.dataset.avatar = player.avatar;
       avatarDiv.dataset.color = player.color;
->>>>>>> c6c62664e2d9a186fd3e8e81fcb10522fe62cc49
       avatarDiv.classList.add(player.avatar);
 
       if (this.isPlayerInRooms(player)) {
@@ -1167,15 +1159,11 @@ class Register {
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
-<<<<<<< HEAD
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _DragAndDrop__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DragAndDrop */ "./src/js/DragAndDrop.js");
-=======
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/js/constants.js");
 /* harmony import */ var _Player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Player */ "./src/js/Player.js");
->>>>>>> c6c62664e2d9a186fd3e8e81fcb10522fe62cc49
 
 
 class Room {
@@ -1269,11 +1257,11 @@ class Room {
 /*!*****************************!*\
   !*** ./src/js/constants.js ***!
   \*****************************/
-/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "MESSAGE_TYPES": function() { return /* binding */ MESSAGE_TYPES; }
+/* harmony export */   "MESSAGE_TYPES": () => (/* binding */ MESSAGE_TYPES)
 /* harmony export */ });
 const MESSAGE_TYPES = {
   CONNECTED_TO_ROOM: "connected_to_room",
