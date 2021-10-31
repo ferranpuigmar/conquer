@@ -221,16 +221,18 @@ class DragAndDrop{
     
    
     init(){
-        let avatarMobile = document.querySelector('#a-avatar');
+        let avatarMobile = document.querySelector('#avatarMobile');
         avatarMobile.addEventListener('dragstart', dragIniciado, false);
         avatarMobile-item.addEventListener('dragend', dragFinalizado, false);
         avatarMobile-item.addEventListener('drag', drageando, false);
-        let contenedor;
-        contenedor = document.querySelector('#m-room-drop-item__image .image');
-        contenedor.addEventListener('dragenter', dragEntraContenedor,false);
-        contenedor.addEventListener('dragover', dragSobreContenedor,false);
-        contenedor.addEventListener('dragleave', dragFueraContenedor,false);
-        contenedor.addEventListener('drop', controlDrop,false);
+        
+        document.querySelectorAll('.m-room-drop-item__image').forEach((el)=>{
+            el.addEventListener('dragenter', dragEntraContenedor,false);
+            el.addEventListener('dragover', dragSobreContenedor,false);
+            el.addEventListener('dragleave', dragFueraContenedor,false);
+            el.addEventListener('drop', controlDrop,false);            
+         });
+        
     }
 
     drageando(ev){
@@ -677,7 +679,9 @@ class Login {
     }
 
     // Aqui va la lógica para poner al "user" (línea 95) dentro de los usuarios conectados
+    this.local.setLocalStorage('me', user, 'sessionStorage');
     // También se tiene que redirigir al usuario a la ruta /rooms
+    window.location.href = '/rooms';
   }
 
   showErrorMessage(message){

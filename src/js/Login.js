@@ -104,7 +104,9 @@ class Login {
     }
 
     // Aqui va la lógica para poner al "user" (línea 95) dentro de los usuarios conectados
+    this.local.setLocalStorage('me', user, 'sessionStorage');
     // También se tiene que redirigir al usuario a la ruta /rooms
+    window.location.href = '/rooms';
   }
 
   showErrorMessage(message){
