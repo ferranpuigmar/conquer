@@ -6,65 +6,57 @@ class Room {
   players = [];
   roomBox = "";
   game = "";
-  
 
-  constructor(id, name, capacity){
+  constructor(id, name, capacity) {
     this.id = id;
     this.name = name;
     this.capacity = capacity;
   }
 
-  onDraggPlayer(user){
-
-    if(this.players.length === this.capacity){
+  onDraggPlayer(user) {
+    if (this.players.length === this.capacity) {
       this.isOpen = false;
-      disableRoom(this.id)
-      console.log('sala llena!')
+      disableRoom(this.id);
+      console.log("sala llena!");
       return;
     }
 
-    if(this.players.length > this.capacity || !this.isOpen){
-      console.log('La sala no acepta más jugadores')
+    if (this.players.length > this.capacity || !this.isOpen) {
+      console.log("La sala no acepta más jugadores");
       return;
     }
 
     this.addToRoom(user);
   }
 
-  addToRoom(user){
+  addToRoom(user) {
     // Creamos jugador que recoge los datos del usuario arrastrado
     const draggedPlayer = new Player(user.id, user.name, user.avatar);
-    this.players.push(draggedPlayer)
+    this.players.push(draggedPlayer);
     // Mostrar mensaje que se ha añadido un nuevo jugador
 
-    if(this.players > 1){
+    if (this.players > 1) {
       // Mostrar posibilidad de empezar a jugar
     }
   }
 
-  disableRoom(id){
+  disableRoom(id) {
     const roomDivElement = document.getElementById(id);
-    roomDivElement.classList.add('isFull');
+    roomDivElement.classList.add("isFull");
   }
 
-  getPlayers(){
+  getPlayers() {
     return players;
   }
 
-  initGame(){
-  
+  initGame() {
     // Quitamos botón de play
 
     // Inicializamos juego
     const gridSize = 20;
-    this.game = Game('grid', this.players, gridSize);
+    this.game = Game("grid", this.players, gridSize);
     this.game.init();
-
   }
-
-  
-
-
 }
 
 export default Room;

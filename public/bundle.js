@@ -1,5 +1,5 @@
 var Conquer;
-/******/ (() => { // webpackBootstrap
+/******/ (function() { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
@@ -7,13 +7,10 @@ var Conquer;
 /*!*****************************************************!*\
   !*** ./node_modules/uuid/dist/esm-browser/regex.js ***!
   \*****************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (/^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i);
+/* harmony default export */ __webpack_exports__["default"] = (/^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i);
 
 /***/ }),
 
@@ -21,11 +18,11 @@ __webpack_require__.r(__webpack_exports__);
 /*!***************************************************!*\
   !*** ./node_modules/uuid/dist/esm-browser/rng.js ***!
   \***************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ rng)
+/* harmony export */   "default": function() { return /* binding */ rng; }
 /* harmony export */ });
 // Unique ID creation requires a high quality random # generator. In the browser we therefore
 // require the crypto API and do not support built-in fallback to lower quality random number
@@ -53,12 +50,9 @@ function rng() {
 /*!*********************************************************!*\
   !*** ./node_modules/uuid/dist/esm-browser/stringify.js ***!
   \*********************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _validate_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./validate.js */ "./node_modules/uuid/dist/esm-browser/validate.js");
 
 /**
@@ -89,7 +83,7 @@ function stringify(arr) {
   return uuid;
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (stringify);
+/* harmony default export */ __webpack_exports__["default"] = (stringify);
 
 /***/ }),
 
@@ -97,12 +91,9 @@ function stringify(arr) {
 /*!**************************************************!*\
   !*** ./node_modules/uuid/dist/esm-browser/v4.js ***!
   \**************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _rng_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./rng.js */ "./node_modules/uuid/dist/esm-browser/rng.js");
 /* harmony import */ var _stringify_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./stringify.js */ "./node_modules/uuid/dist/esm-browser/stringify.js");
 
@@ -128,7 +119,7 @@ function v4(options, buf, offset) {
   return (0,_stringify_js__WEBPACK_IMPORTED_MODULE_1__["default"])(rnds);
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (v4);
+/* harmony default export */ __webpack_exports__["default"] = (v4);
 
 /***/ }),
 
@@ -136,12 +127,9 @@ function v4(options, buf, offset) {
 /*!********************************************************!*\
   !*** ./node_modules/uuid/dist/esm-browser/validate.js ***!
   \********************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _regex_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./regex.js */ "./node_modules/uuid/dist/esm-browser/regex.js");
 
 
@@ -149,7 +137,7 @@ function validate(uuid) {
   return typeof uuid === 'string' && _regex_js__WEBPACK_IMPORTED_MODULE_0__["default"].test(uuid);
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (validate);
+/* harmony default export */ __webpack_exports__["default"] = (validate);
 
 /***/ }),
 
@@ -157,12 +145,9 @@ function validate(uuid) {
 /*!*****************************!*\
   !*** ./src/js/DashBoard.js ***!
   \*****************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _DragAndDrop__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DragAndDrop */ "./src/js/DragAndDrop.js");
 /* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
@@ -170,22 +155,22 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-class Dashboard{
+class Dashboard {
   rooms = [];
-  //dragAndDrop = new DragAndDrop();
+  dragAndDrop = new _DragAndDrop__WEBPACK_IMPORTED_MODULE_0__["default"]();
   local = new _utils__WEBPACK_IMPORTED_MODULE_2__["default"]();
 
-  constructor(initData){
+  constructor(initData) {
     this.boxRooms = initData.boxRooms;
   }
 
-  init(){
+  init() {
     this.generateRooms();
     this.generatePlayerBox();
-    //this.dragAndDrop.init();
+    this.dragAndDrop.init();
   }
 
-  generateRooms(){
+  generateRooms() {
     this.boxRooms.forEach((box, index) => {
       // Generamos las instancias de las salas
       this.rooms[index] = new _Room__WEBPACK_IMPORTED_MODULE_1__["default"](box.id, `Room${index}`, 4);
@@ -196,14 +181,14 @@ class Dashboard{
       // Y que conecte con un método de la instancia de room
 
       // Añadir clase para pintar caja
-      boxDiv.classList.add(`room${index+1}`);
+      boxDiv.classList.add(`room${index + 1}`);
       // Añadir títulos
       const title = `Room ${index + 1}`;
-      const boxDivHeader = document.querySelector(`#${box.id} .m-room-drop-item__header h3`);
+      const boxDivHeader = document.querySelector(
+        `#${box.id} .m-room-drop-item__header h3`
+      );
       boxDivHeader.innerHTML = title;
-
-
-    })
+    });
   }
 
   generatePlayerBox(){
@@ -252,7 +237,8 @@ class Dashboard{
   }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Dashboard);
+/* harmony default export */ __webpack_exports__["default"] = (Dashboard);
+
 
 /***/ }),
 
@@ -260,69 +246,68 @@ class Dashboard{
 /*!*******************************!*\
   !*** ./src/js/DragAndDrop.js ***!
   \*******************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-class DragAndDrop{
-    
-   
-    init(){
-        let avatarMobile = document.querySelector('#avatarMobile');
-        avatarMobile.addEventListener('dragstart', this.dragIniciado, false);
-        avatarMobile-item.addEventListener('dragend', this.dragFinalizado, false);
-        avatarMobile-item.addEventListener('drag', this.drageando, false);
-        
-        document.querySelectorAll('.m-room-drop-item__image').forEach((el)=>{
-            el.addEventListener('dragenter', this.dragEntraContenedor,false);
-            el.addEventListener('dragover', this.dragSobreContenedor,false);
-            el.addEventListener('dragleave', this.dragFueraContenedor,false);
-            el.addEventListener('drop', this.controlDrop,false);            
-         });
-        
-    }
+class DragAndDrop {
+  drageando(ev) {
+    console.log("c");
+    ev.dataTransfer.setData("text", ev.target.id);
+  }
 
-    drageando(ev){
-      ev.dataTransfer.setData("text", ev.target.id);
-    }
+  dragIniciado(e) {
+    console.log("a");
+    this.style.opacity = 0.25;
+    let padre = document.createElement("p");
+    let clon = this.cloneNode(true);
+    padre.appendChild(clon);
+    e.dataTransfer.setData("text", padre.innerHTML);
+  }
 
-    dragIniciado(e){
-      this.style.opacity=0.25;
-      let padre = document.createElement('p');
-      let clon = this.cloneNode(true);
-      padre.appendChild(clon);
-      e.dataTransfer.setData('text',padre.innerHTML);
-    } 
-       
-    dragFinalizado(e){
-      this.style.opacity=0.25;
-    }
+  dragFinalizado(e) {
+    console.log("b");
+    this.style.opacity = 0.25;
+  }
 
-    dragEntraContenedor(e){
-      //e.preventDefault();
-    }
+  dragEntraContenedor(e) {
+    console.log("hola...");
+    //e.preventDefault();
+  }
 
-    dragSobreContenedor(e){
-      e.preventDefault();
-      this.classList.add('over');
-      return false;
-    }
+  dragSobreContenedor(e) {
+    e.preventDefault();
+    this.classList.add("over");
+    return false;
+  }
 
-    dragFueraContenedor(e){
-      this.classList.remove('over');
-    }
+  dragFueraContenedor(e) {
+    this.classList.remove("over");
+  }
 
-    controlDrop(e){
-      //recuperar datos usuario de sesionStorage
-      contenedor.appendChild(avatarMobile);
-      let datos = e.dataTransfer.getData('text');
-      this.innerHTML += datos;
-    }
+  controlDrop(e) {
+    //recuperar datos usuario de sesionStorage
+    contenedor.appendChild(avatarMobile);
+    let datos = e.dataTransfer.getData("text");
+    this.innerHTML += datos;
+  }
+
+  init() {
+    let avatarMobile = document.querySelector("#avatarMobile");
+    avatarMobile.addEventListener("dragstart", this.dragIniciado, false);
+    avatarMobile.addEventListener("dragend", this.dragFinalizado, false);
+    avatarMobile.addEventListener("drag", this.drageando, false);
+
+    document.querySelectorAll(".m-room-drop-item__image").forEach((el) => {
+      el.addEventListener("dragenter", this.dragEntraContenedor, false);
+      el.addEventListener("dragover", this.dragSobreContenedor, false);
+      el.addEventListener("dragleave", this.dragFueraContenedor, false);
+      el.addEventListener("drop", this.controlDrop, false);
+    });
+  }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (DragAndDrop);
+/* harmony default export */ __webpack_exports__["default"] = (DragAndDrop);
+
 
 /***/ }),
 
@@ -330,12 +315,9 @@ class DragAndDrop{
 /*!************************!*\
   !*** ./src/js/Game.js ***!
   \************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 class Game
 {
   colors = [ 'red', 'blue', 'green', 'brown' ];
@@ -607,7 +589,7 @@ class Game
   }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Game);
+/* harmony default export */ __webpack_exports__["default"] = (Game);
 
 /***/ }),
 
@@ -615,154 +597,165 @@ class Game
 /*!*************************!*\
   !*** ./src/js/Login.js ***!
   \*************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
 
 
 class Login {
-
-  fields = {}
-  errors = {}
+  fields = {};
+  errors = {};
   local = new _utils__WEBPACK_IMPORTED_MODULE_0__["default"]();
 
-  constructor(loginFields){
-    this.form = document.getElementById(loginFields.formId)
+  constructor(loginFields) {
+    this.form = document.getElementById(loginFields.formId);
     this.emailInput = document.getElementById(loginFields.emailId);
     this.passwordInput = document.getElementById(loginFields.passwordId);
     this.registerSubmitBtn = document.getElementById(loginFields.submtBtn);
   }
 
-  validateEmail(name, element, value){
+  validateEmail(name, element, value) {
     let message, isValid;
 
-    if(value === ""){
-      message = "El email no puede estar vacío"
+    if (value === "") {
+      message = "El email no puede estar vacío";
       isValid = false;
     }
 
-    if(value !== ""){
-      const regex = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    if (value !== "") {
+      const regex =
+        /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
       isValid = regex.test(value);
-      message = isValid ? "" : "El email no es válido"
+      message = isValid ? "" : "El email no es válido";
     }
 
-    if(isValid) {
+    if (isValid) {
       delete this.errors[name];
-      element.classList.remove('is-invalid')
+      element.classList.remove("is-invalid");
       document.getElementById(`${element.id}_error`).innerHTML = "";
       this.fields[name].value = value;
       return;
     } else {
-      this.fields[name].value = '';
+      this.fields[name].value = "";
     }
 
     this.errors[name] = {
       element: element,
-      message
-    }
+      message,
+    };
   }
 
-  validatePassword(name, element, value){
-
+  validatePassword(name, element, value) {
     const isValid = value !== "";
-    const message = isValid ? '' : "El password no puede estar vacío";
+    const message = isValid ? "" : "El password no puede estar vacío";
 
-    if(isValid) {
+    if (isValid) {
       delete this.errors[name];
-      element.classList.remove('is-invalid')
+      element.classList.remove("is-invalid");
       document.getElementById(`${element.id}_error`).innerHTML = "";
-      this.fields[name].value = value
+      this.fields[name].value = value;
       return;
     } else {
-      this.fields[name].value = '';
+      this.fields[name].value = "";
     }
 
     this.errors[name] = {
       element: element,
-      message
-    }
+      message,
+    };
   }
 
-  registerLoginFields(){
+  registerLoginFields() {
     const requiredFields = [
-      {name: 'emailInput', element: this.emailInput, validate: this.validateEmail.bind(this)},
-      {name: 'passwordInput', element: this.passwordInput, validate: this.validatePassword.bind(this)}
-    ]
-    requiredFields.forEach(field => {
+      {
+        name: "emailInput",
+        element: this.emailInput,
+        validate: this.validateEmail.bind(this),
+      },
+      {
+        name: "passwordInput",
+        element: this.passwordInput,
+        validate: this.validatePassword.bind(this),
+      },
+    ];
+    requiredFields.forEach((field) => {
       this.fields[field.name] = {
         name: field.name,
         validate: field.validate,
         element: field.element,
-        value: ''
-      }
-    })
+        value: "",
+      };
+    });
   }
 
-  assignListeners(){
-    this.form.addEventListener('submit', this.send.bind(this));
+  assignListeners() {
+    this.form.addEventListener("submit", this.send.bind(this));
   }
 
-  init(){
+  init() {
     this.registerLoginFields();
     this.assignListeners();
   }
 
-  loginUser(data){
-    const allUSers = this.local.getLocalStorage('users');
+  loginUser(data) {
+    const allUSers = this.local.getLocalStorage("users");
     const newUser = data;
-    const user = allUSers.find(user => user.email === newUser.email);
-    if(!user){
-      this.showErrorMessage("No existe nadie con este email")
+    const user = allUSers.find((user) => user.email === newUser.email);
+    if (!user) {
+      this.showErrorMessage("No existe nadie con este email");
       return;
     }
-    const passWordIsValid = allUSers.find(user => user.password === newUser.password);
-    if(!passWordIsValid){
-      this.showErrorMessage("La contraseña no es válida")
+    const passWordIsValid = allUSers.find(
+      (user) => user.password === newUser.password
+    );
+    if (!passWordIsValid) {
+      this.showErrorMessage("La contraseña no es válida");
       return;
     }
 
     // Aqui va la lógica para poner al "user" (línea 95) dentro de los usuarios conectados
-    this.local.setLocalStorage('me', user, 'session');
+    this.local.setLocalStorage("me", user, "session");
     // También se tiene que redirigir al usuario a la ruta /rooms
-    window.location.href = '/rooms';
+    window.location.href = "/rooms";
   }
 
-  showErrorMessage(message){
-    const messageElement = document.getElementById('errorMessage');
+  showErrorMessage(message) {
+    const messageElement = document.getElementById("errorMessage");
     messageElement.innerHTML = message;
-    messageElement.classList.remove('d-none');
+    messageElement.classList.remove("d-none");
   }
 
-  send(e){
+  send(e) {
     e.preventDefault();
     const fields = this.fields;
 
-    const errorMessageElement = document.getElementById('errorMessage');
-    errorMessageElement.classList.add('d-none');
+    const errorMessageElement = document.getElementById("errorMessage");
+    errorMessageElement.classList.add("d-none");
 
-    Object.keys(fields).forEach(field => {
-      this.fields[field].validate(fields[field].name, fields[field].element, fields[field].element.value)
-    })
+    Object.keys(fields).forEach((field) => {
+      this.fields[field].validate(
+        fields[field].name,
+        fields[field].element,
+        fields[field].element.value
+      );
+    });
 
     const existErrors = Object.keys(this.errors).length !== 0;
 
-    if(existErrors){
-      Object.keys(this.errors).forEach(error => {
+    if (existErrors) {
+      Object.keys(this.errors).forEach((error) => {
         const inputElement = this.errors[error].element;
         const msgErrorElement = `${inputElement.id}_error`;
-        inputElement.classList.add('is-invalid');
-        document.getElementById(msgErrorElement).innerHTML = this.errors[error].message;
-      })
+        inputElement.classList.add("is-invalid");
+        document.getElementById(msgErrorElement).innerHTML =
+          this.errors[error].message;
+      });
       return;
     }
 
-    const data  = {
+    const data = {
       email: this.fields.emailInput.value,
       password: this.fields.passwordInput.value,
     };
@@ -770,10 +763,10 @@ class Login {
     // Método para enviar la información al localStorage, al apartado de usuaros conectados
     this.loginUser(data);
   }
-
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Login);
+/* harmony default export */ __webpack_exports__["default"] = (Login);
+
 
 /***/ }),
 
@@ -781,12 +774,9 @@ class Login {
 /*!**************************!*\
   !*** ./src/js/Player.js ***!
   \**************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 class Player {
   constructor(
     id,
@@ -807,7 +797,7 @@ class Player {
   }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Player);
+/* harmony default export */ __webpack_exports__["default"] = (Player);
 
 /***/ }),
 
@@ -815,12 +805,9 @@ class Player {
 /*!****************************!*\
   !*** ./src/js/Register.js ***!
   \****************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 /* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! uuid */ "./node_modules/uuid/dist/esm-browser/v4.js");
 
@@ -978,6 +965,8 @@ class Register {
 
     if(!allUSers || allUSers.length === 0){
       this.local.setLocalStorage('users', [newUser])
+      this.resetForm();
+      this.showSuccesMessage();
       return;
     }
 
@@ -1053,7 +1042,7 @@ class Register {
 
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Register);
+/* harmony default export */ __webpack_exports__["default"] = (Register);
 
 /***/ }),
 
@@ -1061,12 +1050,9 @@ class Register {
 /*!************************!*\
   !*** ./src/js/Room.js ***!
   \************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _DragAndDrop__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DragAndDrop */ "./src/js/DragAndDrop.js");
 
 
@@ -1076,68 +1062,61 @@ class Room {
   players = [];
   roomBox = "";
   game = "";
-  
 
-  constructor(id, name, capacity){
+  constructor(id, name, capacity) {
     this.id = id;
     this.name = name;
     this.capacity = capacity;
   }
 
-  onDraggPlayer(user){
-
-    if(this.players.length === this.capacity){
+  onDraggPlayer(user) {
+    if (this.players.length === this.capacity) {
       this.isOpen = false;
-      disableRoom(this.id)
-      console.log('sala llena!')
+      disableRoom(this.id);
+      console.log("sala llena!");
       return;
     }
 
-    if(this.players.length > this.capacity || !this.isOpen){
-      console.log('La sala no acepta más jugadores')
+    if (this.players.length > this.capacity || !this.isOpen) {
+      console.log("La sala no acepta más jugadores");
       return;
     }
 
     this.addToRoom(user);
   }
 
-  addToRoom(user){
+  addToRoom(user) {
     // Creamos jugador que recoge los datos del usuario arrastrado
     const draggedPlayer = new Player(user.id, user.name, user.avatar);
-    this.players.push(draggedPlayer)
+    this.players.push(draggedPlayer);
     // Mostrar mensaje que se ha añadido un nuevo jugador
 
-    if(this.players > 1){
+    if (this.players > 1) {
       // Mostrar posibilidad de empezar a jugar
     }
   }
 
-  disableRoom(id){
+  disableRoom(id) {
     const roomDivElement = document.getElementById(id);
-    roomDivElement.classList.add('isFull');
+    roomDivElement.classList.add("isFull");
   }
 
-  getPlayers(){
+  getPlayers() {
     return players;
   }
 
-  initGame(){
-  
+  initGame() {
     // Quitamos botón de play
 
     // Inicializamos juego
     const gridSize = 20;
-    this.game = Game('grid', this.players, gridSize);
+    this.game = Game("grid", this.players, gridSize);
     this.game.init();
-
   }
-
-  
-
-
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Room);
+/* harmony default export */ __webpack_exports__["default"] = (Room);
+
 
 /***/ }),
 
@@ -1145,38 +1124,38 @@ class Room {
 /*!*************************!*\
   !*** ./src/js/utils.js ***!
   \*************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ LocalStorage)
+/* harmony export */   "default": function() { return /* binding */ LocalStorage; }
 /* harmony export */ });
 class LocalStorage {
   localStorage = window.localStorage;
   sessionStorage = window.sessionStorage;
 
-  setLocalStorage(key, data, type){
+  setLocalStorage(key, data, type) {
     const dataToLocaltorage = JSON.stringify(data);
-    if(type && type.includes('session')){
-      this.sessionStorage.setItem(key, dataToLocaltorage)
-    }else{
-
-      this.localStorage.setItem(key, dataToLocaltorage)
+    if (type === "session") {
+      this.sessionStorage.setItem(key, dataToLocaltorage);
+    } else {
+      this.localStorage.setItem(key, dataToLocaltorage);
     }
   }
 
-  getLocalStorage(key, type){
+  getLocalStorage(key, type) {
     let data;
 
-    if(type && type.includes('session')){
-        data = this.sessionStorage.getItem(key);
-    }else{
-        data = this.localStorage.getItem(key);
+    if (type === "session") {
+      data = this.sessionStorage.getItem(key);
+    } else {
+      data = this.localStorage.getItem(key);
     }
-    
+
     return JSON.parse(data);
   }
 }
+
 
 /***/ })
 
@@ -1208,37 +1187,37 @@ class LocalStorage {
 /******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
+/******/ 	!function() {
 /******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 		__webpack_require__.d = function(exports, definition) {
 /******/ 			for(var key in definition) {
 /******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
 /******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
 /******/ 				}
 /******/ 			}
 /******/ 		};
-/******/ 	})();
+/******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
+/******/ 	!function() {
+/******/ 		__webpack_require__.o = function(obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
+/******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
+/******/ 	!function() {
 /******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
+/******/ 		__webpack_require__.r = function(exports) {
 /******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
 /******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 /******/ 			}
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
-/******/ 	})();
+/******/ 	}();
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other entry modules.
-(() => {
+!function() {
 var __webpack_exports__ = {};
 /*!*****************************!*\
   !*** ./src/sass/style.scss ***!
@@ -1246,21 +1225,20 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 // extracted by mini-css-extract-plugin
 
-})();
-
+}();
 // This entry need to be wrapped in an IIFE because it need to be isolated against other entry modules.
-(() => {
+!function() {
 /*!*************************!*\
   !*** ./src/js/index.js ***!
   \*************************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Game": () => (/* reexport safe */ _Game__WEBPACK_IMPORTED_MODULE_0__["default"]),
-/* harmony export */   "Player": () => (/* reexport safe */ _Player__WEBPACK_IMPORTED_MODULE_1__["default"]),
-/* harmony export */   "Room": () => (/* reexport safe */ _Room__WEBPACK_IMPORTED_MODULE_2__["default"]),
-/* harmony export */   "Dashboard": () => (/* reexport safe */ _DashBoard__WEBPACK_IMPORTED_MODULE_3__["default"]),
-/* harmony export */   "Register": () => (/* reexport safe */ _Register__WEBPACK_IMPORTED_MODULE_4__["default"]),
-/* harmony export */   "Login": () => (/* reexport safe */ _Login__WEBPACK_IMPORTED_MODULE_5__["default"])
+/* harmony export */   "Game": function() { return /* reexport safe */ _Game__WEBPACK_IMPORTED_MODULE_0__["default"]; },
+/* harmony export */   "Player": function() { return /* reexport safe */ _Player__WEBPACK_IMPORTED_MODULE_1__["default"]; },
+/* harmony export */   "Room": function() { return /* reexport safe */ _Room__WEBPACK_IMPORTED_MODULE_2__["default"]; },
+/* harmony export */   "Dashboard": function() { return /* reexport safe */ _DashBoard__WEBPACK_IMPORTED_MODULE_3__["default"]; },
+/* harmony export */   "Register": function() { return /* reexport safe */ _Register__WEBPACK_IMPORTED_MODULE_4__["default"]; },
+/* harmony export */   "Login": function() { return /* reexport safe */ _Login__WEBPACK_IMPORTED_MODULE_5__["default"]; }
 /* harmony export */ });
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Game */ "./src/js/Game.js");
 /* harmony import */ var _Player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Player */ "./src/js/Player.js");
@@ -1276,8 +1254,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-})();
-
+}();
 Conquer = __webpack_exports__;
 /******/ })()
 ;

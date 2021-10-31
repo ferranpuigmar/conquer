@@ -17,7 +17,6 @@
       display: inline-flex;
       border: 3px dashed $gray-700;
       border-radius: 50%;
-      pointer-events: none;
     }
 
     .small {
@@ -125,15 +124,15 @@
     &.isFilled {
       pointer-events: none;
     }
-    &__image{
-      .image{
-          margin: 3px auto;
-          width: 52px;
-          height: 52px;
-          border-radius: 50%;
-          background-color: $white;
-          border: 1px solid $gray-700;
-          transition: all 0.4s;
+    &__image {
+      .image {
+        margin: 3px auto;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background-color: $white;
+        border: 1px solid $gray-700;
+        transition: all 0.4s;
       }
     }
   }

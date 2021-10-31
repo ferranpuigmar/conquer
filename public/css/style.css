@@ -11224,7 +11224,6 @@ textarea.form-control-lg {
   display: inline-flex;
   border: 3px dashed #495057;
   border-radius: 50%;
-  pointer-events: none;
 }
 .m-user-item__image .small {
   font-size: 10px;
