@@ -1,20 +1,22 @@
 import DragAndDrop from "./DragAndDrop";
 import Room from "./Room";
+import LocalStorage from "./utils";
 
-class Dashboard{
+class Dashboard {
   rooms = [];
   dragAndDrop = new DragAndDrop();
+  local = new LocalStorage();
 
-  constructor(initData){
+  constructor(initData) {
     this.boxRooms = initData.boxRooms;
   }
 
-  init(){
+  init() {
     this.generateRooms();
     this.dragAndDrop.init();
   }
 
-  generateRooms(){
+  generateRooms() {
     this.boxRooms.forEach((box, index) => {
       // Generamos las instancias de las salas
       this.rooms[index] = new Room(box.id, `Room${index}`, 4);
@@ -25,14 +27,22 @@ class Dashboard{
       // Y que conecte con un método de la instancia de room
 
       // Añadir clase para pintar caja
-      boxDiv.classList.add(`room${index+1}`);
+      boxDiv.classList.add(`room${index + 1}`);
       // Añadir títulos
       const title = `Room ${index + 1}`;
-      const boxDivHeader = document.querySelector(`#${box.id} .m-room-drop-item__header h3`);
+      const boxDivHeader = document.querySelector(
+        `#${box.id} .m-room-drop-item__header h3`
+      );
       boxDivHeader.innerHTML = title;
+    });
+  }
 
-
-    })
+  generatePlayerBox() {
+    const data = this.local.getLocalStorage("me", "session");
+    if (data) {
+    } else {
+      console.log(data);
+    }
   }
 }
 

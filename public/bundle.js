@@ -150,23 +150,26 @@ function validate(uuid) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _DragAndDrop__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DragAndDrop */ "./src/js/DragAndDrop.js");
 /* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
 
 
-class Dashboard{
+
+class Dashboard {
   rooms = [];
   dragAndDrop = new _DragAndDrop__WEBPACK_IMPORTED_MODULE_0__["default"]();
+  local = new _utils__WEBPACK_IMPORTED_MODULE_2__["default"]();
 
-  constructor(initData){
+  constructor(initData) {
     this.boxRooms = initData.boxRooms;
   }
 
-  init(){
+  init() {
     this.generateRooms();
     this.dragAndDrop.init();
   }
 
-  generateRooms(){
+  generateRooms() {
     this.boxRooms.forEach((box, index) => {
       // Generamos las instancias de las salas
       this.rooms[index] = new _Room__WEBPACK_IMPORTED_MODULE_1__["default"](box.id, `Room${index}`, 4);
@@ -177,18 +180,27 @@ class Dashboard{
       // Y que conecte con un método de la instancia de room
 
       // Añadir clase para pintar caja
-      boxDiv.classList.add(`room${index+1}`);
+      boxDiv.classList.add(`room${index + 1}`);
       // Añadir títulos
       const title = `Room ${index + 1}`;
-      const boxDivHeader = document.querySelector(`#${box.id} .m-room-drop-item__header h3`);
+      const boxDivHeader = document.querySelector(
+        `#${box.id} .m-room-drop-item__header h3`
+      );
       boxDivHeader.innerHTML = title;
+    });
+  }
 
-
-    })
+  generatePlayerBox() {
+    const data = this.local.getLocalStorage("me", "session");
+    if (data) {
+    } else {
+      console.log(data);
+    }
   }
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Dashboard);
+
 
 /***/ }),
 
@@ -200,29 +212,8 @@ class Dashboard{
 
 __webpack_require__.r(__webpack_exports__);
 class DragAndDrop {
-  init() {
-    let avatarMobile = document.querySelector("#avatarMobile");
-    avatarMobile.addEventListener(
-      "dragstart",
-      this.dragIniciado.bind(this),
-      false
-    );
-    avatarMobile.addEventListener(
-      "dragend",
-      this.dragFinalizado.bind(this),
-      false
-    );
-    avatarMobile.addEventListener("drag", this.drageando.bind(this), false);
-
-    document.querySelectorAll(".m-room-drop-item__image").forEach((el) => {
-      el.addEventListener("dragenter", this.dragEntraContenedor, false);
-      el.addEventListener("dragover", this.dragSobreContenedor, false);
-      el.addEventListener("dragleave", this.dragFueraContenedor, false);
-      el.addEventListener("drop", this.controlDrop, false);
-    });
-  }
-
   drageando(ev) {
+    console.log("c");
     ev.dataTransfer.setData("text", ev.target.id);
   }
 
@@ -241,6 +232,7 @@ class DragAndDrop {
   }
 
   dragEntraContenedor(e) {
+    console.log("hola...");
     //e.preventDefault();
   }
 
@@ -259,6 +251,20 @@ class DragAndDrop {
     contenedor.appendChild(avatarMobile);
     let datos = e.dataTransfer.getData("text");
     this.innerHTML += datos;
+  }
+
+  init() {
+    let avatarMobile = document.querySelector("#avatarMobile");
+    avatarMobile.addEventListener("dragstart", this.dragIniciado, false);
+    avatarMobile.addEventListener("dragend", this.dragFinalizado, false);
+    avatarMobile.addEventListener("drag", this.drageando, false);
+
+    document.querySelectorAll(".m-room-drop-item__image").forEach((el) => {
+      el.addEventListener("dragenter", this.dragEntraContenedor, false);
+      el.addEventListener("dragover", this.dragSobreContenedor, false);
+      el.addEventListener("dragleave", this.dragFueraContenedor, false);
+      el.addEventListener("drop", this.controlDrop, false);
+    });
   }
 }
 
@@ -417,7 +423,6 @@ class Game
   }
 
   checkOtherPlayerLoss(currentPlayerId){
-      console.log(currentPlayerId);
       let otherPlayers = this.players.filter((o)=> o.id !== currentPlayerId);
       let defeated = [];
       otherPlayers.forEach((player) => {
@@ -441,6 +446,7 @@ class Game
         defeated.forEach((player)=>{
           this.defeatedPlayers.push(player);
           this.players = this.players.filter(oplayer => oplayer.id !== player.id);
+          console.log(`El jugador ${player.name} ha perdido!!!`);
         });
 
         return true;
@@ -561,143 +567,157 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class Login {
-
-  fields = {}
-  errors = {}
+  fields = {};
+  errors = {};
   local = new _utils__WEBPACK_IMPORTED_MODULE_0__["default"]();
 
-  constructor(loginFields){
-    this.form = document.getElementById(loginFields.formId)
+  constructor(loginFields) {
+    this.form = document.getElementById(loginFields.formId);
     this.emailInput = document.getElementById(loginFields.emailId);
     this.passwordInput = document.getElementById(loginFields.passwordId);
     this.registerSubmitBtn = document.getElementById(loginFields.submtBtn);
   }
 
-  validateEmail(name, element, value){
+  validateEmail(name, element, value) {
     let message, isValid;
 
-    if(value === ""){
-      message = "El email no puede estar vacío"
+    if (value === "") {
+      message = "El email no puede estar vacío";
       isValid = false;
     }
 
-    if(value !== ""){
-      const regex = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    if (value !== "") {
+      const regex =
+        /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
       isValid = regex.test(value);
-      message = isValid ? "" : "El email no es válido"
+      message = isValid ? "" : "El email no es válido";
     }
 
-    if(isValid) {
+    if (isValid) {
       delete this.errors[name];
-      element.classList.remove('is-invalid')
+      element.classList.remove("is-invalid");
       document.getElementById(`${element.id}_error`).innerHTML = "";
       this.fields[name].value = value;
       return;
     } else {
-      this.fields[name].value = '';
+      this.fields[name].value = "";
     }
 
     this.errors[name] = {
       element: element,
-      message
-    }
+      message,
+    };
   }
 
-  validatePassword(name, element, value){
-
+  validatePassword(name, element, value) {
     const isValid = value !== "";
-    const message = isValid ? '' : "El password no puede estar vacío";
+    const message = isValid ? "" : "El password no puede estar vacío";
 
-    if(isValid) {
+    if (isValid) {
       delete this.errors[name];
-      element.classList.remove('is-invalid')
+      element.classList.remove("is-invalid");
       document.getElementById(`${element.id}_error`).innerHTML = "";
-      this.fields[name].value = value
+      this.fields[name].value = value;
       return;
     } else {
-      this.fields[name].value = '';
+      this.fields[name].value = "";
     }
 
     this.errors[name] = {
       element: element,
-      message
-    }
+      message,
+    };
   }
 
-  registerLoginFields(){
+  registerLoginFields() {
     const requiredFields = [
-      {name: 'emailInput', element: this.emailInput, validate: this.validateEmail.bind(this)},
-      {name: 'passwordInput', element: this.passwordInput, validate: this.validatePassword.bind(this)}
-    ]
-    requiredFields.forEach(field => {
+      {
+        name: "emailInput",
+        element: this.emailInput,
+        validate: this.validateEmail.bind(this),
+      },
+      {
+        name: "passwordInput",
+        element: this.passwordInput,
+        validate: this.validatePassword.bind(this),
+      },
+    ];
+    requiredFields.forEach((field) => {
       this.fields[field.name] = {
         name: field.name,
         validate: field.validate,
         element: field.element,
-        value: ''
-      }
-    })
+        value: "",
+      };
+    });
   }
 
-  assignListeners(){
-    this.form.addEventListener('submit', this.send.bind(this));
+  assignListeners() {
+    this.form.addEventListener("submit", this.send.bind(this));
   }
 
-  init(){
+  init() {
     this.registerLoginFields();
     this.assignListeners();
   }
 
-  loginUser(newUser){
-    const allUSers = this.local.getLocalStorage('users');
-
-    const user = allUSers.find(user => user.email === newUser.email);
-    if(!user){
-      this.showErrorMessage("No existe nadie con este email")
+  loginUser(data) {
+    const allUSers = this.local.getLocalStorage("users");
+    const newUser = data;
+    const user = allUSers.find((user) => user.email === newUser.email);
+    if (!user) {
+      this.showErrorMessage("No existe nadie con este email");
       return;
     }
-    const passWordIsValid = allUSers.find(user => user.password === newUser.password);
-    if(!passWordIsValid){
-      this.showErrorMessage("La contraseña no es válida")
+    const passWordIsValid = allUSers.find(
+      (user) => user.password === newUser.password
+    );
+    if (!passWordIsValid) {
+      this.showErrorMessage("La contraseña no es válida");
       return;
     }
 
     // Aqui va la lógica para poner al "user" (línea 95) dentro de los usuarios conectados
-    this.local.setLocalStorage('me', user, 'session');
+    this.local.setLocalStorage("me", user, "session");
     // También se tiene que redirigir al usuario a la ruta /rooms
-    window.location.href = '/rooms';
+    window.location.href = "/rooms";
   }
 
-  showErrorMessage(message){
-    const messageElement = document.getElementById('errorMessage');
+  showErrorMessage(message) {
+    const messageElement = document.getElementById("errorMessage");
     messageElement.innerHTML = message;
-    messageElement.classList.remove('d-none');
+    messageElement.classList.remove("d-none");
   }
 
-  send(e){
+  send(e) {
     e.preventDefault();
     const fields = this.fields;
 
-    const errorMessageElement = document.getElementById('errorMessage');
-    errorMessageElement.classList.add('d-none');
+    const errorMessageElement = document.getElementById("errorMessage");
+    errorMessageElement.classList.add("d-none");
 
-    Object.keys(fields).forEach(field => {
-      this.fields[field].validate(fields[field].name, fields[field].element, fields[field].element.value)
-    })
+    Object.keys(fields).forEach((field) => {
+      this.fields[field].validate(
+        fields[field].name,
+        fields[field].element,
+        fields[field].element.value
+      );
+    });
 
     const existErrors = Object.keys(this.errors).length !== 0;
 
-    if(existErrors){
-      Object.keys(this.errors).forEach(error => {
+    if (existErrors) {
+      Object.keys(this.errors).forEach((error) => {
         const inputElement = this.errors[error].element;
         const msgErrorElement = `${inputElement.id}_error`;
-        inputElement.classList.add('is-invalid');
-        document.getElementById(msgErrorElement).innerHTML = this.errors[error].message;
-      })
+        inputElement.classList.add("is-invalid");
+        document.getElementById(msgErrorElement).innerHTML =
+          this.errors[error].message;
+      });
       return;
     }
 
-    const data  = {
+    const data = {
       email: this.fields.emailInput.value,
       password: this.fields.passwordInput.value,
     };
@@ -705,10 +725,10 @@ class Login {
     // Método para enviar la información al localStorage, al apartado de usuaros conectados
     this.loginUser(data);
   }
-
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Login);
+
 
 /***/ }),
 
@@ -1076,27 +1096,28 @@ class LocalStorage {
   localStorage = window.localStorage;
   sessionStorage = window.sessionStorage;
 
-  setLocalStorage(key, data, type){
+  setLocalStorage(key, data, type) {
     const dataToLocaltorage = JSON.stringify(data);
-    if(type === 'session'){
-      this.sessionStorage.setItem(key, dataToLocaltorage)
-    }else{
-      this.localStorage.setItem(key, dataToLocaltorage)
+    if (type === "session") {
+      this.sessionStorage.setItem(key, dataToLocaltorage);
+    } else {
+      this.localStorage.setItem(key, dataToLocaltorage);
     }
   }
 
-  getLocalStorage(key, type){
+  getLocalStorage(key, type) {
     let data;
 
-    if(type === 'session'){
-        data = this.sessionStorage.getItem(key);
-    }else{
-        data = this.localStorage.getItem(key);
+    if (type === "session") {
+      data = this.sessionStorage.getItem(key);
+    } else {
+      data = this.localStorage.getItem(key);
     }
 
     return JSON.parse(data);
   }
 }
+
 
 /***/ })
 
