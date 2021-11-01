@@ -1,5 +1,5 @@
 import { EVENT_TYPES, MESSAGE_TYPES } from "./constants";
-import LocalStorage from "./utils";
+import LocalStorage, { getNewGameInfo } from "./utils";
 
 class Game {
   colors = ["red", "blue", "green", "brown"];
@@ -18,7 +18,6 @@ class Game {
     this.players = this.userToPlayerDTO(players);
     this.gridSize = gameSize;
     this.totalCells = gameSize * gameSize;
-    x;
     this.round = { turn: 1, roundNumber: 1, player: this.players[0] };
     this.grid = this.generateGrid(gameSize);
     this.roomId = roomId;
@@ -60,11 +59,15 @@ class Game {
       case MESSAGE_TYPES.WAITTING_TURN:
         message = `Es el turno de  ${this.round.player.name}, espera a que haga su movimiento`;
         break;
+      case MESSAGE_TYPES.HAS_LOST:
+        message = `Lo sentimos ${this.player.name}, te han dejado sin casillas. ¡Has perdido!`;
+        break;
       default:
         return "";
     }
     this.waittingDiv.classList.remove("d-none");
-    const messageContentDiv = `<div class="alert alert-info fade show" role="alert">
+    const messageType = this.player.hasLost ? "danger" : "info";
+    const messageContentDiv = `<div class="alert alert-${messageType} fade show" role="alert">
                 <span id="roomMessageContent">${message}</span>
               </div>`;
     messageDiv.innerHTML = messageContentDiv;
@@ -201,13 +204,7 @@ class Game {
     // Actualizamos información del round
     this.round = this.calculateNewRoundInfo();
 
-    const newGameToStorage = {
-      defeatedPlayers: this.defeatedPlayers,
-      grid: this.grid,
-      players: this.players,
-      round: this.round,
-      totalCellsToWin: this.totalCellsToWin,
-    };
+    const newGameToStorage = getNewGameInfo(this);
 
     // Enviamos update al storage
     this.updateGame(this.getRoomsList(), newGameToStorage);
@@ -224,34 +221,51 @@ class Game {
 
   // Método que comprueba si un jugador ha perdido antes de empezar su turno
   checkOtherPlayerLoss(currentPlayerId) {
-    let otherPlayers = this.players.filter((o) => o.id !== currentPlayerId);
+    // sacamos el resto de jugadrores distintos al actual
+    let otherPlayers = this.players.filter(
+      (player) => player.id !== currentPlayerId
+    );
     let defeated = [];
-    otherPlayers.forEach((player) => {
-      let aux = true;
-      let conqueredCells = this.grid.filter((c) => c.playerId == player.id);
 
+    // Contamos las celdas conquistadas por el resto de jugadores
+    // Si estos no pueden mover porque no tienen posibilidad
+    // los movemos a defeated
+    otherPlayers.forEach((player) => {
+      let playerHasLost = false;
+      let conqueredCells = this.grid.filter(
+        (cell) => cell.playerId === player.id
+      );
+
+      // Si tiene alguna celda conquistada
       if (conqueredCells.length > 0) {
         conqueredCells.forEach((cellObj) => {
-          console.log(cellObj);
-          if (this.checkValidCellClick(cellObj, null)) {
-            aux = false;
+          // Si no puede hacer click en ninguna celda adjancente
+          // es que ha perdido, no le qudan más movimientos
+          if (!this.checkValidCellClick(cellObj, null)) {
+            playerHasLost = true;
           }
         });
-      } else {
-        aux = false;
       }
-      if (aux) {
+
+      // Si el jugador ha perdido, lo añadimos al array
+      // de defeated
+      if (playerHasLost) {
         defeated.push(player);
       }
     });
 
+    // Si hay jugadores que han sido eliminados
+    // los añadimos al state de defeatedPlayers
+    // enviamos evento para que se enteren que han perdido
     if (defeated.length > 0) {
       defeated.forEach((player) => {
         this.defeatedPlayers.push(player);
         this.players = this.players.filter(
           (oplayer) => oplayer.id !== player.id
         );
-        console.log(`El jugador ${player.name} ha perdido!!!`);
+        // Enviamos evento que el user ha perdido
+        const newGameToStorage = getNewGameInfo(this);
+        this.notifySomeoneHasLost(newGameToStorage);
       });
 
       return true;
@@ -330,8 +344,9 @@ class Game {
     }
   }
 
-  createLegend() {
-    const userLegend = this.players
+  createLegend(players) {
+    const existingPlayers = players ?? this.players;
+    const userLegend = existingPlayers
       .map(
         (player) =>
           `<li><span style="background-color: ${player.color}"></span><span>${player.name}</span></li>`
@@ -353,6 +368,7 @@ class Game {
       name: player.name,
       cellsConquered: 0,
       color: this.colors[index],
+      hasLost: false,
     }));
   }
 
@@ -369,6 +385,24 @@ class Game {
       Math.floor((totalCells - otherConqueredCells) / numPlayers) + 1;
   }
 
+  //Evento para notificar que alguien ha perdido
+  notifySomeoneHasLost(newGameInfo) {
+    const updateRooms = this.getRoomsList().rooms.map((room) => {
+      if (room.id === this.roomId) {
+        room.game = newGameInfo;
+      }
+      return room;
+    });
+
+    const roomListUpdate = {
+      eventType: EVENT_TYPES.SOMEONE_HAS_LOST,
+      roomEventId: this.roomId,
+      rooms: updateRooms,
+    };
+
+    this.storage.setLocalStorage("roomsList", roomListUpdate);
+  }
+
   // Método que inicializa el juego
   init(isCallWithEvent) {
     this.createDomGrid();
@@ -377,6 +411,10 @@ class Game {
     this.roundTitle.querySelector("span").innerHTML = 1;
     this.roundTitle.classList.remove("d-none");
     this.createLegend();
+
+    if (!this.isMyTurn(this.round)) {
+      this.showRoomMessage(MESSAGE_TYPES.WAITTING_TURN);
+    }
 
     // Inicializamos los datos del juego partiendo del orden establecido
     // por orden de conexión a la sala, que viene dado por el userRomms del localStorage
@@ -424,7 +462,10 @@ class Game {
 
         switch (roomsList.eventType) {
           case EVENT_TYPES.UPDATE_GAME:
-            this.handleUpdateEventGame(roomsList);
+            !this.player.hasLost && this.handleUpdateEventGame(roomsList);
+            break;
+          case EVENT_TYPES.SOMEONE_HAS_LOST:
+            !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);
             break;
           default:
             return;
@@ -450,6 +491,28 @@ class Game {
 
     // Chequeamos el turno del jugador
     this.checkTurn(currentRoom);
+  }
+
+  // Recibe el evento que alguien ha perdido y lo notifica a aquella id
+  // de usuariso que corresponda
+  handleSomeoneHasLostEvent(roomsList) {
+    // Si la sala no es la que tiene el evento no hacemos nada
+    if (roomsList.roomEventId !== this.roomId) return;
+
+    const currentRoom = roomsList.rooms.find(
+      (room) => roomsList.roomEventId === room.id
+    );
+
+    // Sacamos las id que hay dentro de los array de jugadores que han perdido
+    const defeatedPlayersId = currentRoom.game.defeatedPlayers.map(
+      (defeatedPlayer) => defeatedPlayer.id
+    );
+
+    if (defeatedPlayersId.includes(this.player.id)) {
+      this.showRoomMessage(MESSAGE_TYPES.HAS_LOST);
+      this.player.hasLost = true;
+      this.createLegend(currentRoom.game.players);
+    }
   }
 }
 

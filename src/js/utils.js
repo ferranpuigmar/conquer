@@ -23,3 +23,13 @@ export default class LocalStorage {
     return JSON.parse(data);
   }
 }
+
+export const getNewGameInfo = (context) => {
+  return {
+    defeatedPlayers: context.defeatedPlayers,
+    grid: context.grid,
+    players: context.players,
+    round: context.round,
+    totalCellsToWin: context.totalCellsToWin,
+  };
+};
