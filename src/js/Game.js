@@ -2,7 +2,7 @@ import { EVENT_TYPES, MESSAGE_TYPES } from "./constants";
 import LocalStorage, { getNewGameInfo } from "./utils";
 
 class Game {
-  colors = ["red", "blue", "green", "brown"];
+  colors = ["Purple", "Aquamarine", "CadetBlue", "DeepPink"];
   grid = [];
   defeatedPlayers = [];
   wrapper = document.getElementById("grid");
@@ -218,42 +218,30 @@ class Game {
   getRoomsList() {
     return this.storage.getLocalStorage("roomsList");
   }
-
-  // Método que comprueba si un jugador ha perdido antes de empezar su turno
   checkOtherPlayerLoss(currentPlayerId) {
-    // sacamos el resto de jugadrores distintos al actual
-    let otherPlayers = this.players.filter(
-      (player) => player.id !== currentPlayerId
-    );
+    let otherPlayers = this.players.filter((o) => o.id !== currentPlayerId);
     let defeated = [];
-
-    // Contamos las celdas conquistadas por el resto de jugadores
-    // Si estos no pueden mover porque no tienen posibilidad
-    // los movemos a defeated
     otherPlayers.forEach((player) => {
-      let playerHasLost = false;
-      let conqueredCells = this.grid.filter(
-        (cell) => cell.playerId === player.id
-      );
+      let aux = true;
+      let conqueredCells = this.grid.filter((c) => c.playerId == player.id);
 
-      // Si tiene alguna celda conquistada
       if (conqueredCells.length > 0) {
         conqueredCells.forEach((cellObj) => {
-          // Si no puede hacer click en ninguna celda adjancente
-          // es que ha perdido, no le qudan más movimientos
-          if (!this.checkValidCellClick(cellObj, null)) {
-            playerHasLost = true;
+          if (this.checkValidCellClick(cellObj, null)) {
+            aux = false;
           }
         });
+      } else {
+        aux = false;
       }
-
-      // Si el jugador ha perdido, lo añadimos al array
-      // de defeated
-      if (playerHasLost) {
+      if (aux) {
         defeated.push(player);
       }
     });
 
+    // Si hay jugadores que han sido eliminados
+    // los añadimos al state de defeatedPlayers
+    // enviamos evento para que se enteren que han perdido
     // Si hay jugadores que han sido eliminados
     // los añadimos al state de defeatedPlayers
     // enviamos evento para que se enteren que han perdido
@@ -270,6 +258,7 @@ class Game {
 
       return true;
     }
+
     return false;
   }
 
@@ -290,7 +279,21 @@ class Game {
     });
   }
 
-  // Método que genera el Grid del DOM (Tablero)
+  defeatPlayer(player) {
+    this.defeatedPlayers.push(player);
+    this.players = this.players.filter((oplayer) => oplayer.id !== player.id);
+    console.log(`El jugador ${player.name} ha perdido!!!`);
+  }
+
+  takeOutFromGame(player) {
+    let is_in = this.players.find(
+      (current_player) => current_player.id === player.id
+    );
+    if (!!is_in) {
+      this.defeatPlayer(player);
+    }
+  }
+
   createDomGrid() {
     const size = this.gridSize;
     this.wrapper.innerHTML = "";

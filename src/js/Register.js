@@ -184,6 +184,7 @@ class Register {
   }
 
   init() {
+    this.redirectToRooms();
     this.assignListeners();
     this.registerFields();
   }
@@ -273,6 +274,13 @@ class Register {
 
     // Evento para enviar la información al localStorage, al apartado de usuaros registrados
     this.saveUser(data);
+  }
+
+  redirectToRooms(){
+    let user = this.local.getLocalStorage("me", "session");
+    if(user){
+      window.location.href = "/rooms";
+    }
   }
 }
 

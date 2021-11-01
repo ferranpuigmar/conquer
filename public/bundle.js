@@ -165,8 +165,10 @@ class Dashboard {
   }
 
   init() {
+    this.redirectToLogin();
     this.generateRooms();
     this.generatePlayerBox();
+    this.generateLogout();
     this.dragAndDrop.init();
   }
 
@@ -259,6 +261,17 @@ class Dashboard {
     }
   }
 
+  generateLogout(){
+      const logoutBtn = document.getElementById('logout');
+      const player = this.localStorage.getLocalStorage("me", "session");
+
+      logoutBtn.addEventListener('click', function(){
+          this.rooms.takeOutFromRoom(player);
+          this.localStorage.setLocalStorage("me", null, "session");
+          this.redirectToLogin();
+      });
+  }
+
   isPlayerInRooms(player) {
     let allPlayers = [];
     this.roomsList.forEach((room) => {
@@ -268,16 +281,23 @@ class Dashboard {
   }
 
   getRoomName(id) {
-    var index = -1;
-    var room = this.boxRooms.find(function (item, i) {
+    let index = -1;
+    this.boxRooms.find(function (item, i) {
       if (item.id === id) {
         index = i;
         return i;
       }
     });
-    console.log(room, index);
     return "ROOM " + (index + 1);
   }
+
+  redirectToLogin(){
+    let user = this.localStorage.getLocalStorage("me", "session");
+    if(!user){
+      window.location.href = "/";
+    }
+  }
+
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Dashboard);
@@ -367,7 +387,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class Game {
-  colors = ["red", "blue", "green", "brown"];
+  colors = ["Purple", "Aquamarine", "CadetBlue", "DeepPink"];
   grid = [];
   defeatedPlayers = [];
   wrapper = document.getElementById("grid");
@@ -583,42 +603,30 @@ class Game {
   getRoomsList() {
     return this.storage.getLocalStorage("roomsList");
   }
-
-  // Método que comprueba si un jugador ha perdido antes de empezar su turno
   checkOtherPlayerLoss(currentPlayerId) {
-    // sacamos el resto de jugadrores distintos al actual
-    let otherPlayers = this.players.filter(
-      (player) => player.id !== currentPlayerId
-    );
+    let otherPlayers = this.players.filter((o) => o.id !== currentPlayerId);
     let defeated = [];
-
-    // Contamos las celdas conquistadas por el resto de jugadores
-    // Si estos no pueden mover porque no tienen posibilidad
-    // los movemos a defeated
     otherPlayers.forEach((player) => {
-      let playerHasLost = false;
-      let conqueredCells = this.grid.filter(
-        (cell) => cell.playerId === player.id
-      );
+      let aux = true;
+      let conqueredCells = this.grid.filter((c) => c.playerId == player.id);
 
-      // Si tiene alguna celda conquistada
       if (conqueredCells.length > 0) {
         conqueredCells.forEach((cellObj) => {
-          // Si no puede hacer click en ninguna celda adjancente
-          // es que ha perdido, no le qudan más movimientos
-          if (!this.checkValidCellClick(cellObj, null)) {
-            playerHasLost = true;
+          if (this.checkValidCellClick(cellObj, null)) {
+            aux = false;
           }
         });
+      } else {
+        aux = false;
       }
-
-      // Si el jugador ha perdido, lo añadimos al array
-      // de defeated
-      if (playerHasLost) {
+      if (aux) {
         defeated.push(player);
       }
     });
 
+    // Si hay jugadores que han sido eliminados
+    // los añadimos al state de defeatedPlayers
+    // enviamos evento para que se enteren que han perdido
     // Si hay jugadores que han sido eliminados
     // los añadimos al state de defeatedPlayers
     // enviamos evento para que se enteren que han perdido
@@ -635,6 +643,7 @@ class Game {
 
       return true;
     }
+
     return false;
   }
 
@@ -655,7 +664,21 @@ class Game {
     });
   }
 
-  // Método que genera el Grid del DOM (Tablero)
+  defeatPlayer(player) {
+    this.defeatedPlayers.push(player);
+    this.players = this.players.filter((oplayer) => oplayer.id !== player.id);
+    console.log(`El jugador ${player.name} ha perdido!!!`);
+  }
+
+  takeOutFromGame(player) {
+    let is_in = this.players.find(
+      (current_player) => current_player.id === player.id
+    );
+    if (!!is_in) {
+      this.defeatPlayer(player);
+    }
+  }
+
   createDomGrid() {
     const size = this.gridSize;
     this.wrapper.innerHTML = "";
@@ -988,6 +1011,7 @@ class Login {
   }
 
   init() {
+    this.redirectToRooms();
     this.registerLoginFields();
     this.assignListeners();
   }
@@ -1033,6 +1057,13 @@ class Login {
     const messageElement = document.getElementById("errorMessage");
     messageElement.innerHTML = message;
     messageElement.classList.remove("d-none");
+  }
+
+  redirectToRooms() {
+    let user = this.storage.getLocalStorage("me", "session");
+    if (user) {
+      window.location.href = "/rooms";
+    }
   }
 
   send(e) {
@@ -1273,6 +1304,7 @@ class Register {
   }
 
   init() {
+    this.redirectToRooms();
     this.assignListeners();
     this.registerFields();
   }
@@ -1362,6 +1394,13 @@ class Register {
 
     // Evento para enviar la información al localStorage, al apartado de usuaros registrados
     this.saveUser(data);
+  }
+
+  redirectToRooms(){
+    let user = this.local.getLocalStorage("me", "session");
+    if(user){
+      window.location.href = "/rooms";
+    }
   }
 }
 
@@ -1507,6 +1546,14 @@ class Room {
 
     // quitamos mensaje conectados del panel de juego
     document.getElementById("roomConnectedMessage").innerHTML = "";
+  }
+
+  takeOutFromRoom(player){
+      let is_in = this.players.find((room_player)=> room_player.id === player.id);
+      if(!!is_in){
+        this.game.takeOutFromGame(player);
+        //this.players = this.players.filter((room_player)=> room_player.id !== player.id);
+      }
   }
 
   initStorageEvents() {
