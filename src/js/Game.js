@@ -218,30 +218,32 @@ class Game {
   getRoomsList() {
     return this.storage.getLocalStorage("roomsList");
   }
+
   checkOtherPlayerLoss(currentPlayerId) {
-    let otherPlayers = this.players.filter((o) => o.id !== currentPlayerId);
+    let otherPlayers = this.players.filter(
+      (otherPlayer) => otherPlayer.id !== currentPlayerId
+    );
     let defeated = [];
     otherPlayers.forEach((player) => {
-      let aux = true;
-      let conqueredCells = this.grid.filter((c) => c.playerId == player.id);
+      let playerHasLost = true;
+      let conqueredCells = this.grid.filter(
+        (cell) => cell.playerId === player.id
+      );
 
       if (conqueredCells.length > 0) {
         conqueredCells.forEach((cellObj) => {
           if (this.checkValidCellClick(cellObj, null)) {
-            aux = false;
+            playerHasLost = false;
           }
         });
       } else {
-        aux = false;
+        playerHasLost = false;
       }
-      if (aux) {
+      if (playerHasLost) {
         defeated.push(player);
       }
     });
 
-    // Si hay jugadores que han sido eliminados
-    // los añadimos al state de defeatedPlayers
-    // enviamos evento para que se enteren que han perdido
     // Si hay jugadores que han sido eliminados
     // los añadimos al state de defeatedPlayers
     // enviamos evento para que se enteren que han perdido
@@ -256,6 +258,7 @@ class Game {
         this.notifySomeoneHasLost(newGameToStorage);
       });
 
+      this.calculateTotalCellsToWin(this.totalCells, this.players);
       return true;
     }
 
@@ -291,6 +294,7 @@ class Game {
     );
     if (!!is_in) {
       this.defeatPlayer(player);
+      this.calculateTotalCellsToWin(this.totalCells, this.players);
     }
   }
 
@@ -379,13 +383,15 @@ class Game {
   // que rellenar un jugador para ganar
   calculateTotalCellsToWin(totalCells, players) {
     const numPlayers = players.length;
-    const otherConqueredCells = this.defeatedPlayers.reduce(
-      (acc, player) => acc.cellsConquered + player.cellsConquered,
-      0
-    ); // X casillas conquistadas por otros jugadores
+    let totalDefeatedCells = 0;
+
+    this.defeatedPlayers.forEach((defeatyedPlayer) => {
+      const cellsConquered = defeatyedPlayer.cellsConquered;
+      totalDefeatedCells += cellsConquered;
+    });
 
     this.totalCellsToWin =
-      Math.floor((totalCells - otherConqueredCells) / numPlayers) + 1;
+      Math.floor((totalCells - totalDefeatedCells) / numPlayers) + 1;
   }
 
   //Evento para notificar que alguien ha perdido
@@ -483,6 +489,7 @@ class Game {
     console.log("update game from event");
     // Si la sala no es la que tiene el evento no hacemos nada
     if (roomsList.roomEventId !== this.roomId) return;
+
     const currentRoom = roomsList.rooms.find(
       (room) => room.id === roomsList.roomEventId
     );
@@ -491,6 +498,7 @@ class Game {
     this.grid = currentRoom.game.grid;
     this.round = currentRoom.game.round;
     this.totalCellsToWin = currentRoom.game.totalCellsToWin;
+    this.players = currentRoom.game.players;
 
     // Chequeamos el turno del jugador
     this.checkTurn(currentRoom);
