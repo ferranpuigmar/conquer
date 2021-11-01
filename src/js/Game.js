@@ -190,7 +190,7 @@ class Game
 
   takeOutFromGame(player){
     let is_in = this.players.find(current_player => current_player.id === player.id);
-    if(!is_in){
+    if(!!is_in){
       this.defeatPlayer(player);
     }
   }

@@ -67,7 +67,7 @@ class Room {
   takeOutFromRoom(player){
       let is_in = this.players.find((room_player)=> room_player.id === player.id);
       if(!!is_in){
-        this.Game.takeOutFromGame(player);
+        this.game.takeOutFromGame(player);
         //this.players = this.players.filter((room_player)=> room_player.id !== player.id);
       }
   }
