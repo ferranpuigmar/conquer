@@ -3,7 +3,7 @@ import Room from "./Room";
 import LocalStorage from "./utils";
 
 class Dashboard {
-  rooms = [];
+  roomsList = [];
   dragAndDrop = new DragAndDrop();
   localStorage = new LocalStorage();
 
@@ -19,10 +19,11 @@ class Dashboard {
 
   generateRooms() {
     this.boxRooms.forEach((box, index) => {
+      const roomName = `Room ${index + 1}`;
       // Generamos las instancias de las salas
-      this.rooms[index] = new Room(box.id, `Room${index}`, 4);
+      this.roomsList[index] = new Room(box.id, roomName, 4);
       // Iniciamos listeners para eventos del tipo storage
-      this.rooms[index].initStorageEvents();
+      this.roomsList[index].initStorageEvents();
 
       const boxDiv = document.getElementById(box.id);
 
@@ -32,11 +33,10 @@ class Dashboard {
       // Añadir clase para pintar caja
       boxDiv.classList.add(`room${index + 1}`);
       // Añadir títulos
-      const title = `Room ${index + 1}`;
       const boxDivHeader = document.querySelector(
         `#${box.id} .m-room-drop-item__header h3`
       );
-      boxDivHeader.innerHTML = title;
+      boxDivHeader.innerHTML = roomName;
     });
 
     this.generateStorageRooms();
@@ -44,12 +44,13 @@ class Dashboard {
 
   generateStorageRooms() {
     // Comprobamos si ya hay rooms en el LocalStorage
-    const existRooms = this.localStorage.getLocalStorage("rooms");
+    const existRooms = this.localStorage.getLocalStorage("roomsList");
     if (!existRooms) {
       // Generamos localStorage inicial para las rooms
-      const roomDataToStorage = this.rooms.map((room) => ({
+      const roomsDataToStorage = this.roomsList.map((room) => ({
         id: room.id,
-        userRooms: [],
+        usersRoom: [],
+        isOpen: true,
         game: {
           grid: [],
           players: [],
@@ -62,12 +63,17 @@ class Dashboard {
           },
         },
       }));
-      this.localStorage.setLocalStorage("rooms", roomDataToStorage);
+      const roomsDataType = {
+        eventType: null,
+        roomEventId: null,
+        rooms: roomsDataToStorage,
+      };
+      this.localStorage.setLocalStorage("roomsList", roomsDataType);
     }
 
-    //Temporal, añadimos user a la priemra sala
+    //Temporal, añadimos user a la primera sala
     const currentUserData = this.localStorage.getLocalStorage("me", "session");
-    const currentRoom = this.rooms[0];
+    const currentRoom = this.roomsList[0];
     currentRoom.addToRoom(currentUserData);
   }
 
@@ -102,7 +108,7 @@ class Dashboard {
 
   isPlayerInRooms(player) {
     let allPlayers = [];
-    this.rooms.forEach((room) => {
+    this.roomsList.forEach((room) => {
       allPlayers.concat(room.players);
     });
     return !!allPlayers.find((pl) => pl.id === player.id);

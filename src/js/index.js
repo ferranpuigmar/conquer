@@ -1,15 +1,7 @@
-import Game from './Game';
-import Player from './Player';
-import Room from './Room';
-import Dashboard from './DashBoard';
-import Register from './Register';
-import Login from './Login';
+import Game from "./Game";
+import Room from "./Room";
+import Dashboard from "./DashBoard";
+import Register from "./Register";
+import Login from "./Login";
 
-export {
-  Game,
-  Player,
-  Room,
-  Dashboard,
-  Register,
-  Login
-}
+export { Game, Room, Dashboard, Register, Login };

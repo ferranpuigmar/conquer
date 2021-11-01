@@ -156,7 +156,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 class Dashboard {
-  rooms = [];
+  roomsList = [];
   dragAndDrop = new _DragAndDrop__WEBPACK_IMPORTED_MODULE_0__["default"]();
   localStorage = new _utils__WEBPACK_IMPORTED_MODULE_2__["default"]();
 
@@ -172,10 +172,11 @@ class Dashboard {
 
   generateRooms() {
     this.boxRooms.forEach((box, index) => {
+      const roomName = `Room ${index + 1}`;
       // Generamos las instancias de las salas
-      this.rooms[index] = new _Room__WEBPACK_IMPORTED_MODULE_1__["default"](box.id, `Room${index}`, 4);
+      this.roomsList[index] = new _Room__WEBPACK_IMPORTED_MODULE_1__["default"](box.id, roomName, 4);
       // Iniciamos listeners para eventos del tipo storage
-      this.rooms[index].initStorageEvents();
+      this.roomsList[index].initStorageEvents();
 
       const boxDiv = document.getElementById(box.id);
 
@@ -185,11 +186,10 @@ class Dashboard {
       // Añadir clase para pintar caja
       boxDiv.classList.add(`room${index + 1}`);
       // Añadir títulos
-      const title = `Room ${index + 1}`;
       const boxDivHeader = document.querySelector(
         `#${box.id} .m-room-drop-item__header h3`
       );
-      boxDivHeader.innerHTML = title;
+      boxDivHeader.innerHTML = roomName;
     });
 
     this.generateStorageRooms();
@@ -197,12 +197,13 @@ class Dashboard {
 
   generateStorageRooms() {
     // Comprobamos si ya hay rooms en el LocalStorage
-    const existRooms = this.localStorage.getLocalStorage("rooms");
+    const existRooms = this.localStorage.getLocalStorage("roomsList");
     if (!existRooms) {
       // Generamos localStorage inicial para las rooms
-      const roomDataToStorage = this.rooms.map((room) => ({
+      const roomsDataToStorage = this.roomsList.map((room) => ({
         id: room.id,
-        userRooms: [],
+        usersRoom: [],
+        isOpen: true,
         game: {
           grid: [],
           players: [],
@@ -215,12 +216,17 @@ class Dashboard {
           },
         },
       }));
-      this.localStorage.setLocalStorage("rooms", roomDataToStorage);
+      const roomsDataType = {
+        eventType: null,
+        roomEventId: null,
+        rooms: roomsDataToStorage,
+      };
+      this.localStorage.setLocalStorage("roomsList", roomsDataType);
     }
 
-    //Temporal, añadimos user a la priemra sala
+    //Temporal, añadimos user a la primera sala
     const currentUserData = this.localStorage.getLocalStorage("me", "session");
-    const currentRoom = this.rooms[0];
+    const currentRoom = this.roomsList[0];
     currentRoom.addToRoom(currentUserData);
   }
 
@@ -255,7 +261,7 @@ class Dashboard {
 
   isPlayerInRooms(player) {
     let allPlayers = [];
-    this.rooms.forEach((room) => {
+    this.roomsList.forEach((room) => {
       allPlayers.concat(room.players);
     });
     return !!allPlayers.find((pl) => pl.id === player.id);
@@ -355,59 +361,115 @@ class DragAndDrop {
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-class Game
-{
-  colors = [ 'red', 'blue', 'green', 'brown' ];
-  grid = []
-  defeatedPlayers = [];
-  wrapper = "";
-  totalCellsToWin = 0;
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/js/constants.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
-  constructor (
-    wrapper,
-    players,
-    gameSize
-  )
-  {
-    this.players = this.buildToGamePlayers( players );
+
+
+class Game {
+  colors = ["red", "blue", "green", "brown"];
+  grid = [];
+  defeatedPlayers = [];
+  wrapper = document.getElementById("grid");
+  totalCellsToWin = 0;
+  storage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
+  waittingDiv = document.querySelector("#roomMessage"); // Div del mensaje de espera
+  roomsList;
+  roundTitle = document.getElementById("roundTitle"); // Número del Round
+  pannelInfo = document.getElementById("roomPannelInfo");
+
+  constructor(roomId, playerInfo, players, gameSize) {
+    this.player = playerInfo;
+    this.players = this.userToPlayerDTO(players);
     this.gridSize = gameSize;
     this.totalCells = gameSize * gameSize;
-    this.round = { turn: 1, roundNumber: 1, player: this.players[ 0 ] }
+    x;
+    this.round = { turn: 1, roundNumber: 1, player: this.players[0] };
     this.grid = this.generateGrid(gameSize);
-    this.wrapper = wrapper;
+    this.roomId = roomId;
   }
 
-  getPlayers ()
-  {
-    console.log( 'players: ', this.players );
+  isMyTurn(round) {
+    return round.player.id === this.player.id;
   }
 
-  getRoundInfo(){
+  getPlayers() {
+    return this.players;
+  }
+
+  // Método que calcula la nueva info del Round después de un movimiento
+  calculateNewRoundInfo() {
     const newTurn = this.round.turn + 1;
     const isTurnEnd = newTurn > this.players.length;
-    const newRoundTitle = isTurnEnd ? this.round.roundNumber + 1 : this.round.roundNumber;
+    const newRoundTitle = isTurnEnd
+      ? this.round.roundNumber + 1
+      : this.round.roundNumber;
 
-    if(isTurnEnd){
-      const rountDivSection = document.querySelector('#roundTitle h3');
-      rountDivSection.innerHTML = `Round ${newRoundTitle}`
+    // Si el último jugador ha movido cambiamos el número del Round
+    // si no, aumentamos en 1 el turno
+    if (isTurnEnd) {
+      this.roundTitle.querySelector("span").innerHTML = newRoundTitle;
     }
 
     return {
       roundNumber: newRoundTitle,
       turn: isTurnEnd ? 1 : newTurn,
-      player: isTurnEnd ? this.players[0] : this.players[ newTurn - 1]
+      player: isTurnEnd ? this.players[0] : this.players[newTurn - 1],
+    };
+  }
+
+  showRoomMessage(type) {
+    let message;
+    const messageDiv = document.querySelector("#roomMessage");
+    switch (type) {
+      case _constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.WAITTING_TURN:
+        message = `Es el turno de  ${this.round.player.name}, espera a que haga su movimiento`;
+        break;
+      default:
+        return "";
     }
+    this.waittingDiv.classList.remove("d-none");
+    const messageContentDiv = `<div class="alert alert-info fade show" role="alert">
+                <span id="roomMessageContent">${message}</span>
+              </div>`;
+    messageDiv.innerHTML = messageContentDiv;
   }
 
-  checkTurn ()
-  {
-    // Me descargo los updates del juego
-
-    // Seteo las propiedades del juego con esa info
-    this.round = this.getRoundInfo();
+  hideRoomMessage() {
+    this.waittingDiv.classList.add("d-none");
+    this.waittingDiv.innerHTML = "";
   }
 
-  checkValidCellClick (cellObj, id){
+  // Método que chequea que sea el turno del jugador
+  // y actualiza la información del juego que viene por el localStorage
+  checkTurn(currentRoom) {
+    if (this.round.player.id !== this.player.id) {
+      this.showRoomMessage(_constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.WAITTING_TURN);
+    } else {
+      this.hideRoomMessage();
+    }
+
+    // Actualizamos juego para el jugador
+    const updateGame = currentRoom.game;
+    this.roundTitle.querySelector("span").innerHTML =
+      updateGame.round.roundNumber;
+
+    // Iteramos sobre las celdas del grid del DOM
+    // las cotejamos con nuestro grid actualizado del localStorage
+    // Si existe un id dentro del grid que es = a el del id de la cell
+    // cambiamos el color de la celda
+    const cells = this.wrapper.querySelectorAll(".m-game-grid__cell");
+    cells.forEach((cell, index) => {
+      const cellId = cell.id;
+      if (this.grid[index].id && this.grid[index].id === cellId) {
+        cell.style.backgroundColor = this.grid[index].color;
+      }
+    });
+  }
+
+  // Método que calcula que casillas son clicables por el jugador
+  // de momento es en cruz
+  checkValidCellClick(cellObj, id) {
     // row de la casilla clickada
     const row = Number(cellObj.row);
     // celda de la casilla clickada
@@ -415,37 +477,42 @@ class Game
 
     // Generamos posibles celdas adjacentes que pueden ser del jugador
     const nearCells = [
-      `cell${row+1}-${cell}`,
-      `cell${row}-${cell+1}`,
-      `cell${row-1}-${cell}`,
-      `cell${row}-${cell-1}`
-    ]
-    // Inicializamos un array para guardar las celdas 
+      `cell${row + 1}-${cell}`,
+      `cell${row}-${cell + 1}`,
+      `cell${row - 1}-${cell}`,
+      `cell${row}-${cell - 1}`,
+    ];
+    // Inicializamos un array para guardar las celdas
     // adjacentes que pertenecen al jugador
-    const validClick = []
+    const validClick = [];
 
     // Iteramos por el array de grid de nuestra clase Game para
     // cotejar si las celdas que estan en nearCells tienen registrado al
     // jugador, de modo que sabemos que son casillas en las que ha hecho click
     // anteriormente
-    for(let i= 0; i < nearCells.length; i++){
+    for (let i = 0; i < nearCells.length; i++) {
       // buscamos dentro de nuestro registro de grid la id de celda
-      const targetCell = this.grid.find(cell => cell.id === nearCells[i]);
+      const targetCell = this.grid.find((cell) => cell.id === nearCells[i]);
       // Si la celda existe en el gri y además está registrado a nombre del jugador
       // añadimos una celda válida dentro de las posibles celdas adyacentes
-      if(targetCell && targetCell.playerId === id){
-        validClick.push({validCell: true})
+      if (targetCell && targetCell.playerId === id) {
+        validClick.push({ validCell: true });
       }
     }
 
     // Retornamos un valor booleanos que nos dice si almenos una
     // de las casillas adjacentes a la casilla en la que se ha hecho click
     // pertenece al jugador
-    return validClick.some(el => el.validCell)
+    return validClick.some((el) => el.validCell);
   }
 
-  checkCellClick ( e )
-  {
+  // Método que chequea la celda que se ha clicado en el tablero
+  // Chequeamos que sea clicable
+  // Chequeamos si el jugador ha ganado
+  // Actualizamos el localStorage con ese clic
+  checkCellClick(e) {
+    if (!this.isMyTurn(this.round)) return;
+
     // chequeamos a que jugador le toca
     const currentPlayerTurn = this.round.player;
 
@@ -454,121 +521,152 @@ class Game
     const cellId = e.target.id;
     const cellObj = {
       row: e.target.dataset.row,
-      cell: e.target.dataset.cell
-    }
+      cell: e.target.dataset.cell,
+    };
     const cell = document.getElementById(cellId);
 
     // comprobamos si es adjacente a la última seleccionada por el jugador
     // siempre y cuando no sea el primer turno
-    if(this.round.roundNumber !== 1){
+    if (this.round.roundNumber !== 1) {
       let isCellFilled, isAValidCellClick;
       // comprobamos si está llena
-      isCellFilled = cell.classList.contains('isFilled')
+      isCellFilled = cell.classList.contains("isFilled");
       // comprobamos si el click está en una casilla adjacente que pertenece al jugador
-      isAValidCellClick = this.checkValidCellClick(cellObj, currentPlayerTurn.id);
+      isAValidCellClick = this.checkValidCellClick(
+        cellObj,
+        currentPlayerTurn.id
+      );
 
-      if(isCellFilled || !isAValidCellClick) {
-        return
-      };
+      if (isCellFilled || !isAValidCellClick) {
+        return;
+      }
     }
 
     // Añadimos la class isFilled que no permite pulsar la casilla
-    cell.classList.add('isFilled');
+    cell.classList.add("isFilled");
     // Cambiamos la celda al color del jugador
-    cell.style.backgroundColor= currentPlayerTurn.color;
+    cell.style.backgroundColor = currentPlayerTurn.color;
     // Le sumamos 1 a sus casillas conquistadas
     // y registramos la id de la celda como última posición
     this.AddConqueredCell(currentPlayerTurn.id, cellId);
 
-    // Comprobamos que ninguno de los otros jugadores 
+    // Comprobamos que ninguno de los otros jugadores
     // ha perdido.
     this.checkOtherPlayerLoss(currentPlayerTurn.id);
 
     // Comprobamos si ha ganado
-    if(this.totalCellsToWin === currentPlayerTurn.cellsConquered){
+    if (this.totalCellsToWin === currentPlayerTurn.cellsConquered) {
       console.log(`El jugador ${currentPlayerTurn.name} ha ganado!!!`);
     }
 
-    if(this.players.length == 1){
+    if (this.players.length == 1) {
       console.log(`El jugador ${this.players[0].name} ha ganado!!!`);
     }
 
-    // cambiamos el turno
-    this.checkTurn()
+    // Actualizamos información del round
+    this.round = this.calculateNewRoundInfo();
+
+    const newGameToStorage = {
+      defeatedPlayers: this.defeatedPlayers,
+      grid: this.grid,
+      players: this.players,
+      round: this.round,
+      totalCellsToWin: this.totalCellsToWin,
+    };
+
+    // Enviamos update al storage
+    this.updateGame(this.getRoomsList(), newGameToStorage);
+    const currentRoom = this.getRoomsList().rooms.find(
+      (room) => room.id === this.roomId
+    );
+    this.checkTurn(currentRoom);
   }
 
-  checkOtherPlayerLoss(currentPlayerId){
-      let otherPlayers = this.players.filter((o)=> o.id !== currentPlayerId);
-      let defeated = [];
-      otherPlayers.forEach((player) => {
-        let aux = true;
-          let conqueredCells = this.grid.filter((c)=> c.playerId == player.id);
+  // Devuelve la key roomsList del localStorage
+  getRoomsList() {
+    return this.storage.getLocalStorage("roomsList");
+  }
 
-          if(conqueredCells.length > 0){
-            conqueredCells.forEach((cellObj)=>{
-              console.log(cellObj);
-              if(this.checkValidCellClick(cellObj, null)){
-                aux = false;
-              }
-            })
-          }else{
-            aux= false;
+  // Método que comprueba si un jugador ha perdido antes de empezar su turno
+  checkOtherPlayerLoss(currentPlayerId) {
+    let otherPlayers = this.players.filter((o) => o.id !== currentPlayerId);
+    let defeated = [];
+    otherPlayers.forEach((player) => {
+      let aux = true;
+      let conqueredCells = this.grid.filter((c) => c.playerId == player.id);
+
+      if (conqueredCells.length > 0) {
+        conqueredCells.forEach((cellObj) => {
+          console.log(cellObj);
+          if (this.checkValidCellClick(cellObj, null)) {
+            aux = false;
           }
-        if(aux){ defeated.push(player); };
+        });
+      } else {
+        aux = false;
+      }
+      if (aux) {
+        defeated.push(player);
+      }
+    });
+
+    if (defeated.length > 0) {
+      defeated.forEach((player) => {
+        this.defeatedPlayers.push(player);
+        this.players = this.players.filter(
+          (oplayer) => oplayer.id !== player.id
+        );
+        console.log(`El jugador ${player.name} ha perdido!!!`);
       });
 
-      if(defeated.length > 0){
-        defeated.forEach((player)=>{
-          this.defeatedPlayers.push(player);
-          this.players = this.players.filter(oplayer => oplayer.id !== player.id);
-          console.log(`El jugador ${player.name} ha perdido!!!`);
-        });
-
-        return true;
-      }
-      return false;
+      return true;
+    }
+    return false;
   }
 
-  AddConqueredCell(playerId, cellId){
-    this.players = this.players.map(player => {
-      if(player.id === playerId){
+  // Método que añade una casilla al total
+  // de casillas conquistadas del jugador
+  AddConqueredCell(playerId, cellId) {
+    this.players = this.players.map((player) => {
+      if (player.id === playerId) {
         player.cellsConquered += 1;
       }
       return player;
-    })
-    this.grid.forEach(cell => {
-      if(cell.id === cellId){
-        cell.playerId = this.round.player.id
+    });
+    this.grid.forEach((cell) => {
+      if (cell.id === cellId) {
+        cell.playerId = this.round.player.id;
+        cell.color = this.round.player.color;
       }
-    })
+    });
   }
 
-  createDomGrid ()
-  {
+  // Método que genera el Grid del DOM (Tablero)
+  createDomGrid() {
     const size = this.gridSize;
-    const wrapper = document.getElementById( this.wrapper );
+    this.wrapper.innerHTML = "";
     let rowCounter = 1;
     let cellCounter = 1;
-    let cells = []
+    let cells = [];
 
-    for ( let i = 1; i <= size * size; i++ ) {
-      let cellId = `cell${ rowCounter }-${ cellCounter }`;
-      let cell = document.createElement( 'div' );
+    for (let i = 1; i <= size * size; i++) {
+      let cellId = `cell${rowCounter}-${cellCounter}`;
+      let cell = document.createElement("div");
       cell.id = cellId;
       cell.row = rowCounter;
       cell.cell = cellCounter;
       cell.className = `m-game-grid__cell cell-${rowCounter}-${cellCounter}`;
       cell.dataset.cell = cellCounter;
       cell.dataset.row = rowCounter;
-      cell.addEventListener( 'click', this.checkCellClick.bind( this ), false );
+      cell.addEventListener("click", this.checkCellClick.bind(this), false);
       cells.push(cell);
       cellCounter++;
 
       // Si hay 20 celdas
-      if ( i % size === 0) {
+      if (i % size === 0) {
         // Creamos contenedor de la fila
-        let row = document.createElement( 'div' );
-        row.className = 'm-game-grid__row';
+        let row = document.createElement("div");
+        row.className = "m-game-grid__row";
 
         // Añadimos las 20 celdas a la fila
         cells.forEach((cell, index) => {
@@ -576,10 +674,10 @@ class Game
         });
 
         // Añadimos la fila al grid del HTML
-        wrapper.appendChild( row )
+        this.wrapper.appendChild(row);
 
-        // Reiniciamos el array de celdas, 
-        // el contador de celdas a 1 
+        // Reiniciamos el array de celdas,
+        // el contador de celdas a 1
         // y añadimos 1 al contador de filas
         cells = [];
         cellCounter = 1;
@@ -587,46 +685,141 @@ class Game
       }
 
       // registamos la id de la casilla en nuestro registro de grid
-      this.grid[i-1] = {
+      this.grid[i - 1] = {
         id: cell.id,
         row: cell.row,
         cell: cell.cell,
-        playerId: null
-      }
+        playerId: null,
+        color: null,
+      };
     }
   }
 
-  generateGrid(gridSize){
-    return [...Array(gridSize * gridSize)]
+  createLegend() {
+    const userLegend = this.players
+      .map(
+        (player) =>
+          `<li><span style="background-color: ${player.color}"></span><span>${player.name}</span></li>`
+      )
+      .join("");
+    this.pannelInfo.innerHTML = `<span>Jugadores:</span> <ul>${userLegend}</ul>`;
   }
 
-  buildToGamePlayers ( players )
-  {
-    return players.map( ( player, index ) => ( {
+  // Método que inicializa el registro de grid según las dimensiones
+  generateGrid(gridSize) {
+    return [...Array(gridSize * gridSize)];
+  }
+
+  // Método que transforma los datos que nos llegan de los usuarios
+  // a datos de jugador que necesitamos para gestionar el juego
+  userToPlayerDTO(players) {
+    return players.map((player, index) => ({
       id: player.id,
-      name: player.getName(),
+      name: player.name,
       cellsConquered: 0,
-      color: this.colors[ index ]
-    } ) )
+      color: this.colors[index],
+    }));
   }
 
-  calculateTotalCellsToWin ( totalCells, players )
-  {
+  // Método que calcula el total de celdas que tiene
+  // que rellenar un jugador para ganar
+  calculateTotalCellsToWin(totalCells, players) {
     const numPlayers = players.length;
-    const otherConqueredCells = this.defeatedPlayers.reduce((acc, player) => acc.cellsConquered + player.cellsConquered, 0); // X casillas conquistadas por otros jugadores
+    const otherConqueredCells = this.defeatedPlayers.reduce(
+      (acc, player) => acc.cellsConquered + player.cellsConquered,
+      0
+    ); // X casillas conquistadas por otros jugadores
 
-    this.totalCellsToWin =  Math.floor( (totalCells-otherConqueredCells) / numPlayers ) + 1
+    this.totalCellsToWin =
+      Math.floor((totalCells - otherConqueredCells) / numPlayers) + 1;
   }
 
-  init(){
+  // Método que inicializa el juego
+  init(isCallWithEvent) {
     this.createDomGrid();
-    this.calculateTotalCellsToWin(this.totalCells, this.players)
+    this.calculateTotalCellsToWin(this.totalCells, this.players);
+    this.initStorageEvents();
+    this.roundTitle.querySelector("span").innerHTML = 1;
+    this.roundTitle.classList.remove("d-none");
+    this.createLegend();
 
-    // Generamos listener para manejar cambios en el localStorage
+    // Inicializamos los datos del juego partiendo del orden establecido
+    // por orden de conexión a la sala, que viene dado por el userRomms del localStorage
+    // mediante isCallWithEvent, si el juego se ha inciado por evento no lo hacemos ya que
+    // inicialmente ya lo ha iniciado el primero que le ha dado al botón de play
+    if (!isCallWithEvent) {
+      const initNewGameToStorage = {
+        defeatedPlayers: this.defeatedPlayers,
+        grid: this.grid,
+        players: this.players,
+        round: this.round,
+        totalCellsToWin: this.totalCellsToWin,
+      };
+
+      this.updateGame(this.getRoomsList(), initNewGameToStorage);
+    }
+  }
+
+  // Método que actualiza el localStorage del juego
+  // y añade un evento del tipo update para que el listener del storage
+  // reaccione en el resto de tabs de jugador
+  updateGame(roomsList, newGameInfo) {
+    const updateRooms = roomsList.rooms.map((room) => {
+      if (room.id === this.roomId) {
+        room.game = newGameInfo;
+      }
+      return room;
+    });
+
+    const roomListUpdate = {
+      eventType: _constants__WEBPACK_IMPORTED_MODULE_0__.EVENT_TYPES.UPDATE_GAME,
+      roomEventId: this.roomId,
+      rooms: updateRooms,
+    };
+
+    this.storage.setLocalStorage("roomsList", roomListUpdate);
+  }
+
+  // Método que añade el evento storage al juego
+  initStorageEvents() {
+    window.addEventListener("storage", (e) => {
+      // por cada sala se lanza este evento
+      if (e.key === "roomsList") {
+        const roomsList = JSON.parse(e.newValue);
+
+        switch (roomsList.eventType) {
+          case _constants__WEBPACK_IMPORTED_MODULE_0__.EVENT_TYPES.UPDATE_GAME:
+            this.handleUpdateEventGame(roomsList);
+            break;
+          default:
+            return;
+        }
+      }
+    });
+  }
+
+  // Recibe el evento update y cambia la info de los demás jugadores
+  // que estan conectados a la partida y aún no es su turno
+  handleUpdateEventGame(roomsList) {
+    console.log("update game from event");
+    // Si la sala no es la que tiene el evento no hacemos nada
+    if (roomsList.roomEventId !== this.roomId) return;
+    const currentRoom = roomsList.rooms.find(
+      (room) => room.id === roomsList.roomEventId
+    );
+
+    // Actualizamos grid de la clase
+    this.grid = currentRoom.game.grid;
+    this.round = currentRoom.game.round;
+    this.totalCellsToWin = currentRoom.game.totalCellsToWin;
+
+    // Chequeamos el turno del jugador
+    this.checkTurn(currentRoom);
   }
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Game);
+
 
 /***/ }),
 
@@ -644,7 +837,7 @@ __webpack_require__.r(__webpack_exports__);
 class Login {
   fields = {};
   errors = {};
-  local = new _utils__WEBPACK_IMPORTED_MODULE_0__["default"]();
+  storage = new _utils__WEBPACK_IMPORTED_MODULE_0__["default"]();
 
   constructor(loginFields) {
     this.form = document.getElementById(loginFields.formId);
@@ -737,9 +930,9 @@ class Login {
   }
 
   loginUser(data) {
-    const allUSers = this.local.getLocalStorage("users");
+    const allUSers = this.storage.getLocalStorage("users");
     const newUser = data;
-    const user = allUSers.find((user) => user.email === newUser.email);
+    const user = allUSers?.find((user) => user.email === newUser.email);
     if (!user) {
       this.showErrorMessage("No existe nadie con este email");
       return;
@@ -753,7 +946,22 @@ class Login {
     }
 
     // Aqui va la lógica para poner al "user" (línea 95) dentro de los usuarios conectados
-    this.local.setLocalStorage("me", user, "session");
+    this.storage.setLocalStorage("me", user, "session");
+
+    //!Temporal
+    const connectedUsers = this.storage.getLocalStorage("connectedUsers");
+    if (!connectedUsers) {
+      this.storage.setLocalStorage("connectedUsers", [user]);
+    } else {
+      const existConnectedUser = connectedUsers.find(
+        (connectedUser) => connectedUser.id === user.id
+      );
+      if (!existConnectedUser) {
+        connectedUsers.push(user);
+        this.storage.setLocalStorage("connectedUsers", connectedUsers);
+      }
+    }
+
     // También se tiene que redirigir al usuario a la ruta /rooms
     window.location.href = "/rooms";
   }
@@ -804,37 +1012,6 @@ class Login {
 
 /* harmony default export */ __webpack_exports__["default"] = (Login);
 
-
-/***/ }),
-
-/***/ "./src/js/Player.js":
-/*!**************************!*\
-  !*** ./src/js/Player.js ***!
-  \**************************/
-/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-class Player {
-  constructor(
-    id,
-    name,
-    avatar
-  ){
-    this.id = id;
-    this.name = name;
-    this.avatar = avatar;
-  }
-
-  getName(){
-    return this.name;
-  }
-
-  getAvatar(){
-    return this.avatar;
-  }
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (Player);
 
 /***/ }),
 
@@ -1139,7 +1316,7 @@ class Register {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/js/constants.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
-/* harmony import */ var _Player__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Player */ "./src/js/Player.js");
+/* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Game */ "./src/js/Game.js");
 
 
 
@@ -1150,6 +1327,7 @@ class Room {
   roomBox = "";
   game = "";
   storage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
+  playButtonDiv = document.getElementById("playButton");
 
   constructor(id, name, capacity) {
     this.id = id;
@@ -1174,37 +1352,71 @@ class Room {
   }
 
   addToRoom(user) {
-    //! Esto se tiene que poner dentro del forEach línea 44 para actualizar
-    //! la class Room a lo que tenga el localStorage de esta room
     // Creamos jugador que recoge los datos del usuario arrastrado
-    const draggedPlayer = new _Player__WEBPACK_IMPORTED_MODULE_2__["default"](user.id, user.name, user.avatar);
-    this.players.push(draggedPlayer);
+    const draggedPlayer = {
+      name: user.name,
+      avatar: user.avatar,
+      id: user.id,
+    };
 
-    // Añadir jugador al LocalStorage rooms, en userRooms
-    const currentRoomId = this.id;
-    const rooms = this.storage.getLocalStorage("rooms");
+    const rooms = this.storage.getLocalStorage("roomsList").rooms;
+    const currentRoom = rooms.find((room) => room.id === this.id);
+    const restUsers = currentRoom.usersRoom.filter(
+      (userRoom) => userRoom.id !== draggedPlayer.id
+    );
 
-    rooms.forEach((room) => {
-      if (room.id === currentRoomId) {
-        // Añadimos el usuario al array de userRooms de la sala que corresponde
-        // siempre y cuando que no estuviese conectado
-        const existUser = room.userRooms.find(
-          (userRoom) => userRoom.id === user.id
-        );
-        !existUser && room.userRooms.push(user);
+    // Si no existen usuarios en la sala
+    if (currentRoom.usersRoom.length === 0) {
+      currentRoom.usersRoom.push(draggedPlayer);
+      this.updatePlayers(currentRoom.usersRoom);
+    } else {
+      // Si no existe el usuario y ya hay usuarios en la sala
+      currentRoom.usersRoom = [...restUsers, draggedPlayer];
+      this.updatePlayers(currentRoom.usersRoom);
+    }
 
-        // Modificamos contador jugadores caja
-        const roomBoxDiv = document.getElementById(this.id);
-        roomBoxDiv.querySelector(".m-room-drop-item__total span").innerHTML =
-          room.userRooms.length;
-      }
-    });
+    // Añadimos players a la room
+    this.players = currentRoom.usersRoom;
 
     // Añadimos rooms actualizado al localStorage
-    this.storage.setLocalStorage("rooms", rooms);
+    const updateRooms = rooms.map((room) => {
+      if (room.id === this.id) {
+        room.usersRoom = currentRoom.usersRoom;
+      }
+      return room;
+    });
+    const updateRoomsList = {
+      eventType: _constants__WEBPACK_IMPORTED_MODULE_0__.EVENT_TYPES.ADD_USER_TO_ROOM,
+      roomEventId: this.id,
+      rooms: updateRooms,
+    };
 
-    if (this.players > 1) {
-      // Mostrar posibilidad de empezar a jugar
+    this.storage.setLocalStorage("roomsList", updateRoomsList);
+
+    // Mostramos panel superior sala
+    const gameTopPannelDiv = document.getElementById("gameTopPannel");
+    gameTopPannelDiv.classList.remove("d-none");
+    setTimeout(() => gameTopPannelDiv.classList.add("has-players"), 1000);
+    gameTopPannelDiv.querySelector(
+      ".m-game__title strong"
+    ).innerHTML = `${this.name}`;
+  }
+
+  updatePlayers(usersRoom) {
+    const roomBoxDiv = document.getElementById(this.id);
+    roomBoxDiv.querySelector(".m-room-drop-item__total span").innerHTML =
+      usersRoom.length;
+
+    // Actualizamos listado de los usarios conectados en el tablero
+    const listConnectedUSers = document.querySelector(
+      "#roomConnectedMessage ul"
+    );
+    const connectedUsers = usersRoom.map((user) => `<li>${user.name}</li>`);
+    listConnectedUSers.innerHTML = connectedUsers.join("");
+
+    // Mostrar posibilidad de empezar a jugar
+    if (usersRoom.length > 1) {
+      this.renderPlayBtn();
     }
   }
 
@@ -1229,28 +1441,95 @@ class Room {
   disableRoom(id) {
     const roomDivElement = document.getElementById(id);
     roomDivElement.classList.add("isFull");
-  }
 
-  getPlayers() {
-    return players;
+    // quitamos mensaje conectados del panel de juego
+    document.getElementById("roomConnectedMessage").innerHTML = "";
   }
 
   initStorageEvents() {
     window.addEventListener("storage", (e) => {
-      // When local storage changes, dump the list to
-      // the console.
-      // console.log("e: ", e);
-      // console.log(JSON.parse(window.localStorage.getItem("rooms")));
+      // por cada sala se lanza este evento
+      if (e.key === "roomsList") {
+        const roomsList = JSON.parse(e.newValue);
+
+        switch (roomsList.eventType) {
+          case _constants__WEBPACK_IMPORTED_MODULE_0__.EVENT_TYPES.ADD_USER_TO_ROOM:
+            this.handleEventAddUser(roomsList);
+            break;
+          case _constants__WEBPACK_IMPORTED_MODULE_0__.EVENT_TYPES.PLAY_GAME:
+            this.handleEventPlayGame(roomsList);
+            break;
+          default:
+            return;
+        }
+      }
     });
   }
 
-  initGame() {
-    // Quitamos botón de play
+  handleEventAddUser(roomsList) {
+    // Si la sala no es la que tiene el evento no hacemos nada
+    if (roomsList.roomEventId !== this.id) return;
 
+    const currentEventRoom = roomsList.rooms.find(
+      (room) => room.id === roomsList.roomEventId
+    );
+
+    // Actualizamos la información relacionada con el comienzo del juego en los otros jugadores
+    // caja de sala, mensaje de usuarios conectados en la sala
+    this.updatePlayers(currentEventRoom.usersRoom);
+  }
+
+  handleEventPlayGame(roomsList) {
+    // Si la sala no es la que tiene el evento no hacemos nada
+    if (roomsList.roomEventId !== this.id) return;
+    const currentRoom = roomsList.rooms.find(
+      (room) => room.id === roomsList.roomEventId
+    );
+    this.initGame(currentRoom.usersRoom, true);
+  }
+
+  renderPlayBtn() {
+    this.playButtonDiv.innerHTML = `<button class="btn btn-primary btn-lg btn-rounded px-4" type="button">Empezar a jugar!</button>`;
+    this.playButtonDiv.addEventListener("click", this.playGame.bind(this));
+  }
+
+  playGame() {
+    const rooms = this.storage.getLocalStorage("roomsList").rooms;
+    const updateRoomsStorage = rooms.map((room) => {
+      if (room.id === this.id) {
+        room.isOpen = false;
+      }
+      return room;
+    });
+
+    this.storage.setLocalStorage("roomsList", {
+      eventType: _constants__WEBPACK_IMPORTED_MODULE_0__.EVENT_TYPES.PLAY_GAME,
+      roomEventId: this.id,
+      rooms: updateRoomsStorage,
+    });
+
+    const currentRoom = rooms.find((room) => room.id === this.id);
+    this.initGame(currentRoom.usersRoom);
+  }
+
+  prepareGame() {
+    // Quitamos botón de play
+    this.playButtonDiv.innerHTML = "";
+
+    // seteamos la room a close
+    this.isOpen = false;
+
+    // deshabilitamos sala
+    this.disableRoom(this.id);
+  }
+
+  initGame(players, isCallWithEvent = false) {
+    this.prepareGame(players);
     // Inicializamos juego
     const gridSize = 20;
-    this.game = Game("grid", this.players, gridSize);
-    this.game.init();
+    const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
+    this.game = new _Game__WEBPACK_IMPORTED_MODULE_2__["default"](this.id, currentPlayerInfo, players, gridSize);
+    this.game.init(isCallWithEvent);
   }
 }
 
@@ -1267,11 +1546,19 @@ class Room {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "MESSAGE_TYPES": function() { return /* binding */ MESSAGE_TYPES; }
+/* harmony export */   "MESSAGE_TYPES": function() { return /* binding */ MESSAGE_TYPES; },
+/* harmony export */   "EVENT_TYPES": function() { return /* binding */ EVENT_TYPES; }
 /* harmony export */ });
 const MESSAGE_TYPES = {
-  CONNECTED_TO_ROOM: "connected_to_room",
-  DISCONNECTED_FROM_ROOM: "disconnected_from_room",
+  CONNECTED_TO_ROOM: "CONNECTED_TO_ROOM",
+  DISCONNECTED_FROM_ROOM: "DISCONNECTED_FROM_ROOM",
+  WAITTING_TURN: "WAITTING_TURN",
+};
+
+const EVENT_TYPES = {
+  ADD_USER_TO_ROOM: "ADD_USER_TO_ROOM",
+  PLAY_GAME: "PLAY_GAME",
+  UPDATE_GAME: "UPDATE_GAME",
 };
 
 
@@ -1391,18 +1678,16 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Game": function() { return /* reexport safe */ _Game__WEBPACK_IMPORTED_MODULE_0__["default"]; },
-/* harmony export */   "Player": function() { return /* reexport safe */ _Player__WEBPACK_IMPORTED_MODULE_1__["default"]; },
-/* harmony export */   "Room": function() { return /* reexport safe */ _Room__WEBPACK_IMPORTED_MODULE_2__["default"]; },
-/* harmony export */   "Dashboard": function() { return /* reexport safe */ _DashBoard__WEBPACK_IMPORTED_MODULE_3__["default"]; },
-/* harmony export */   "Register": function() { return /* reexport safe */ _Register__WEBPACK_IMPORTED_MODULE_4__["default"]; },
-/* harmony export */   "Login": function() { return /* reexport safe */ _Login__WEBPACK_IMPORTED_MODULE_5__["default"]; }
+/* harmony export */   "Room": function() { return /* reexport safe */ _Room__WEBPACK_IMPORTED_MODULE_1__["default"]; },
+/* harmony export */   "Dashboard": function() { return /* reexport safe */ _DashBoard__WEBPACK_IMPORTED_MODULE_2__["default"]; },
+/* harmony export */   "Register": function() { return /* reexport safe */ _Register__WEBPACK_IMPORTED_MODULE_3__["default"]; },
+/* harmony export */   "Login": function() { return /* reexport safe */ _Login__WEBPACK_IMPORTED_MODULE_4__["default"]; }
 /* harmony export */ });
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Game */ "./src/js/Game.js");
-/* harmony import */ var _Player__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Player */ "./src/js/Player.js");
-/* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
-/* harmony import */ var _DashBoard__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./DashBoard */ "./src/js/DashBoard.js");
-/* harmony import */ var _Register__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Register */ "./src/js/Register.js");
-/* harmony import */ var _Login__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Login */ "./src/js/Login.js");
+/* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
+/* harmony import */ var _DashBoard__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./DashBoard */ "./src/js/DashBoard.js");
+/* harmony import */ var _Register__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Register */ "./src/js/Register.js");
+/* harmony import */ var _Login__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Login */ "./src/js/Login.js");
 
 
 

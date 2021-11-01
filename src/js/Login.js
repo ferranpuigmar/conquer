@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 class Login {
   fields = {};
   errors = {};
-  local = new LocalStorage();
+  storage = new LocalStorage();
 
   constructor(loginFields) {
     this.form = document.getElementById(loginFields.formId);
@@ -97,9 +97,9 @@ class Login {
   }
 
   loginUser(data) {
-    const allUSers = this.local.getLocalStorage("users");
+    const allUSers = this.storage.getLocalStorage("users");
     const newUser = data;
-    const user = allUSers.find((user) => user.email === newUser.email);
+    const user = allUSers?.find((user) => user.email === newUser.email);
     if (!user) {
       this.showErrorMessage("No existe nadie con este email");
       return;
@@ -113,7 +113,22 @@ class Login {
     }
 
     // Aqui va la lógica para poner al "user" (línea 95) dentro de los usuarios conectados
-    this.local.setLocalStorage("me", user, "session");
+    this.storage.setLocalStorage("me", user, "session");
+
+    //!Temporal
+    const connectedUsers = this.storage.getLocalStorage("connectedUsers");
+    if (!connectedUsers) {
+      this.storage.setLocalStorage("connectedUsers", [user]);
+    } else {
+      const existConnectedUser = connectedUsers.find(
+        (connectedUser) => connectedUser.id === user.id
+      );
+      if (!existConnectedUser) {
+        connectedUsers.push(user);
+        this.storage.setLocalStorage("connectedUsers", connectedUsers);
+      }
+    }
+
     // También se tiene que redirigir al usuario a la ruta /rooms
     window.location.href = "/rooms";
   }

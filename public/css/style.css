@@ -11298,23 +11298,106 @@ textarea.form-control-lg {
 
 .m-game {
   position: relative;
+  overflow: hidden;
+  height: 694px;
+}
+.m-game header {
+  background-color: #fff;
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease-out;
+}
+.m-game header.has-players {
+  transform: translateY(0);
+}
+.m-game__title, .m-game__round-title {
+  font-size: 20px;
+  margin: 0;
+}
+.m-game-pannelInfo {
+  padding: 0 10px;
+  position: absolute;
+  bottom: 10px;
+  display: flex;
+}
+.m-game-pannelInfo span {
+  margin-right: 15px;
+  display: inline-block;
+}
+.m-game-pannelInfo ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+.m-game-pannelInfo ul li span {
+  display: inline-block;
+  margin-right: 16px;
+}
+.m-game-pannelInfo ul li span:first-letter {
+  text-transform: uppercase;
+}
+.m-game-pannelInfo ul li span:first-child {
+  width: 10px;
+  height: 10px;
+  margin-right: 8px;
 }
 .m-game--preparing-game {
   width: 100%;
-  height: 600px;
   background-color: #f8f9fa;
   border: 1px solid #adb5bd;
   border-radius: 5px;
 }
 .m-game-message {
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+}
+.m-game-message > * {
+  box-shadow: 0px 0px 19px 2px rgba(0, 0, 0, 0.33);
+  margin-bottom: 0;
+  text-align: center;
+}
+.m-game-messageConnected {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.m-game-messageConnected p {
+  text-align: center;
+}
+.m-game-messageConnected ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  justify-content: center;
+}
+.m-game-messageConnected ul li {
+  padding: 5px 20px;
+  border: 1px solid #ccc;
+  text-align: center;
+  border-radius: 5px;
+  margin: 0 10px;
+}
+.m-game-playButton {
+  position: absolute;
+  bottom: 35px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .m-game-grid {
   display: flex;
   flex-flow: column;
   width: auto;
+  padding: 0 10px;
 }
 .m-game-grid .m-game-grid__row {
   display: flex;
@@ -11338,6 +11421,17 @@ textarea.form-control-lg {
   background-color: #fff;
   border: 1px solid #495057;
   transition: all 0.4s;
+}
+.m-game-waitting-message {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /*# sourceMappingURL=style.css.map*/

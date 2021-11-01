@@ -31,12 +31,24 @@
       <div class="row">
         <div class="col-lg-8">
           <section class="my-3 m-game m-game--preparing-game">
-            <div id="roundTitle" class="m-game-round-title d-none">
-              <h3></h3>
+            <header id="gameTopPannel" class="d-none">
+              <h3 class="m-game__title"><strong></strong></h3>
+              <div id="roundTitle" class="m-game__round-title d-none">Round <span></span></div>
+            </header>
+            <div id="roomMessage" class="m-game-message p-2 d-none">
             </div>
-            <div id="roomMessage" class="m-game-message w-100 p-2">
+            <div id="roomConnectedMessage" class="m-game-messageConnected">
+              <p>Jugadores conectados:</p>
+              <ul>
+                <li>Ferran</li>
+                <li>Dani</li>
+              </ul>
             </div>
+            <div id="playButton" class="m-game-playButton"></div>
+            <div id="waittingTurn" class="m-game-waitting-message d-none"></div>
             <div id="grid" class="m-game-grid"></div>
+            <div id="roomPannelInfo" class="m-game-pannelInfo w-100">
+            </div>
           </section>
         </div>
         <div class="col-lg-4">

@@ -106,10 +106,67 @@
 
 .m-game {
   position: relative;
+  overflow: hidden;
+  height: calc((20px * 32) + 44px + 10px);
+
+  header {
+    background-color: $white;
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease-out;
+
+    &.has-players {
+      transform: translateY(0);
+    }
+  }
+
+  &__title,
+  &__round-title {
+    font-size: 20px;
+    margin: 0;
+  }
+
+  &-pannelInfo {
+    padding: 0 10px;
+    position: absolute;
+    bottom: 10px;
+    display: flex;
+
+    span {
+      margin-right: 15px;
+      display: inline-block;
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+
+      li {
+        span {
+          display: inline-block;
+          margin-right: 16px;
+          &:first-letter {
+            text-transform: uppercase;
+          }
+        }
+        span:first-child {
+          width: 10px;
+          height: 10px;
+          margin-right: 8px;
+        }
+      }
+    }
+  }
 
   &--preparing-game {
     width: 100%;
-    height: calc(20px * 30);
+
     background-color: $gray-100;
     border: 1px solid $gray-500;
     border-radius: 5px;
@@ -117,14 +174,57 @@
 
   &-message {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+
+    > * {
+      box-shadow: 0px 0px 19px 2px rgba(0, 0, 0, 0.33);
+      margin-bottom: 0;
+      text-align: center;
+    }
+  }
+
+  &-messageConnected {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    p {
+      text-align: center;
+    }
+
+    ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      justify-content: center;
+
+      li {
+        padding: 5px 20px;
+        border: 1px solid #ccc;
+        text-align: center;
+        border-radius: 5px;
+        margin: 0 10px;
+      }
+    }
+  }
+
+  &-playButton {
+    position: absolute;
+    bottom: 35px;
+    left: 50%;
+    transform: translateX(-50%);
   }
 
   &-grid {
     display: flex;
     flex-flow: column;
     width: auto;
+    padding: 0 10px;
 
     .m-game-grid__row {
       display: flex;
@@ -153,5 +253,17 @@
         }
       }
     }
+  }
+
+  &-waitting-message {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba($white, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }

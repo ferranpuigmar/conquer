@@ -1,6 +1,6 @@
-import { MESSAGE_TYPES } from "./constants";
+import { EVENT_TYPES, MESSAGE_TYPES } from "./constants";
 import LocalStorage from "./utils";
-import Player from "./Player";
+import Game from "./Game";
 class Room {
   capacity = 4;
   isOpen = true;
@@ -8,6 +8,7 @@ class Room {
   roomBox = "";
   game = "";
   storage = new LocalStorage();
+  playButtonDiv = document.getElementById("playButton");
 
   constructor(id, name, capacity) {
     this.id = id;
@@ -32,37 +33,71 @@ class Room {
   }
 
   addToRoom(user) {
-    //! Esto se tiene que poner dentro del forEach línea 44 para actualizar
-    //! la class Room a lo que tenga el localStorage de esta room
     // Creamos jugador que recoge los datos del usuario arrastrado
-    const draggedPlayer = new Player(user.id, user.name, user.avatar);
-    this.players.push(draggedPlayer);
+    const draggedPlayer = {
+      name: user.name,
+      avatar: user.avatar,
+      id: user.id,
+    };
 
-    // Añadir jugador al LocalStorage rooms, en userRooms
-    const currentRoomId = this.id;
-    const rooms = this.storage.getLocalStorage("rooms");
+    const rooms = this.storage.getLocalStorage("roomsList").rooms;
+    const currentRoom = rooms.find((room) => room.id === this.id);
+    const restUsers = currentRoom.usersRoom.filter(
+      (userRoom) => userRoom.id !== draggedPlayer.id
+    );
 
-    rooms.forEach((room) => {
-      if (room.id === currentRoomId) {
-        // Añadimos el usuario al array de userRooms de la sala que corresponde
-        // siempre y cuando que no estuviese conectado
-        const existUser = room.userRooms.find(
-          (userRoom) => userRoom.id === user.id
-        );
-        !existUser && room.userRooms.push(user);
+    // Si no existen usuarios en la sala
+    if (currentRoom.usersRoom.length === 0) {
+      currentRoom.usersRoom.push(draggedPlayer);
+      this.updatePlayers(currentRoom.usersRoom);
+    } else {
+      // Si no existe el usuario y ya hay usuarios en la sala
+      currentRoom.usersRoom = [...restUsers, draggedPlayer];
+      this.updatePlayers(currentRoom.usersRoom);
+    }
 
-        // Modificamos contador jugadores caja
-        const roomBoxDiv = document.getElementById(this.id);
-        roomBoxDiv.querySelector(".m-room-drop-item__total span").innerHTML =
-          room.userRooms.length;
-      }
-    });
+    // Añadimos players a la room
+    this.players = currentRoom.usersRoom;
 
     // Añadimos rooms actualizado al localStorage
-    this.storage.setLocalStorage("rooms", rooms);
+    const updateRooms = rooms.map((room) => {
+      if (room.id === this.id) {
+        room.usersRoom = currentRoom.usersRoom;
+      }
+      return room;
+    });
+    const updateRoomsList = {
+      eventType: EVENT_TYPES.ADD_USER_TO_ROOM,
+      roomEventId: this.id,
+      rooms: updateRooms,
+    };
 
-    if (this.players > 1) {
-      // Mostrar posibilidad de empezar a jugar
+    this.storage.setLocalStorage("roomsList", updateRoomsList);
+
+    // Mostramos panel superior sala
+    const gameTopPannelDiv = document.getElementById("gameTopPannel");
+    gameTopPannelDiv.classList.remove("d-none");
+    setTimeout(() => gameTopPannelDiv.classList.add("has-players"), 1000);
+    gameTopPannelDiv.querySelector(
+      ".m-game__title strong"
+    ).innerHTML = `${this.name}`;
+  }
+
+  updatePlayers(usersRoom) {
+    const roomBoxDiv = document.getElementById(this.id);
+    roomBoxDiv.querySelector(".m-room-drop-item__total span").innerHTML =
+      usersRoom.length;
+
+    // Actualizamos listado de los usarios conectados en el tablero
+    const listConnectedUSers = document.querySelector(
+      "#roomConnectedMessage ul"
+    );
+    const connectedUsers = usersRoom.map((user) => `<li>${user.name}</li>`);
+    listConnectedUSers.innerHTML = connectedUsers.join("");
+
+    // Mostrar posibilidad de empezar a jugar
+    if (usersRoom.length > 1) {
+      this.renderPlayBtn();
     }
   }
 
@@ -87,28 +122,95 @@ class Room {
   disableRoom(id) {
     const roomDivElement = document.getElementById(id);
     roomDivElement.classList.add("isFull");
-  }
 
-  getPlayers() {
-    return players;
+    // quitamos mensaje conectados del panel de juego
+    document.getElementById("roomConnectedMessage").innerHTML = "";
   }
 
   initStorageEvents() {
     window.addEventListener("storage", (e) => {
-      // When local storage changes, dump the list to
-      // the console.
-      // console.log("e: ", e);
-      // console.log(JSON.parse(window.localStorage.getItem("rooms")));
+      // por cada sala se lanza este evento
+      if (e.key === "roomsList") {
+        const roomsList = JSON.parse(e.newValue);
+
+        switch (roomsList.eventType) {
+          case EVENT_TYPES.ADD_USER_TO_ROOM:
+            this.handleEventAddUser(roomsList);
+            break;
+          case EVENT_TYPES.PLAY_GAME:
+            this.handleEventPlayGame(roomsList);
+            break;
+          default:
+            return;
+        }
+      }
     });
   }
 
-  initGame() {
-    // Quitamos botón de play
+  handleEventAddUser(roomsList) {
+    // Si la sala no es la que tiene el evento no hacemos nada
+    if (roomsList.roomEventId !== this.id) return;
 
+    const currentEventRoom = roomsList.rooms.find(
+      (room) => room.id === roomsList.roomEventId
+    );
+
+    // Actualizamos la información relacionada con el comienzo del juego en los otros jugadores
+    // caja de sala, mensaje de usuarios conectados en la sala
+    this.updatePlayers(currentEventRoom.usersRoom);
+  }
+
+  handleEventPlayGame(roomsList) {
+    // Si la sala no es la que tiene el evento no hacemos nada
+    if (roomsList.roomEventId !== this.id) return;
+    const currentRoom = roomsList.rooms.find(
+      (room) => room.id === roomsList.roomEventId
+    );
+    this.initGame(currentRoom.usersRoom, true);
+  }
+
+  renderPlayBtn() {
+    this.playButtonDiv.innerHTML = `<button class="btn btn-primary btn-lg btn-rounded px-4" type="button">Empezar a jugar!</button>`;
+    this.playButtonDiv.addEventListener("click", this.playGame.bind(this));
+  }
+
+  playGame() {
+    const rooms = this.storage.getLocalStorage("roomsList").rooms;
+    const updateRoomsStorage = rooms.map((room) => {
+      if (room.id === this.id) {
+        room.isOpen = false;
+      }
+      return room;
+    });
+
+    this.storage.setLocalStorage("roomsList", {
+      eventType: EVENT_TYPES.PLAY_GAME,
+      roomEventId: this.id,
+      rooms: updateRoomsStorage,
+    });
+
+    const currentRoom = rooms.find((room) => room.id === this.id);
+    this.initGame(currentRoom.usersRoom);
+  }
+
+  prepareGame() {
+    // Quitamos botón de play
+    this.playButtonDiv.innerHTML = "";
+
+    // seteamos la room a close
+    this.isOpen = false;
+
+    // deshabilitamos sala
+    this.disableRoom(this.id);
+  }
+
+  initGame(players, isCallWithEvent = false) {
+    this.prepareGame(players);
     // Inicializamos juego
     const gridSize = 20;
-    this.game = Game("grid", this.players, gridSize);
-    this.game.init();
+    const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
+    this.game = new Game(this.id, currentPlayerInfo, players, gridSize);
+    this.game.init(isCallWithEvent);
   }
 }
 
