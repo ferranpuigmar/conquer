@@ -13,7 +13,6 @@ export default class LocalStorage {
 
   getLocalStorage(key, type) {
     let data;
-
     if (type === "session") {
       data = this.sessionStorage.getItem(key);
     } else {

@@ -1,6 +1,7 @@
 import { EVENT_TYPES, MESSAGE_TYPES } from "./constants";
 import LocalStorage from "./utils";
 import Game from "./Game";
+import DragAndDrop from "./DragAndDrop";
 class Room {
   capacity = 4;
   isOpen = true;
@@ -9,31 +10,48 @@ class Room {
   game = "";
   storage = new LocalStorage();
   playButtonDiv = document.getElementById("playButton");
+  dragAndDrop = new DragAndDrop();
+  roomBox;
 
   constructor(id, name, capacity) {
     this.id = id;
     this.name = name;
     this.capacity = capacity;
+    this.roomBox = document.querySelector(`#${id} .m-room-drop-item__image`);
   }
 
-  onDraggPlayer(user) {
-    if (this.players.length === this.capacity) {
-      this.isOpen = false;
-      disableRoom(this.id);
-      console.log("sala llena!");
-      return;
-    }
+  initDragListeners() {
+    console.log("caja: ", this.roomBox);
+    this.roomBox.addEventListener("drop", this.onDraggPlayer.bind(this));
+    this.roomBox.addEventListener("dragover", function (event) {
+      event.preventDefault();
+    });
+  }
 
-    if (this.players.length > this.capacity || !this.isOpen) {
-      console.log("La sala no acepta más jugadores");
-      return;
-    }
+  onDraggPlayer(e) {
+    console.log("EOOOOO");
+    const dragUSer = this.storage.getLocalStorage("me", "session");
 
-    this.addToRoom(user);
+    // if (this.players.length === this.capacity) {
+    //   this.isOpen = false;
+    //   this.disableRoom(this.id);
+    //   console.log("sala llena!");
+    //   return;
+    // }
+
+    // if (this.players.length > this.capacity || !this.isOpen) {
+    //   console.log("La sala no acepta más jugadores");
+    //   return;
+    // }
+
+    this.addToRoom(dragUSer);
   }
 
   addToRoom(user) {
     // Creamos jugador que recoge los datos del usuario arrastrado
+
+    console.log("user:", user);
+
     const draggedPlayer = {
       name: user.name,
       avatar: user.avatar,
@@ -127,12 +145,14 @@ class Room {
     document.getElementById("roomConnectedMessage").innerHTML = "";
   }
 
-  takeOutFromRoom(player){
-      let is_in = this.players.find((room_player)=> room_player.id === player.id);
-      if(!!is_in){
-        this.game.takeOutFromGame(player);
-        //this.players = this.players.filter((room_player)=> room_player.id !== player.id);
-      }
+  takeOutFromRoom(player) {
+    let is_in = this.players.find(
+      (room_player) => room_player.id === player.id
+    );
+    if (!!is_in) {
+      this.game.takeOutFromGame(player);
+      //this.players = this.players.filter((room_player)=> room_player.id !== player.id);
+    }
   }
 
   initStorageEvents() {

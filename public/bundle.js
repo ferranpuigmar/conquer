@@ -148,17 +148,14 @@ function validate(uuid) {
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _DragAndDrop__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./DragAndDrop */ "./src/js/DragAndDrop.js");
-/* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
-
+/* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
 
 
 class Dashboard {
   roomsList = [];
-  dragAndDrop = new _DragAndDrop__WEBPACK_IMPORTED_MODULE_0__["default"]();
-  localStorage = new _utils__WEBPACK_IMPORTED_MODULE_2__["default"]();
+  localStorage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
 
   constructor(initData) {
     this.boxRooms = initData.boxRooms;
@@ -169,16 +166,24 @@ class Dashboard {
     this.generateRooms();
     this.generatePlayerBox();
     this.generateLogout();
-    this.dragAndDrop.init();
+    let avatarMobile = document.querySelector("#avatarMobile");
+    avatarMobile.addEventListener(
+      "dragstart",
+      () => {
+        console.log("me arrastrooo");
+      },
+      false
+    );
   }
 
   generateRooms() {
     this.boxRooms.forEach((box, index) => {
       const roomName = `Room ${index + 1}`;
       // Generamos las instancias de las salas
-      this.roomsList[index] = new _Room__WEBPACK_IMPORTED_MODULE_1__["default"](box.id, roomName, 4);
+      this.roomsList[index] = new _Room__WEBPACK_IMPORTED_MODULE_0__["default"](box.id, roomName, 4);
       // Iniciamos listeners para eventos del tipo storage
       this.roomsList[index].initStorageEvents();
+      this.roomsList[index].initDragListeners();
 
       const boxDiv = document.getElementById(box.id);
 
@@ -227,9 +232,9 @@ class Dashboard {
     }
 
     //Temporal, añadimos user a la primera sala
-    const currentUserData = this.localStorage.getLocalStorage("me", "session");
-    const currentRoom = this.roomsList[0];
-    currentRoom.addToRoom(currentUserData);
+    // const currentUserData = this.localStorage.getLocalStorage("me", "session");
+    // const currentRoom = this.roomsList[0];
+    // currentRoom.addToRoom(currentUserData);
   }
 
   generatePlayerBox() {
@@ -261,15 +266,15 @@ class Dashboard {
     }
   }
 
-  generateLogout(){
-      const logoutBtn = document.getElementById('logout');
-      const player = this.localStorage.getLocalStorage("me", "session");
+  generateLogout() {
+    const logoutBtn = document.getElementById("logout");
+    const player = this.localStorage.getLocalStorage("me", "session");
 
-      logoutBtn.addEventListener('click', function(){
-          this.rooms.takeOutFromRoom(player);
-          this.localStorage.setLocalStorage("me", null, "session");
-          this.redirectToLogin();
-      });
+    logoutBtn.addEventListener("click", function () {
+      this.rooms.takeOutFromRoom(player);
+      this.localStorage.setLocalStorage("me", null, "session");
+      this.redirectToLogin();
+    });
   }
 
   isPlayerInRooms(player) {
@@ -291,13 +296,12 @@ class Dashboard {
     return "ROOM " + (index + 1);
   }
 
-  redirectToLogin(){
+  redirectToLogin() {
     let user = this.localStorage.getLocalStorage("me", "session");
-    if(!user){
+    if (!user) {
       window.location.href = "/";
     }
   }
-
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Dashboard);
@@ -312,59 +316,79 @@ class Dashboard {
 /***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
+
+
 class DragAndDrop {
+  localStorage = new _utils__WEBPACK_IMPORTED_MODULE_0__["default"]();
+
   drageando(ev) {
-    console.log("c");
-    ev.dataTransfer.setData("text", ev.target.id);
+    // Comportamiento del resto de elementos cuando empieza el drag
   }
 
   dragIniciado(e) {
-    console.log("a");
-    this.style.opacity = 0.25;
-    let padre = document.createElement("p");
-    let clon = this.cloneNode(true);
-    padre.appendChild(clon);
-    e.dataTransfer.setData("text", padre.innerHTML);
+    // this.style.opacity = 0.25;
+    // let padre = document.createElement("p");
+    // let clon = this.cloneNode(true);
+    // padre.appendChild(clon);
+    // e.dataTransfer.setData("userInfo", padre.innerHTML);
   }
 
   dragFinalizado(e) {
-    console.log("b");
-    this.style.opacity = 0.25;
+    // this.style.opacity = 0.25;
   }
 
   dragEntraContenedor(e) {
-    console.log("hola...");
+    // console.log("dragEntraContenedor id: ", e.dataTransfer.id);
     //e.preventDefault();
   }
 
   dragSobreContenedor(e) {
+    // console.log("dragSobreContenedor e: ", e);
     e.preventDefault();
-    this.classList.add("over");
+    //this.classList.add("over");
     return false;
   }
 
   dragFueraContenedor(e) {
-    this.classList.remove("over");
+    //this.classList.remove("over");
   }
 
   controlDrop(e) {
-    //recuperar datos usuario de sesionStorage
-    contenedor.appendChild(avatarMobile);
-    let datos = e.dataTransfer.getData("text");
+    let datos = e.dataTransfer.getData("userInfo");
+    console.log("e: ", e);
+    const currentDragUser = this.localStorage.getLocalStorage("me", "session");
+    console.log("userInfo: ", currentDragUser);
     this.innerHTML += datos;
   }
 
   init() {
     let avatarMobile = document.querySelector("#avatarMobile");
-    avatarMobile.addEventListener("dragstart", this.dragIniciado, false);
-    avatarMobile.addEventListener("dragend", this.dragFinalizado, false);
-    avatarMobile.addEventListener("drag", this.drageando, false);
+    avatarMobile.addEventListener(
+      "dragstart",
+      this.dragIniciado.bind(this),
+      false
+    );
+    avatarMobile.addEventListener(
+      "dragend",
+      this.dragFinalizado.bind(this),
+      false
+    );
+    // avatarMobile.addEventListener("drag", this.drageando, false);
 
     document.querySelectorAll(".m-room-drop-item__image").forEach((el) => {
-      el.addEventListener("dragenter", this.dragEntraContenedor, false);
-      el.addEventListener("dragover", this.dragSobreContenedor, false);
-      el.addEventListener("dragleave", this.dragFueraContenedor, false);
-      el.addEventListener("drop", this.controlDrop, false);
+      el.addEventListener(
+        "dragenter",
+        this.dragEntraContenedor.bind(this),
+        false
+      );
+      el.addEventListener(
+        "dragover",
+        this.dragSobreContenedor.bind(this),
+        false
+      );
+      // el.addEventListener("dragleave", this.dragFueraContenedor, false);
+      el.addEventListener("drop", this.controlDrop.bind(this), false);
     });
   }
 }
@@ -1427,6 +1451,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/js/constants.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Game */ "./src/js/Game.js");
+/* harmony import */ var _DragAndDrop__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./DragAndDrop */ "./src/js/DragAndDrop.js");
+
 
 
 
@@ -1438,31 +1464,48 @@ class Room {
   game = "";
   storage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
   playButtonDiv = document.getElementById("playButton");
+  dragAndDrop = new _DragAndDrop__WEBPACK_IMPORTED_MODULE_3__["default"]();
+  roomBox;
 
   constructor(id, name, capacity) {
     this.id = id;
     this.name = name;
     this.capacity = capacity;
+    this.roomBox = document.querySelector(`#${id} .m-room-drop-item__image`);
   }
 
-  onDraggPlayer(user) {
-    if (this.players.length === this.capacity) {
-      this.isOpen = false;
-      disableRoom(this.id);
-      console.log("sala llena!");
-      return;
-    }
+  initDragListeners() {
+    console.log("caja: ", this.roomBox);
+    this.roomBox.addEventListener("drop", this.onDraggPlayer.bind(this));
+    this.roomBox.addEventListener("dragover", function (event) {
+      event.preventDefault();
+    });
+  }
 
-    if (this.players.length > this.capacity || !this.isOpen) {
-      console.log("La sala no acepta más jugadores");
-      return;
-    }
+  onDraggPlayer(e) {
+    console.log("EOOOOO");
+    const dragUSer = this.storage.getLocalStorage("me", "session");
 
-    this.addToRoom(user);
+    // if (this.players.length === this.capacity) {
+    //   this.isOpen = false;
+    //   this.disableRoom(this.id);
+    //   console.log("sala llena!");
+    //   return;
+    // }
+
+    // if (this.players.length > this.capacity || !this.isOpen) {
+    //   console.log("La sala no acepta más jugadores");
+    //   return;
+    // }
+
+    this.addToRoom(dragUSer);
   }
 
   addToRoom(user) {
     // Creamos jugador que recoge los datos del usuario arrastrado
+
+    console.log("user:", user);
+
     const draggedPlayer = {
       name: user.name,
       avatar: user.avatar,
@@ -1556,12 +1599,14 @@ class Room {
     document.getElementById("roomConnectedMessage").innerHTML = "";
   }
 
-  takeOutFromRoom(player){
-      let is_in = this.players.find((room_player)=> room_player.id === player.id);
-      if(!!is_in){
-        this.game.takeOutFromGame(player);
-        //this.players = this.players.filter((room_player)=> room_player.id !== player.id);
-      }
+  takeOutFromRoom(player) {
+    let is_in = this.players.find(
+      (room_player) => room_player.id === player.id
+    );
+    if (!!is_in) {
+      this.game.takeOutFromGame(player);
+      //this.players = this.players.filter((room_player)=> room_player.id !== player.id);
+    }
   }
 
   initStorageEvents() {
@@ -1710,7 +1755,6 @@ class LocalStorage {
 
   getLocalStorage(key, type) {
     let data;
-
     if (type === "session") {
       data = this.sessionStorage.getItem(key);
     } else {

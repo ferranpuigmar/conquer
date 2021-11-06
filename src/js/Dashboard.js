@@ -1,10 +1,8 @@
-import DragAndDrop from "./DragAndDrop";
 import Room from "./Room";
 import LocalStorage from "./utils";
 
 class Dashboard {
   roomsList = [];
-  dragAndDrop = new DragAndDrop();
   localStorage = new LocalStorage();
 
   constructor(initData) {
@@ -16,7 +14,14 @@ class Dashboard {
     this.generateRooms();
     this.generatePlayerBox();
     this.generateLogout();
-    this.dragAndDrop.init();
+    let avatarMobile = document.querySelector("#avatarMobile");
+    avatarMobile.addEventListener(
+      "dragstart",
+      () => {
+        console.log("me arrastrooo");
+      },
+      false
+    );
   }
 
   generateRooms() {
@@ -26,6 +31,7 @@ class Dashboard {
       this.roomsList[index] = new Room(box.id, roomName, 4);
       // Iniciamos listeners para eventos del tipo storage
       this.roomsList[index].initStorageEvents();
+      this.roomsList[index].initDragListeners();
 
       const boxDiv = document.getElementById(box.id);
 
@@ -74,9 +80,9 @@ class Dashboard {
     }
 
     //Temporal, añadimos user a la primera sala
-    const currentUserData = this.localStorage.getLocalStorage("me", "session");
-    const currentRoom = this.roomsList[0];
-    currentRoom.addToRoom(currentUserData);
+    // const currentUserData = this.localStorage.getLocalStorage("me", "session");
+    // const currentRoom = this.roomsList[0];
+    // currentRoom.addToRoom(currentUserData);
   }
 
   generatePlayerBox() {
@@ -108,15 +114,15 @@ class Dashboard {
     }
   }
 
-  generateLogout(){
-      const logoutBtn = document.getElementById('logout');
-      const player = this.localStorage.getLocalStorage("me", "session");
+  generateLogout() {
+    const logoutBtn = document.getElementById("logout");
+    const player = this.localStorage.getLocalStorage("me", "session");
 
-      logoutBtn.addEventListener('click', function(){
-          this.rooms.takeOutFromRoom(player);
-          this.localStorage.setLocalStorage("me", null, "session");
-          this.redirectToLogin();
-      });
+    logoutBtn.addEventListener("click", function () {
+      this.rooms.takeOutFromRoom(player);
+      this.localStorage.setLocalStorage("me", null, "session");
+      this.redirectToLogin();
+    });
   }
 
   isPlayerInRooms(player) {
@@ -138,13 +144,12 @@ class Dashboard {
     return "ROOM " + (index + 1);
   }
 
-  redirectToLogin(){
+  redirectToLogin() {
     let user = this.localStorage.getLocalStorage("me", "session");
-    if(!user){
+    if (!user) {
       window.location.href = "/";
     }
   }
-
 }
 
 export default Dashboard;
