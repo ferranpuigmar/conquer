@@ -1,5 +1,5 @@
 var Conquer;
-/******/ (() => { // webpackBootstrap
+/******/ (function() { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
@@ -7,13 +7,10 @@ var Conquer;
 /*!*****************************************************!*\
   !*** ./node_modules/uuid/dist/esm-browser/regex.js ***!
   \*****************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (/^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i);
+/* harmony default export */ __webpack_exports__["default"] = (/^(?:[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}|00000000-0000-0000-0000-000000000000)$/i);
 
 /***/ }),
 
@@ -21,11 +18,11 @@ __webpack_require__.r(__webpack_exports__);
 /*!***************************************************!*\
   !*** ./node_modules/uuid/dist/esm-browser/rng.js ***!
   \***************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ rng)
+/* harmony export */   "default": function() { return /* binding */ rng; }
 /* harmony export */ });
 // Unique ID creation requires a high quality random # generator. In the browser we therefore
 // require the crypto API and do not support built-in fallback to lower quality random number
@@ -53,12 +50,9 @@ function rng() {
 /*!*********************************************************!*\
   !*** ./node_modules/uuid/dist/esm-browser/stringify.js ***!
   \*********************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _validate_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./validate.js */ "./node_modules/uuid/dist/esm-browser/validate.js");
 
 /**
@@ -89,7 +83,7 @@ function stringify(arr) {
   return uuid;
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (stringify);
+/* harmony default export */ __webpack_exports__["default"] = (stringify);
 
 /***/ }),
 
@@ -97,12 +91,9 @@ function stringify(arr) {
 /*!**************************************************!*\
   !*** ./node_modules/uuid/dist/esm-browser/v4.js ***!
   \**************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _rng_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./rng.js */ "./node_modules/uuid/dist/esm-browser/rng.js");
 /* harmony import */ var _stringify_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./stringify.js */ "./node_modules/uuid/dist/esm-browser/stringify.js");
 
@@ -128,7 +119,7 @@ function v4(options, buf, offset) {
   return (0,_stringify_js__WEBPACK_IMPORTED_MODULE_1__["default"])(rnds);
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (v4);
+/* harmony default export */ __webpack_exports__["default"] = (v4);
 
 /***/ }),
 
@@ -136,12 +127,9 @@ function v4(options, buf, offset) {
 /*!********************************************************!*\
   !*** ./node_modules/uuid/dist/esm-browser/validate.js ***!
   \********************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _regex_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./regex.js */ "./node_modules/uuid/dist/esm-browser/regex.js");
 
 
@@ -149,7 +137,7 @@ function validate(uuid) {
   return typeof uuid === 'string' && _regex_js__WEBPACK_IMPORTED_MODULE_0__["default"].test(uuid);
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (validate);
+/* harmony default export */ __webpack_exports__["default"] = (validate);
 
 /***/ }),
 
@@ -157,12 +145,9 @@ function validate(uuid) {
 /*!*****************************!*\
   !*** ./src/js/DashBoard.js ***!
   \*****************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
@@ -195,16 +180,11 @@ class Dashboard {
   }
 
   dragIniciado(e) {
-    console.log("me arrastrooo");
-    //let padre = document.createElement("div");
-    //let clon = this.avatarMobile;
-    //padre.appendChild(clon);
     e.dataTransfer.setData("userAvatar","avatarMobile");
   }
   
   dragFinalizado() {
-    console.log("me solteeee");
-    
+     
   }
 
 
@@ -219,8 +199,6 @@ class Dashboard {
 
       const boxDiv = document.getElementById(box.id);
 
-      // Añadir evento en alguna parte del box para cuando se hace drag&drop
-      // Y que conecte con un método de la instancia de room
 
       // Añadir clase para pintar caja
       boxDiv.classList.add(`room${index + 1}`);
@@ -263,10 +241,6 @@ class Dashboard {
       this.localStorage.setLocalStorage("roomsList", roomsDataType);
     }
 
-    //Temporal, añadimos user a la primera sala
-    // const currentUserData = this.localStorage.getLocalStorage("me", "session");
-    // const currentRoom = this.roomsList[0];
-    // currentRoom.addToRoom(currentUserData);
   }
 
   generatePlayerBox() {
@@ -336,55 +310,7 @@ class Dashboard {
   }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Dashboard);
-
-
-/***/ }),
-
-/***/ "./src/js/DragAndDrop.js":
-/*!*******************************!*\
-  !*** ./src/js/DragAndDrop.js ***!
-  \*******************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
-
-
-class DragAndDrop {
-  localStorage = new _utils__WEBPACK_IMPORTED_MODULE_0__["default"]();
-
-  /*controlDrop(e) {
-    let datos = e.dataTransfer.getData("userInfo");
-    console.log("e: ", e);
-    const currentDragUser = this.localStorage.getLocalStorage("me", "session");
-    console.log("userInfo: ", currentDragUser);
-    this.innerHTML += datos;
-  }*/
-
-  init() {
-    console.log("e: ", e);
-    /*document.querySelectorAll(".m-room-drop-item__image").forEach((el) => {
-      el.addEventListener(
-        "dragenter",
-        this.dragEntraContenedor.bind(this),
-        false
-      );
-      el.addEventListener(
-        "dragover",
-        this.dragSobreContenedor.bind(this),
-        false
-      );
-      el.addEventListener("dragleave", this.dragFueraContenedor.bind(this), false);
-      el.addEventListener("drop", this.controlDrop.bind(this), false);
-    });*/
-  }
-}
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (DragAndDrop);
+/* harmony default export */ __webpack_exports__["default"] = (Dashboard);
 
 
 /***/ }),
@@ -393,12 +319,9 @@ class DragAndDrop {
 /*!************************!*\
   !*** ./src/js/Game.js ***!
   \************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/js/constants.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
@@ -930,7 +853,7 @@ class Game {
   }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Game);
+/* harmony default export */ __webpack_exports__["default"] = (Game);
 
 
 /***/ }),
@@ -939,12 +862,9 @@ class Game {
 /*!*************************!*\
   !*** ./src/js/Login.js ***!
   \*************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
 
@@ -1133,7 +1053,7 @@ class Login {
   }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Login);
+/* harmony default export */ __webpack_exports__["default"] = (Login);
 
 
 /***/ }),
@@ -1142,12 +1062,9 @@ class Login {
 /*!****************************!*\
   !*** ./src/js/Register.js ***!
   \****************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 /* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! uuid */ "./node_modules/uuid/dist/esm-browser/v4.js");
 
@@ -1436,7 +1353,7 @@ class Register {
   }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Register);
+/* harmony default export */ __webpack_exports__["default"] = (Register);
 
 
 /***/ }),
@@ -1445,17 +1362,12 @@ class Register {
 /*!************************!*\
   !*** ./src/js/Room.js ***!
   \************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/js/constants.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Game */ "./src/js/Game.js");
-/* harmony import */ var _DragAndDrop__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./DragAndDrop */ "./src/js/DragAndDrop.js");
-
 
 
 
@@ -1467,7 +1379,6 @@ class Room {
   game = "";
   storage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
   playButtonDiv = document.getElementById("playButton");
-  //dragAndDrop = new DragAndDrop();
   roomBox;
   currentAvatar;
 
@@ -1479,52 +1390,38 @@ class Room {
   }
 
   initDragListeners() {
-    //console.log("caja: ", this.roomBox);
     this.roomBox.addEventListener("drop", this.onDropPlayer.bind(this));
     this.roomBox.addEventListener("dragover", this.dragSobreContenedor.bind(this));
     this.roomBox.addEventListener("dragleave", this.dragSaleContenedor.bind(this));
   }
 
   dragSaleContenedor(e) {
-    //console.log("dragSaleContenedor e: ", e);
-    //this.classList.remove("over");
+    e.preventDefault();
   }
 
   dragSobreContenedor(e) {
     e.preventDefault();
-    //console.log("dragSobreContenedor e: ", e);
-    //this.classList.add("over");
-    //return false;
   }
 
   onDropPlayer(e) {
-    //console.log(e);
     const dragUSer = this.storage.getLocalStorage("me", "session");
     const avatarMobile = document.getElementById(e.dataTransfer.getData("userAvatar"));
-    console.log(avatarMobile);
-    console.log(avatarMobile.parentNode);
-    console.log(avatarMobile.parentElement);
     this.currentAvatar = avatarMobile;
-    console.log(this.currentAvatar);
-    this.roomBox.innerHTML =this.currentAvatar.outerHTML;
-    //avatarMobile.innerHTML = "";
-
-
-    
+    this.roomBox.innerHTML =this.currentAvatar.outerHTML;    
     avatarMobile.parentNode.removeChild(avatarMobile);
-    //this.classList.remove('over');
+    
 
-    // if (this.players.length === this.capacity) {
-    //   this.isOpen = false;
-    //   this.disableRoom(this.id);
-    //   console.log("sala llena!");
-    //   return;
-    // }
+     if (this.players.length === this.capacity) {
+       this.isOpen = false;
+       this.disableRoom(this.id);
+       console.log("sala llena!");
+       return;
+     }
 
-    // if (this.players.length > this.capacity || !this.isOpen) {
+     if (this.players.length > this.capacity || !this.isOpen) {
     //   console.log("La sala no acepta más jugadores");
-    //   return;
-    // }
+       return;
+     }
 
     this.addToRoom(dragUSer);
   }
@@ -1724,7 +1621,7 @@ class Room {
   }
 }
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Room);
+/* harmony default export */ __webpack_exports__["default"] = (Room);
 
 
 /***/ }),
@@ -1733,12 +1630,12 @@ class Room {
 /*!*****************************!*\
   !*** ./src/js/constants.js ***!
   \*****************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "MESSAGE_TYPES": () => (/* binding */ MESSAGE_TYPES),
-/* harmony export */   "EVENT_TYPES": () => (/* binding */ EVENT_TYPES)
+/* harmony export */   "MESSAGE_TYPES": function() { return /* binding */ MESSAGE_TYPES; },
+/* harmony export */   "EVENT_TYPES": function() { return /* binding */ EVENT_TYPES; }
 /* harmony export */ });
 const MESSAGE_TYPES = {
   CONNECTED_TO_ROOM: "CONNECTED_TO_ROOM",
@@ -1761,12 +1658,12 @@ const EVENT_TYPES = {
 /*!*************************!*\
   !*** ./src/js/utils.js ***!
   \*************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (function(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ LocalStorage),
-/* harmony export */   "getNewGameInfo": () => (/* binding */ getNewGameInfo)
+/* harmony export */   "default": function() { return /* binding */ LocalStorage; },
+/* harmony export */   "getNewGameInfo": function() { return /* binding */ getNewGameInfo; }
 /* harmony export */ });
 class LocalStorage {
   localStorage = window.localStorage;
@@ -1834,37 +1731,37 @@ const getNewGameInfo = (context) => {
 /******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
+/******/ 	!function() {
 /******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 		__webpack_require__.d = function(exports, definition) {
 /******/ 			for(var key in definition) {
 /******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
 /******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
 /******/ 				}
 /******/ 			}
 /******/ 		};
-/******/ 	})();
+/******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
+/******/ 	!function() {
+/******/ 		__webpack_require__.o = function(obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
+/******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
+/******/ 	!function() {
 /******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
+/******/ 		__webpack_require__.r = function(exports) {
 /******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
 /******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 /******/ 			}
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
-/******/ 	})();
+/******/ 	}();
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other entry modules.
-(() => {
+!function() {
 var __webpack_exports__ = {};
 /*!*****************************!*\
   !*** ./src/sass/style.scss ***!
@@ -1872,20 +1769,19 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 // extracted by mini-css-extract-plugin
 
-})();
-
+}();
 // This entry need to be wrapped in an IIFE because it need to be isolated against other entry modules.
-(() => {
+!function() {
 /*!*************************!*\
   !*** ./src/js/index.js ***!
   \*************************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Game": () => (/* reexport safe */ _Game__WEBPACK_IMPORTED_MODULE_0__["default"]),
-/* harmony export */   "Room": () => (/* reexport safe */ _Room__WEBPACK_IMPORTED_MODULE_1__["default"]),
-/* harmony export */   "Dashboard": () => (/* reexport safe */ _DashBoard__WEBPACK_IMPORTED_MODULE_2__["default"]),
-/* harmony export */   "Register": () => (/* reexport safe */ _Register__WEBPACK_IMPORTED_MODULE_3__["default"]),
-/* harmony export */   "Login": () => (/* reexport safe */ _Login__WEBPACK_IMPORTED_MODULE_4__["default"])
+/* harmony export */   "Game": function() { return /* reexport safe */ _Game__WEBPACK_IMPORTED_MODULE_0__["default"]; },
+/* harmony export */   "Room": function() { return /* reexport safe */ _Room__WEBPACK_IMPORTED_MODULE_1__["default"]; },
+/* harmony export */   "Dashboard": function() { return /* reexport safe */ _DashBoard__WEBPACK_IMPORTED_MODULE_2__["default"]; },
+/* harmony export */   "Register": function() { return /* reexport safe */ _Register__WEBPACK_IMPORTED_MODULE_3__["default"]; },
+/* harmony export */   "Login": function() { return /* reexport safe */ _Login__WEBPACK_IMPORTED_MODULE_4__["default"]; }
 /* harmony export */ });
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Game */ "./src/js/Game.js");
 /* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
@@ -1900,8 +1796,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-})();
-
+}();
 Conquer = __webpack_exports__;
 /******/ })()
 ;
