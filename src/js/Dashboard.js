@@ -4,6 +4,7 @@ import LocalStorage from "./utils";
 class Dashboard {
   roomsList = [];
   localStorage = new LocalStorage();
+  avatarMobile;
 
   constructor(initData) {
     this.boxRooms = initData.boxRooms;
@@ -14,15 +15,26 @@ class Dashboard {
     this.generateRooms();
     this.generatePlayerBox();
     this.generateLogout();
-    let avatarMobile = document.querySelector("#avatarMobile");
+    this.avatarMobile = document.querySelector("#avatarMobile");
+    //this.avatarMobile = new D
     avatarMobile.addEventListener(
-      "dragstart",
-      () => {
-        console.log("me arrastrooo");
-      },
+      "dragstart", this.dragIniciado.bind(this),     
+      false
+    );
+    avatarMobile.addEventListener(
+      "dragend", this.dragFinalizado.bind(this),
       false
     );
   }
+
+  dragIniciado(e) {
+    e.dataTransfer.setData("userAvatar","avatarMobile");
+  }
+  
+  dragFinalizado() {
+     
+  }
+
 
   generateRooms() {
     this.boxRooms.forEach((box, index) => {
@@ -35,8 +47,6 @@ class Dashboard {
 
       const boxDiv = document.getElementById(box.id);
 
-      // Añadir evento en alguna parte del box para cuando se hace drag&drop
-      // Y que conecte con un método de la instancia de room
 
       // Añadir clase para pintar caja
       boxDiv.classList.add(`room${index + 1}`);
@@ -79,10 +89,6 @@ class Dashboard {
       this.localStorage.setLocalStorage("roomsList", roomsDataType);
     }
 
-    //Temporal, añadimos user a la primera sala
-    // const currentUserData = this.localStorage.getLocalStorage("me", "session");
-    // const currentRoom = this.roomsList[0];
-    // currentRoom.addToRoom(currentUserData);
   }
 
   generatePlayerBox() {

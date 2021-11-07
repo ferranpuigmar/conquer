@@ -10,8 +10,8 @@ class Room {
   game = "";
   storage = new LocalStorage();
   playButtonDiv = document.getElementById("playButton");
-  dragAndDrop = new DragAndDrop();
   roomBox;
+  currentAvatar;
 
   constructor(id, name, capacity) {
     this.id = id;
@@ -21,28 +21,29 @@ class Room {
   }
 
   initDragListeners() {
-    console.log("caja: ", this.roomBox);
-    this.roomBox.addEventListener("drop", this.onDraggPlayer.bind(this));
-    this.roomBox.addEventListener("dragover", function (event) {
-      event.preventDefault();
-    });
+    this.roomBox.addEventListener("drop", this.onDropPlayer.bind(this));
+
   }
 
-  onDraggPlayer(e) {
-    console.log("EOOOOO");
+  onDropPlayer(e) {
     const dragUSer = this.storage.getLocalStorage("me", "session");
+    const avatarMobile = document.getElementById(e.dataTransfer.getData("userAvatar"));
+    this.currentAvatar = avatarMobile;
+    this.roomBox.innerHTML =this.currentAvatar.outerHTML;    
+    avatarMobile.parentNode.removeChild(avatarMobile);
+    
 
-    // if (this.players.length === this.capacity) {
-    //   this.isOpen = false;
-    //   this.disableRoom(this.id);
-    //   console.log("sala llena!");
-    //   return;
-    // }
+     if (this.players.length === this.capacity) {
+       this.isOpen = false;
+       this.disableRoom(this.id);
+       console.log("sala llena!");
+       return;
+     }
 
-    // if (this.players.length > this.capacity || !this.isOpen) {
+     if (this.players.length > this.capacity || !this.isOpen) {
     //   console.log("La sala no acepta más jugadores");
-    //   return;
-    // }
+       return;
+     }
 
     this.addToRoom(dragUSer);
   }

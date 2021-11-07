@@ -11158,6 +11158,7 @@ textarea.form-control-lg {
   justify-content: center;
   opacity: 0.3;
   transition: opacity 0.5s ease-in-out;
+  cursor: move;
 }
 .a-avatar i {
   font-size: 30px;
@@ -11221,6 +11222,8 @@ textarea.form-control-lg {
   margin: 0px;
 }
 .m-user-item__image .image {
+  min-width: 48px;
+  min-height: 48px;
   display: inline-flex;
   border: 3px dashed #495057;
   border-radius: 50%;
@@ -11284,6 +11287,8 @@ textarea.form-control-lg {
   padding-left: 19px;
   text-align: center;
   min-height: 52px;
+  display: flex;
+  justify-content: center;
 }
 .m-room-drop-item__image .image {
   margin: 3px auto;
@@ -11293,8 +11298,9 @@ textarea.form-control-lg {
   background-color: #fff;
   border: 1px solid #495057;
   display: inline-block;
-  margin-right: -19px;
-  transform: translateX(-19px);
+}
+.m-room-drop-item__image .a-avatar {
+  opacity: 1;
 }
 
 .m-game {
