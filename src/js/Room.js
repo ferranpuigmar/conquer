@@ -21,7 +21,16 @@ class Room {
 
   initDragListeners() {
     this.roomBox.addEventListener("drop", this.onDropPlayer.bind(this));
+    this.roomBox.addEventListener("dragover", this.dragSobreContenedor.bind(this));
+    this.roomBox.addEventListener("dragleave", this.dragSaleContenedor.bind(this));
+  }
 
+  dragSaleContenedor(e) {
+    e.preventDefault();
+  }
+
+  dragSobreContenedor(e) {
+    e.preventDefault();
   }
 
   onDropPlayer(e) {
