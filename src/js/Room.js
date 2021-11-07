@@ -1,7 +1,6 @@
 import { EVENT_TYPES, MESSAGE_TYPES } from "./constants";
 import LocalStorage from "./utils";
 import Game from "./Game";
-import DragAndDrop from "./DragAndDrop";
 class Room {
   capacity = 4;
   isOpen = true;
