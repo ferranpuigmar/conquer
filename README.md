@@ -1,4 +1,4 @@
-###### Pasos a seguir para el correcto funcionamiento del repositorio
+#### Pasos a seguir para el correcto funcionamiento del repositorio
 
 1. Descargar el repositorio en local
 
