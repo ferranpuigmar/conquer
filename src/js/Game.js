@@ -468,7 +468,7 @@ class Game {
       // por cada sala se lanza este evento
       if (e.key === "roomsList") {
         const roomsList = JSON.parse(e.newValue);
-
+        this.storage.setLocalStorage("roomsList", roomsList);
         switch (roomsList.eventType) {
           case EVENT_TYPES.UPDATE_GAME:
             !this.player.hasLost && this.handleUpdateEventGame(roomsList);

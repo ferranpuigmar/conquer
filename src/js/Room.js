@@ -169,7 +169,8 @@ class Room {
       // por cada sala se lanza este evento
       if (e.key === "roomsList") {
         const roomsList = JSON.parse(e.newValue);
-
+        this.storage.setLocalStorage("roomsList", roomsList);
+        
         switch (roomsList.eventType) {
           case EVENT_TYPES.ADD_USER_TO_ROOM:
             this.handleEventAddUser(roomsList);
@@ -220,11 +221,13 @@ class Room {
       return room;
     });
 
-    socket.emit("room", {
+    const data = {
       eventType: EVENT_TYPES.PLAY_GAME,
       roomEventId: this.id,
       rooms: updateRoomsStorage,
-    });
+    }
+
+    socket.emit("room", data);
 
     const currentRoom = rooms.find((room) => room.id === this.id);
     this.initGame(currentRoom.usersRoom);
