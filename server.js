@@ -29,7 +29,7 @@ app.use(
 
 // Motor de plantilla
 const hbs = require("hbs");
-hbs.registerPartials(__dirname + "src/views/partials", function (err) {});
+hbs.registerPartials(__dirname + "/src/views/partials", function (err) {});
 app.set("view engine", "hbs");
 app.set("views", __dirname + "/src/views");
 
