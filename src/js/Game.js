@@ -409,7 +409,7 @@ class Game {
       rooms: updateRooms,
     };
 
-    this.storage.setLocalStorage("roomsList", roomListUpdate);
+    socket.emit("game", roomListUpdate);
   }
 
   // Método que inicializa el juego
@@ -459,12 +459,12 @@ class Game {
       rooms: updateRooms,
     };
 
-    this.storage.setLocalStorage("roomsList", roomListUpdate);
+    socket.emit("game", roomListUpdate);
   }
 
   // Método que añade el evento storage al juego
   initStorageEvents() {
-    window.addEventListener("storage", (e) => {
+    socket.on("game", (e) => {
       // por cada sala se lanza este evento
       if (e.key === "roomsList") {
         const roomsList = JSON.parse(e.newValue);
