@@ -735,7 +735,7 @@ class Game {
       rooms: updateRooms,
     };
 
-    this.storage.setLocalStorage("roomsList", roomListUpdate);
+    socket.emit("game", roomListUpdate);
   }
 
   // Método que inicializa el juego
@@ -785,16 +785,16 @@ class Game {
       rooms: updateRooms,
     };
 
-    this.storage.setLocalStorage("roomsList", roomListUpdate);
+    socket.emit("game", roomListUpdate);
   }
 
   // Método que añade el evento storage al juego
   initStorageEvents() {
-    window.addEventListener("storage", (e) => {
+    socket.on("game", (e) => {
       // por cada sala se lanza este evento
       if (e.key === "roomsList") {
         const roomsList = JSON.parse(e.newValue);
-
+        this.storage.setLocalStorage("roomsList", roomsList);
         switch (roomsList.eventType) {
           case _constants__WEBPACK_IMPORTED_MODULE_0__.EVENT_TYPES.UPDATE_GAME:
             !this.player.hasLost && this.handleUpdateEventGame(roomsList);
@@ -1469,7 +1469,7 @@ class Room {
       rooms: updateRooms,
     };
 
-    this.storage.setLocalStorage("roomsList", updateRoomsList);
+    socket.emit("room", updateRoomsList);
 
     // Mostramos panel superior sala
     const gameTopPannelDiv = document.getElementById("gameTopPannel");
@@ -1535,11 +1535,12 @@ class Room {
   }
 
   initStorageEvents() {
-    window.addEventListener("storage", (e) => {
+    socket.on("room", (e) => {
       // por cada sala se lanza este evento
       if (e.key === "roomsList") {
         const roomsList = JSON.parse(e.newValue);
-
+        this.storage.setLocalStorage("roomsList", roomsList);
+        
         switch (roomsList.eventType) {
           case _constants__WEBPACK_IMPORTED_MODULE_0__.EVENT_TYPES.ADD_USER_TO_ROOM:
             this.handleEventAddUser(roomsList);
@@ -1590,11 +1591,13 @@ class Room {
       return room;
     });
 
-    this.storage.setLocalStorage("roomsList", {
+    const data = {
       eventType: _constants__WEBPACK_IMPORTED_MODULE_0__.EVENT_TYPES.PLAY_GAME,
       roomEventId: this.id,
       rooms: updateRoomsStorage,
-    });
+    }
+
+    socket.emit("room", data);
 
     const currentRoom = rooms.find((room) => room.id === this.id);
     this.initGame(currentRoom.usersRoom);
