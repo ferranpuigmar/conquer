@@ -1,4 +1,5 @@
 require("dotenv").config();
+const sassMiddleware = require("node-sass-middleware");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const path = require("path");
@@ -7,17 +8,23 @@ const path = require("path");
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3001;
+var srcPath = __dirname + "/src/sass";
+var destPath = __dirname + "/public/css";
 
 //MiddleWares
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
 app.use(
-  require("node-sass-middleware")({
-    src: path.join(__dirname, "./src/sass"),
-    dest: path.join(__dirname, "public/css"),
-    sourceMap: true,
-  })
+  sassMiddleware({
+    src: srcPath,
+    dest: destPath,
+    debug: true,
+    outputStyle: "compressed",
+    prefix: "/css",
+  }),
+  express.static(path.join(__dirname, "public"))
 );
 
 // Motor de plantilla
@@ -28,9 +35,8 @@ app.set("views", __dirname + "/src/views");
 
 app.use(express.static(__dirname + "/public"));
 
-app.get("/", function (req, res) {
-  res.render("login");
-});
+const index = require("./routes/index");
+app.use("/", index);
 
 // Iniciar servidor
 app.listen(port, () => {

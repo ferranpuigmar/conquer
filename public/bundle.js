@@ -1763,17 +1763,7 @@ const getNewGameInfo = (context) => {
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be isolated against other entry modules.
-!function() {
-var __webpack_exports__ = {};
-/*!*****************************!*\
-  !*** ./src/sass/style.scss ***!
-  \*****************************/
-__webpack_require__.r(__webpack_exports__);
-// extracted by mini-css-extract-plugin
-
-}();
-// This entry need to be wrapped in an IIFE because it need to be isolated against other entry modules.
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 !function() {
 /*!*************************!*\
   !*** ./src/js/index.js ***!
