@@ -1,6 +1,7 @@
 import { EVENT_TYPES, MESSAGE_TYPES } from "./constants";
 import LocalStorage from "./utils";
 import Game from "./Game";
+import { io } from "socket.io-client";
 class Room {
   capacity = 4;
   isOpen = true;
@@ -11,6 +12,7 @@ class Room {
   playButtonDiv = document.getElementById("playButton");
   roomBox;
   currentAvatar;
+  socket = io(`127.0.0.1:3000`);
 
   constructor(id, name, capacity) {
     this.id = id;
@@ -106,7 +108,7 @@ class Room {
       rooms: updateRooms,
     };
 
-    socket.emit("room", updateRoomsList);
+    this.socket.emit("room", updateRoomsList);
 
     // Mostramos panel superior sala
     const gameTopPannelDiv = document.getElementById("gameTopPannel");
@@ -172,7 +174,7 @@ class Room {
   }
 
   initStorageEvents() {
-    socket.on("room", (e) => {
+    this.socket.on("room", (e) => {
       // por cada sala se lanza este evento
       if (e.key === "roomsList") {
         const roomsList = JSON.parse(e.newValue);
@@ -234,7 +236,7 @@ class Room {
       rooms: updateRoomsStorage,
     };
 
-    socket.emit("room", data);
+    this.socket.emit("room", data);
 
     const currentRoom = rooms.find((room) => room.id === this.id);
     this.initGame(currentRoom.usersRoom);
@@ -256,7 +258,13 @@ class Room {
     // Inicializamos juego
     const gridSize = 20;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
-    this.game = new Game(this.id, currentPlayerInfo, players, gridSize);
+    this.game = new Game(
+      this.id,
+      currentPlayerInfo,
+      players,
+      this.socket,
+      gridSize
+    );
     this.game.init(isCallWithEvent);
   }
 }

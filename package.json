@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev_m": "webpack & nodemon server.js",
+    "dev_m": "webpack -w& nodemon server.js",
     "dev_w": "webpack --mode development & node server.js & open http://localhost:3000/",
     "build": "webpack --mode development & node server.js"
   },
@@ -29,7 +29,9 @@
     "module-alias": "^2.2.2",
     "node-sass-middleware": "^0.11.0",
     "nodemon": "^2.0.15",
+    "nodemon-webpack-plugin": "^4.5.2",
     "socket.io": "^4.3.2",
+    "socket.io-client": "^4.3.2",
     "uuid": "^8.3.2"
   },
   "_moduleAliases": {

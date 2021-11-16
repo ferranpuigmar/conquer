@@ -12,15 +12,27 @@ class Game {
   roomsList;
   roundTitle = document.getElementById("roundTitle"); // Número del Round
   pannelInfo = document.getElementById("roomPannelInfo");
+  canvas = document.getElementById("game");
+  cells = [];
 
-  constructor(roomId, playerInfo, players, gameSize) {
+  constructor(roomId, playerInfo, players, socket, gameSize) {
     this.player = playerInfo;
     this.players = this.userToPlayerDTO(players);
-    this.gridSize = gameSize;
     this.totalCells = gameSize * gameSize;
     this.round = { turn: 1, roundNumber: 1, player: this.players[0] };
     this.grid = this.generateGrid(gameSize);
     this.roomId = roomId;
+    this.socket = socket;
+    this.context = this.canvas.getContext("2d");
+    this.canvas.width = this.canvas.offsetWidth;
+    this.canvas.height = this.canvas.offsetHeight;
+    this.gridSize = gameSize;
+    this.cellWidth = this.canvas.width / this.gridSize;
+    this.cellHeight = this.canvas.height / this.gridSize;
+  }
+
+  initCanvasEvents() {
+    this.canvas.addEventListener("click", this.checkFillCell.bind(this));
   }
 
   isMyTurn(round) {
@@ -148,27 +160,36 @@ class Game {
   // Chequeamos que sea clicable
   // Chequeamos si el jugador ha ganado
   // Actualizamos el localStorage con ese clic
-  checkCellClick(e) {
-    if (!this.isMyTurn(this.round)) return;
+  checkFillCell(e) {
+    // if (!this.isMyTurn(this.round)) return;
 
     // chequeamos a que jugador le toca
     const currentPlayerTurn = this.round.player;
 
-    // sacamos la id de la celda dentro del DOM
+    let currentCell;
+    let gridIndex;
+    for (let i = 0; i < this.cells.length; i++) {
+      let cellPath = this.cells[i];
+      if (this.context.isPointInPath(cellPath, e.offsetX, e.offsetY)) {
+        currentCell = this.grid[i];
+        gridIndex = i;
+      }
+    }
+
+    // sacamos la id de la celda dentro de canvas
     // sacamos los data asciados al número de row y la celda
-    const cellId = e.target.id;
+    const cellId = currentCell.id;
     const cellObj = {
-      row: e.target.dataset.row,
-      cell: e.target.dataset.cell,
+      row: currentCell.row,
+      cell: currentCell.cell,
     };
-    const cell = document.getElementById(cellId);
 
     // comprobamos si es adjacente a la última seleccionada por el jugador
     // siempre y cuando no sea el primer turno
     if (this.round.roundNumber !== 1) {
       let isCellFilled, isAValidCellClick;
       // comprobamos si está llena
-      isCellFilled = cell.classList.contains("isFilled");
+      isCellFilled = currentCell.id !== "";
       // comprobamos si el click está en una casilla adjacente que pertenece al jugador
       isAValidCellClick = this.checkValidCellClick(
         cellObj,
@@ -180,38 +201,29 @@ class Game {
       }
     }
 
-    // Añadimos la class isFilled que no permite pulsar la casilla
-    cell.classList.add("isFilled");
-    // Cambiamos la celda al color del jugador
-    cell.style.backgroundColor = currentPlayerTurn.color;
-    // Le sumamos 1 a sus casillas conquistadas
-    // y registramos la id de la celda como última posición
-    this.AddConqueredCell(currentPlayerTurn.id, cellId);
+    this.fillCell(currentCell, gridIndex);
+  }
 
-    // Comprobamos que ninguno de los otros jugadores
-    // ha perdido.
-    this.checkOtherPlayerLoss(currentPlayerTurn.id);
-
-    // Comprobamos si ha ganado
-    if (this.totalCellsToWin === currentPlayerTurn.cellsConquered) {
-      console.log(`El jugador ${currentPlayerTurn.name} ha ganado!!!`);
-    }
-
-    if (this.players.length == 1) {
-      console.log(`El jugador ${this.players[0].name} ha ganado!!!`);
-    }
-
-    // Actualizamos información del round
-    this.round = this.calculateNewRoundInfo();
-
-    const newGameToStorage = getNewGameInfo(this);
-
-    // Enviamos update al storage
-    this.updateGame(this.getRoomsList(), newGameToStorage);
-    const currentRoom = this.getRoomsList().rooms.find(
-      (room) => room.id === this.roomId
+  fillCell(cell, index) {
+    this.context.beginPath();
+    this.context.rect(
+      cell.cell_x,
+      cell.cell_y,
+      this.cellWidth,
+      this.cellHeight
     );
-    this.checkTurn(currentRoom);
+    this.context.strokeStyle = "#ccc";
+    this.context.lineWidth = 1;
+    this.context.fillStyle = this.round.player.color;
+    this.context.fill();
+    this.context.stroke();
+
+    // Actualizamos grid de referencia
+    this.grid[index] = {
+      ...this.grid[index],
+      playerId: this.round.player.id,
+      color: this.round.player.color,
+    };
   }
 
   // Devuelve la key roomsList del localStorage
@@ -298,56 +310,48 @@ class Game {
     }
   }
 
-  createDomGrid() {
-    const size = this.gridSize;
-    this.wrapper.innerHTML = "";
-    let rowCounter = 1;
-    let cellCounter = 1;
-    let cells = [];
+  generateCanvas() {
+    let colCounter = 0;
+    let rowCounter = 0;
 
-    for (let i = 1; i <= size * size; i++) {
-      let cellId = `cell${rowCounter}-${cellCounter}`;
-      let cell = document.createElement("div");
-      cell.id = cellId;
-      cell.row = rowCounter;
-      cell.cell = cellCounter;
-      cell.className = `m-game-grid__cell cell-${rowCounter}-${cellCounter}`;
-      cell.dataset.cell = cellCounter;
-      cell.dataset.row = rowCounter;
-      cell.addEventListener("click", this.checkCellClick.bind(this), false);
-      cells.push(cell);
-      cellCounter++;
-
-      // Si hay 20 celdas
-      if (i % size === 0) {
-        // Creamos contenedor de la fila
-        let row = document.createElement("div");
-        row.className = "m-game-grid__row";
-
-        // Añadimos las 20 celdas a la fila
-        cells.forEach((cell, index) => {
-          row.appendChild(cell);
-        });
-
-        // Añadimos la fila al grid del HTML
-        this.wrapper.appendChild(row);
-
-        // Reiniciamos el array de celdas,
-        // el contador de celdas a 1
-        // y añadimos 1 al contador de filas
-        cells = [];
-        cellCounter = 1;
+    for (let cell = 0; cell < this.totalCells; cell++) {
+      if (cell !== 0 && cell % 20 === 0) {
+        colCounter = 0;
         rowCounter++;
       }
 
-      // registamos la id de la casilla en nuestro registro de grid
-      this.grid[i - 1] = {
-        id: cell.id,
-        row: cell.row,
-        cell: cell.cell,
+      const path = new Path2D();
+      this.context.strokeStyle = "#ccc";
+      this.context.lineWidth = 1;
+      this.context.rect(
+        colCounter * this.cellWidth,
+        rowCounter * this.cellHeight,
+        this.cellWidth,
+        this.cellHeight
+      );
+      this.context.stroke();
+
+      const rowNum = rowCounter + 1;
+      const cellNum = colCounter + 1;
+      this.grid[cell] = {
+        id: `cell${rowNum}_${cellNum}`,
+        row: rowNum,
+        cell: cellNum,
+        cell_x: colCounter * this.cellWidth,
+        cell_y: rowCounter * this.cellHeight,
         playerId: null,
         color: null,
       };
+
+      path.rect(
+        colCounter * this.cellWidth,
+        rowCounter * this.cellHeight,
+        this.cellWidth,
+        this.cellHeight
+      );
+      this.cells.push(path);
+
+      colCounter++;
     }
   }
 
@@ -409,12 +413,13 @@ class Game {
       rooms: updateRooms,
     };
 
-    socket.emit("game", roomListUpdate);
+    this.socket.emit("game", roomListUpdate);
   }
 
   // Método que inicializa el juego
   init(isCallWithEvent) {
-    this.createDomGrid();
+    this.generateCanvas();
+    this.initCanvasEvents();
     this.calculateTotalCellsToWin(this.totalCells, this.players);
     this.initStorageEvents();
     this.roundTitle.querySelector("span").innerHTML = 1;
@@ -459,12 +464,12 @@ class Game {
       rooms: updateRooms,
     };
 
-    socket.emit("game", roomListUpdate);
+    this.socket.emit("game", roomListUpdate);
   }
 
   // Método que añade el evento storage al juego
   initStorageEvents() {
-    socket.on("game", (e) => {
+    this.socket.on("game", (e) => {
       // por cada sala se lanza este evento
       if (e.key === "roomsList") {
         const roomsList = JSON.parse(e.newValue);

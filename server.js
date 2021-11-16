@@ -3,6 +3,7 @@ const sassMiddleware = require("node-sass-middleware");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const path = require("path");
+const http = require("http");
 
 // Configuración inicial
 const express = require("express");
@@ -41,4 +42,20 @@ app.use("/", index);
 // Iniciar servidor
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
+});
+
+let server = http.createServer(app);
+
+const io = require("socket.io")(server);
+
+io.on("connection", (socket) => {
+  console.log("User connected: " + socket.id);
+
+  socket.on("game", (data) => {
+    socket.emit("game", data);
+  });
+
+  socket.on("room", (data) => {
+    socket.emit("room", data);
+  });
 });
