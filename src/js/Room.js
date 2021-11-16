@@ -21,8 +21,14 @@ class Room {
 
   initDragListeners() {
     this.roomBox.addEventListener("drop", this.onDropPlayer.bind(this));
-    this.roomBox.addEventListener("dragover", this.dragSobreContenedor.bind(this));
-    this.roomBox.addEventListener("dragleave", this.dragSaleContenedor.bind(this));
+    this.roomBox.addEventListener(
+      "dragover",
+      this.dragSobreContenedor.bind(this)
+    );
+    this.roomBox.addEventListener(
+      "dragleave",
+      this.dragSaleContenedor.bind(this)
+    );
   }
 
   dragSaleContenedor(e) {
@@ -35,23 +41,24 @@ class Room {
 
   onDropPlayer(e) {
     const dragUSer = this.storage.getLocalStorage("me", "session");
-    const avatarMobile = document.getElementById(e.dataTransfer.getData("userAvatar"));
+    const avatarMobile = document.getElementById(
+      e.dataTransfer.getData("userAvatar")
+    );
     this.currentAvatar = avatarMobile;
-    this.roomBox.innerHTML =this.currentAvatar.outerHTML;    
+    this.roomBox.innerHTML = this.currentAvatar.outerHTML;
     avatarMobile.parentNode.removeChild(avatarMobile);
-    
 
-     if (this.players.length === this.capacity) {
-       this.isOpen = false;
-       this.disableRoom(this.id);
-       console.log("sala llena!");
-       return;
-     }
+    if (this.players.length === this.capacity) {
+      this.isOpen = false;
+      this.disableRoom(this.id);
+      console.log("sala llena!");
+      return;
+    }
 
-     if (this.players.length > this.capacity || !this.isOpen) {
-    //   console.log("La sala no acepta más jugadores");
-       return;
-     }
+    if (this.players.length > this.capacity || !this.isOpen) {
+      //   console.log("La sala no acepta más jugadores");
+      return;
+    }
 
     this.addToRoom(dragUSer);
   }
@@ -170,7 +177,7 @@ class Room {
       if (e.key === "roomsList") {
         const roomsList = JSON.parse(e.newValue);
         this.storage.setLocalStorage("roomsList", roomsList);
-        
+
         switch (roomsList.eventType) {
           case EVENT_TYPES.ADD_USER_TO_ROOM:
             this.handleEventAddUser(roomsList);
@@ -225,7 +232,7 @@ class Room {
       eventType: EVENT_TYPES.PLAY_GAME,
       roomEventId: this.id,
       rooms: updateRoomsStorage,
-    }
+    };
 
     socket.emit("room", data);
 

@@ -18,23 +18,22 @@ class Dashboard {
     this.avatarMobile = document.querySelector("#avatarMobile");
     //this.avatarMobile = new D
     avatarMobile.addEventListener(
-      "dragstart", this.dragIniciado.bind(this),     
+      "dragstart",
+      this.dragIniciado.bind(this),
       false
     );
     avatarMobile.addEventListener(
-      "dragend", this.dragFinalizado.bind(this),
+      "dragend",
+      this.dragFinalizado.bind(this),
       false
     );
   }
 
   dragIniciado(e) {
-    e.dataTransfer.setData("userAvatar","avatarMobile");
-  }
-  
-  dragFinalizado() {
-     
+    e.dataTransfer.setData("userAvatar", "avatarMobile");
   }
 
+  dragFinalizado() {}
 
   generateRooms() {
     this.boxRooms.forEach((box, index) => {
@@ -46,7 +45,6 @@ class Dashboard {
       this.roomsList[index].initDragListeners();
 
       const boxDiv = document.getElementById(box.id);
-
 
       // Añadir clase para pintar caja
       boxDiv.classList.add(`room${index + 1}`);
@@ -88,7 +86,6 @@ class Dashboard {
       };
       this.localStorage.setLocalStorage("roomsList", roomsDataType);
     }
-
   }
 
   generatePlayerBox() {
