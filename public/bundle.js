@@ -939,7 +939,7 @@ class Game {
   }
 
   initCanvasEvents() {
-    this.canvas.addEventListener("click", this.checkFillCell.bind(this));
+    new ResizeObserver(this.generateCanvas.bind(this)).observe(this.canvas);
   }
 
   isMyTurn(round) {
@@ -997,8 +997,6 @@ class Game {
     this.waittingDiv.innerHTML = "";
   }
 
-  // Método que chequea que sea el turno del jugador
-  // y actualiza la información del juego que viene por el localStorage
   checkTurn(currentRoom) {
     if (this.round.player.id !== this.player.id) {
       this.showRoomMessage(_constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.WAITTING_TURN);
@@ -1062,6 +1060,7 @@ class Game {
     for (let i = 0; i < this.cells.length; i++) {
       let cellPath = this.cells[i];
       if (this.context.isPointInPath(cellPath, e.offsetX, e.offsetY)) {
+        console.log("cell " + i);
         currentCell = this.grid[i];
         gridIndex = i;
       }
@@ -1085,12 +1084,16 @@ class Game {
       }
     }
 
-    this.fillCell(currentCell, gridIndex);
+    this.fillCell(currentCell);
+    this.addConqueredCell(currentPlayerTurn.id, gridIndex);
+
+    this.checkOtherPlayerLoss(currentPlayerTurn.id);
+
     //!Temporal
     this.round.roundNumber++;
   }
 
-  fillCell(cell, index) {
+  fillCell(cell, color) {
     this.context.beginPath();
     this.context.rect(
       cell.cell_x,
@@ -1100,16 +1103,9 @@ class Game {
     );
     this.context.strokeStyle = "#ccc";
     this.context.lineWidth = 1;
-    this.context.fillStyle = this.round.player.color;
+    this.context.fillStyle = color ?? this.round.player.color;
     this.context.fill();
     this.context.stroke();
-
-    // Actualizamos grid de referencia
-    this.grid[index] = {
-      ...this.grid[index],
-      playerId: this.round.player.id,
-      color: this.round.player.color,
-    };
   }
 
   // Devuelve la key roomsList del localStorage
@@ -1130,7 +1126,7 @@ class Game {
 
       if (conqueredCells.length > 0) {
         conqueredCells.forEach((cellObj) => {
-          if (this.checkValidCellClick(cellObj, null)) {
+          if (this.checkValidCellClick(cellObj, player.id)) {
             playerHasLost = false;
           }
         });
@@ -1142,9 +1138,6 @@ class Game {
       }
     });
 
-    // Si hay jugadores que han sido eliminados
-    // los añadimos al state de defeatedPlayers
-    // enviamos evento para que se enteren que han perdido
     if (defeated.length > 0) {
       defeated.forEach((player) => {
         this.defeatedPlayers.push(player);
@@ -1163,21 +1156,21 @@ class Game {
     return false;
   }
 
-  // Método que añade una casilla al total
-  // de casillas conquistadas del jugador
-  AddConqueredCell(playerId, cellId) {
+  addConqueredCell(playerId, index) {
     this.players = this.players.map((player) => {
       if (player.id === playerId) {
         player.cellsConquered += 1;
       }
       return player;
     });
-    this.grid.forEach((cell) => {
-      if (cell.id === cellId) {
-        cell.playerId = this.round.player.id;
-        cell.color = this.round.player.color;
-      }
-    });
+
+    // Actualizamos grid de referencia
+    this.grid[index] = {
+      ...this.grid[index],
+      playerId: this.round.player.id,
+      color: this.round.player.color,
+    };
+    console.log(this.grid);
   }
 
   defeatPlayer(player) {
@@ -1197,6 +1190,9 @@ class Game {
   }
 
   generateCanvas() {
+    this.clearCanvas();
+    console.log("generating canvas....");
+
     let colCounter = 0;
     let rowCounter = 0;
 
@@ -1225,9 +1221,13 @@ class Game {
         cell: cellNum,
         cell_x: colCounter * this.cellWidth,
         cell_y: rowCounter * this.cellHeight,
-        playerId: null,
-        color: null,
+        playerId: this.grid[cell]?.playerId ?? null,
+        color: this.grid[cell]?.color ?? null,
       };
+
+      if (this.grid[cell].playerId !== null) {
+        this.fillCell(this.grid[cell], this.grid[cell].color);
+      }
 
       path.rect(
         colCounter * this.cellWidth,
@@ -1239,6 +1239,14 @@ class Game {
 
       colCounter++;
     }
+    console.log(this.grid);
+  }
+
+  clearCanvas() {
+    this.context.clearRect(0, 0, 1000, 1000);
+    this.context = this.canvas.getContext("2d");
+    this.canvas.addEventListener("click", this.checkFillCell.bind(this));
+    this.cells = [];
   }
 
   createLegend(players) {
