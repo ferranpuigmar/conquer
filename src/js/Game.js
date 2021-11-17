@@ -117,53 +117,37 @@ class Game {
     });
   }
 
-  // Método que calcula que casillas son clicables por el jugador
-  // de momento es en cruz
   checkValidCellClick(cellObj, id) {
-    // row de la casilla clickada
     const row = Number(cellObj.row);
-    // celda de la casilla clickada
     const cell = Number(cellObj.cell);
 
-    // Generamos posibles celdas adjacentes que pueden ser del jugador
     const nearCells = [
-      `cell${row + 1}-${cell}`,
-      `cell${row}-${cell + 1}`,
-      `cell${row - 1}-${cell}`,
-      `cell${row}-${cell - 1}`,
+      `cell${row + 1}_${cell - 1}`, // bottom left
+      `cell${row + 1}_${cell}`, // bottom
+      `cell${row + 1}_${cell + 1}`, // bottom right
+      `cell${row}_${cell - 1}`, // left
+      `cell${row}_${cell + 1}`, // right
+      `cell${row - 1}_${cell - 1}`, // top left
+      `cell${row - 1}_${cell}`, // top
+      `cell${row - 1}_${cell + 1}`, // top right
     ];
-    // Inicializamos un array para guardar las celdas
-    // adjacentes que pertenecen al jugador
+
     const validClick = [];
 
-    // Iteramos por el array de grid de nuestra clase Game para
-    // cotejar si las celdas que estan en nearCells tienen registrado al
-    // jugador, de modo que sabemos que son casillas en las que ha hecho click
-    // anteriormente
     for (let i = 0; i < nearCells.length; i++) {
-      // buscamos dentro de nuestro registro de grid la id de celda
-      const targetCell = this.grid.find((cell) => cell.id === nearCells[i]);
-      // Si la celda existe en el gri y además está registrado a nombre del jugador
-      // añadimos una celda válida dentro de las posibles celdas adyacentes
+      const targetCell = this.grid.find((cell) => {
+        return cell.id === nearCells[i];
+      });
       if (targetCell && targetCell.playerId === id) {
         validClick.push({ validCell: true });
       }
     }
-
-    // Retornamos un valor booleanos que nos dice si almenos una
-    // de las casillas adjacentes a la casilla en la que se ha hecho click
-    // pertenece al jugador
     return validClick.some((el) => el.validCell);
   }
 
-  // Método que chequea la celda que se ha clicado en el tablero
-  // Chequeamos que sea clicable
-  // Chequeamos si el jugador ha ganado
-  // Actualizamos el localStorage con ese clic
   checkFillCell(e) {
-    // if (!this.isMyTurn(this.round)) return;
+    //!Temporal if (!this.isMyTurn(this.round)) return;
 
-    // chequeamos a que jugador le toca
     const currentPlayerTurn = this.round.player;
 
     let currentCell;
@@ -176,21 +160,14 @@ class Game {
       }
     }
 
-    // sacamos la id de la celda dentro de canvas
-    // sacamos los data asciados al número de row y la celda
-    const cellId = currentCell.id;
     const cellObj = {
       row: currentCell.row,
       cell: currentCell.cell,
     };
 
-    // comprobamos si es adjacente a la última seleccionada por el jugador
-    // siempre y cuando no sea el primer turno
     if (this.round.roundNumber !== 1) {
       let isCellFilled, isAValidCellClick;
-      // comprobamos si está llena
-      isCellFilled = currentCell.id !== "";
-      // comprobamos si el click está en una casilla adjacente que pertenece al jugador
+      isCellFilled = currentCell.playerId !== null;
       isAValidCellClick = this.checkValidCellClick(
         cellObj,
         currentPlayerTurn.id
@@ -202,6 +179,8 @@ class Game {
     }
 
     this.fillCell(currentCell, gridIndex);
+    //!Temporal
+    this.round.roundNumber++;
   }
 
   fillCell(cell, index) {
