@@ -742,7 +742,7 @@ class Dashboard {
   roomsList = [];
   localStorage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
   avatarMobile;
-  socket = (0,socket_io_client__WEBPACK_IMPORTED_MODULE_2__.io)(`127.0.0.1:3000`);
+  socket = (0,socket_io_client__WEBPACK_IMPORTED_MODULE_2__.io)();
 
   constructor(initData) {
     this.boxRooms = initData.boxRooms;
@@ -777,7 +777,7 @@ class Dashboard {
     this.boxRooms.forEach((box, index) => {
       const roomName = `Room ${index + 1}`;
       // Generamos las instancias de las salas
-      this.roomsList[index] = new _Room__WEBPACK_IMPORTED_MODULE_0__["default"](box.id, roomName, 4);
+      this.roomsList[index] = new _Room__WEBPACK_IMPORTED_MODULE_0__["default"](box.id, roomName, 4, this.sockets);
       // Iniciamos listeners para eventos del tipo storage
       this.roomsList[index].initStorageEvents();
       this.roomsList[index].initDragListeners();
@@ -1947,8 +1947,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/js/constants.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Game */ "./src/js/Game.js");
-/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/build/esm/index.js");
-
 
 
 
@@ -1962,13 +1960,13 @@ class Room {
   playButtonDiv = document.getElementById("playButton");
   roomBox;
   currentAvatar;
-  socket = (0,socket_io_client__WEBPACK_IMPORTED_MODULE_3__.io)(`127.0.0.1:3000`);
 
-  constructor(id, name, capacity) {
+  constructor(id, name, capacity, socket) {
     this.id = id;
     this.name = name;
     this.capacity = capacity;
     this.roomBox = document.querySelector(`#${id} .m-room-drop-item__image`);
+    this.socket = socket;
   }
 
   initDragListeners() {

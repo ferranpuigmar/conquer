@@ -3,11 +3,12 @@ const sassMiddleware = require("node-sass-middleware");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const path = require("path");
-const http = require("http");
 
 // Configuración inicial
 const express = require("express");
 const app = express();
+const http = require("http").Server(app);
+const io = require("socket.io")(http);
 const port = process.env.PORT || 3001;
 var srcPath = __dirname + "/src/sass";
 var destPath = __dirname + "/public/css";
@@ -40,13 +41,9 @@ const index = require("./routes/index");
 app.use("/", index);
 
 // Iniciar servidor
-app.listen(port, () => {
+http.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
-
-let server = http.createServer(app);
-
-const io = require("socket.io")(server);
 
 io.on("connection", (socket) => {
   console.log("User connected: " + socket.id);
@@ -56,6 +53,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("room", (data) => {
+    console.log("en sala...");
     socket.emit("room", data);
   });
 });

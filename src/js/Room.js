@@ -1,7 +1,6 @@
 import { EVENT_TYPES, MESSAGE_TYPES } from "./constants";
 import LocalStorage from "./utils";
 import Game from "./Game";
-import { io } from "socket.io-client";
 class Room {
   capacity = 4;
   isOpen = true;
@@ -12,13 +11,13 @@ class Room {
   playButtonDiv = document.getElementById("playButton");
   roomBox;
   currentAvatar;
-  socket = io(`127.0.0.1:3000`);
 
-  constructor(id, name, capacity) {
+  constructor(id, name, capacity, socket) {
     this.id = id;
     this.name = name;
     this.capacity = capacity;
     this.roomBox = document.querySelector(`#${id} .m-room-drop-item__image`);
+    this.socket = socket;
   }
 
   initDragListeners() {
