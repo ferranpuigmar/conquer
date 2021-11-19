@@ -1,10 +1,12 @@
 import Room from "./Room";
 import LocalStorage from "./utils";
+import { io } from "socket.io-client";
 
 class Dashboard {
   roomsList = [];
   localStorage = new LocalStorage();
   avatarMobile;
+  socket = io(`127.0.0.1:3000`);
 
   constructor(initData) {
     this.boxRooms = initData.boxRooms;

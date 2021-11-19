@@ -733,6 +733,8 @@ module.exports = yeast;
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/build/esm/index.js");
+
 
 
 
@@ -740,6 +742,7 @@ class Dashboard {
   roomsList = [];
   localStorage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
   avatarMobile;
+  socket = (0,socket_io_client__WEBPACK_IMPORTED_MODULE_2__.io)(`127.0.0.1:3000`);
 
   constructor(initData) {
     this.boxRooms = initData.boxRooms;
