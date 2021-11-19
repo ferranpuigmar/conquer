@@ -41,7 +41,7 @@ class Dashboard {
     this.boxRooms.forEach((box, index) => {
       const roomName = `Room ${index + 1}`;
       // Generamos las instancias de las salas
-      this.roomsList[index] = new Room(box.id, roomName, 4, this.sockets);
+      this.roomsList[index] = new Room(box.id, roomName, 4, this.socket);
       // Iniciamos listeners para eventos del tipo storage
       this.roomsList[index].initStorageEvents();
       this.roomsList[index].initDragListeners();
