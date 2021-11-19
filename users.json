@@ -1,0 +1,20 @@
+[
+    {
+        "id": "337b8f8b-e27e-47b1-a6a1-db86cd585311",
+        "name": "dani",
+        "email": "dani@gmail.com",
+        "password": "123",
+        "avatar": "mod6",
+        "favouriteRoom": "green-room-box",
+        "color": "mod6"
+    },
+    {
+        "id": "c7a1c6a1-d47e-44d8-9fbb-979592500b18",
+        "name": "sarah",
+        "email": "sarah@gmail.com",
+        "password": "123",
+        "avatar": "mod6",
+        "favouriteRoom": "green-room-box",
+        "color": "mod6"
+    }
+]
