@@ -275,7 +275,6 @@ class Register {
     });
 
     this.socket.on("register_success", () => {
-      console.log("SUCCESS!!!");
       this.resetForm();
       this.showSuccesMessage();
     });

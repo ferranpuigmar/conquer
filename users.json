@@ -16,5 +16,14 @@
         "avatar": "mod6",
         "favouriteRoom": "green-room-box",
         "color": "mod6"
+    },
+    {
+        "id": "e1c47b96-6fab-478f-bbf3-f353c0ee8567",
+        "name": "ferran",
+        "email": "ferran@gmail.com",
+        "password": "123",
+        "avatar": "mod6",
+        "favouriteRoom": "blue-room-box",
+        "color": "mod6"
     }
 ]

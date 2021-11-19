@@ -104,8 +104,8 @@ io.on("connection", (socket) => {
     writeUserFiles(pathDB, data, socket);
   });
 
-  socket.on("load_users", (socket) => {
-    const usersDB = readFile(pathDB);
+  socket.on("load_db_users", () => {
+    const usersDB = readUsersFile(pathDB) ?? [];
     io.to(socket.id).emit("get_db_users", usersDB);
   });
 });
