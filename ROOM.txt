@@ -1,0 +1,24 @@
+ROOM
+=================
+
+Emmits to Server    => Emmits to Users
+================       ===================
+addUsertoRoom       => notifyNewUsertoRoom
+removeUserFromRoom  => notifyUserGoOuttoRoom
+playGame            => notifyPlayGame
+
+GAME
+================
+
+Emmits to Server    => Emmits to Users
+================       ===================
+updateMove          => notifyUpdateMove
+updatePlayerLost    => notifyPlayerLost
+updatePlayerWin     => notifyPlayerWin
+endGame             => notifyEndGame
+
+EN TODOS LOS EVENTOS ENVIO LA ID DE LA ROOM Y LA MODIFICACION
+
+EL LOCAL STORAGE LO GUSRADAMOS IGUAL Y SE LO PASAMOS EN CADA EVENTO A LOS OTROS JUGADORES
+MODIFICAR STORAGE EN LUGAR TODAS LAS ROOMS NECESITAMOS LA ROOM ACTUAL 
+QUE SE TENDRA QUE HACER UN JOIN PAR ENVIAR SOLO A LOS USUARIOS DE ESA SALA

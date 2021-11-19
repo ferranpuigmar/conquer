@@ -9,16 +9,11 @@ const mysockets = () =>{
         console.log("User connected: " + socket.id);
       
         socket.on("game", (data) => {
-          switch (data.eventType) {
-            case EVENT_TYPES.ADD_USER_TO_ROOM:
-                break;
-            default:
-               socket.emit("game", data);
-          }
+          socket.emit("game", data);
         });
       
         socket.on("room", (data) => {
-          socket.emit("room", data);
+          socket.to(data.roomID).emit("room", data);
         });
       });
 }

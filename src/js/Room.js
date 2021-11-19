@@ -12,7 +12,7 @@ class Room {
   playButtonDiv = document.getElementById("playButton");
   roomBox;
   currentAvatar;
-  socket = io(`127.0.0.1:3000`);
+  socket = io();
 
   constructor(id, name, capacity) {
     this.id = id;
@@ -103,12 +103,11 @@ class Room {
       return room;
     });
     const updateRoomsList = {
-      eventType: EVENT_TYPES.ADD_USER_TO_ROOM,
-      roomEventId: this.id,
+      roomId: this.id,
       rooms: updateRooms,
     };
 
-    this.socket.emit("room", updateRoomsList);
+    this.socket.emit("addUserToRoom", updateRoomsList);
 
     // Mostramos panel superior sala
     const gameTopPannelDiv = document.getElementById("gameTopPannel");
@@ -174,6 +173,11 @@ class Room {
   }
 
   initStorageEvents() {
+    this.socket.on("addUserToRoom", (e) => {
+        const roomsList = JSON.parse(e.newValue);
+        this.storage.setLocalStorage("roomsList", roomsList);
+        this.handleEventAddUser(roomsList);
+    });
     this.socket.on("room", (e) => {
       // por cada sala se lanza este evento
       if (e.key === "roomsList") {
