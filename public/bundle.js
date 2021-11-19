@@ -733,6 +733,8 @@ module.exports = yeast;
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/build/esm/index.js");
+
 
 
 
@@ -740,6 +742,7 @@ class Dashboard {
   roomsList = [];
   localStorage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
   avatarMobile;
+  socket = (0,socket_io_client__WEBPACK_IMPORTED_MODULE_2__.io)();
 
   constructor(initData) {
     this.boxRooms = initData.boxRooms;
@@ -774,7 +777,7 @@ class Dashboard {
     this.boxRooms.forEach((box, index) => {
       const roomName = `Room ${index + 1}`;
       // Generamos las instancias de las salas
-      this.roomsList[index] = new _Room__WEBPACK_IMPORTED_MODULE_0__["default"](box.id, roomName, 4);
+      this.roomsList[index] = new _Room__WEBPACK_IMPORTED_MODULE_0__["default"](box.id, roomName, 4, this.socket);
       // Iniciamos listeners para eventos del tipo storage
       this.roomsList[index].initStorageEvents();
       this.roomsList[index].initDragListeners();
@@ -1440,6 +1443,7 @@ class Game {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/build/esm/index.js");
 
 
 
@@ -1447,6 +1451,8 @@ class Login {
   fields = {};
   errors = {};
   storage = new _utils__WEBPACK_IMPORTED_MODULE_0__["default"]();
+  socket = (0,socket_io_client__WEBPACK_IMPORTED_MODULE_1__.io)();
+  usersDb = [];
 
   constructor(loginFields) {
     this.form = document.getElementById(loginFields.formId);
@@ -1534,22 +1540,22 @@ class Login {
   }
 
   init() {
+    this.socketListeners();
     this.redirectToRooms();
     this.registerLoginFields();
     this.assignListeners();
+    this.socket.emit("load_db_users");
   }
 
   loginUser(data) {
-    const allUSers = this.storage.getLocalStorage("users");
     const newUser = data;
-    const user = allUSers?.find((user) => user.email === newUser.email);
+    const user = this.usersDb.find((user) => user.email === newUser.email);
     if (!user) {
       this.showErrorMessage("No existe nadie con este email");
       return;
     }
-    const passWordIsValid = allUSers.find(
-      (user) => user.password === newUser.password
-    );
+    const passWordIsValid = user.password === newUser.password;
+
     if (!passWordIsValid) {
       this.showErrorMessage("La contraseña no es válida");
       return;
@@ -1557,20 +1563,6 @@ class Login {
 
     // Aqui va la lógica para poner al "user" (línea 95) dentro de los usuarios conectados
     this.storage.setLocalStorage("me", user, "session");
-
-    //!Temporal
-    const connectedUsers = this.storage.getLocalStorage("connectedUsers");
-    if (!connectedUsers) {
-      this.storage.setLocalStorage("connectedUsers", [user]);
-    } else {
-      const existConnectedUser = connectedUsers.find(
-        (connectedUser) => connectedUser.id === user.id
-      );
-      if (!existConnectedUser) {
-        connectedUsers.push(user);
-        this.storage.setLocalStorage("connectedUsers", connectedUsers);
-      }
-    }
 
     // También se tiene que redirigir al usuario a la ruta /rooms
     window.location.href = "/rooms";
@@ -1625,6 +1617,12 @@ class Login {
     // Método para enviar la información al localStorage, al apartado de usuaros conectados
     this.loginUser(data);
   }
+
+  socketListeners() {
+    this.socket.on("get_db_users", (data) => {
+      this.usersDb = data;
+    });
+  }
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Login);
@@ -1641,7 +1639,9 @@ class Login {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
-/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! uuid */ "./node_modules/uuid/dist/esm-browser/v4.js");
+/* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! uuid */ "./node_modules/uuid/dist/esm-browser/v4.js");
+/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/build/esm/index.js");
+
 
 
 
@@ -1649,6 +1649,7 @@ class Register {
   fields = {};
   errors = {};
   local = new _utils__WEBPACK_IMPORTED_MODULE_0__["default"]();
+  socket = (0,socket_io_client__WEBPACK_IMPORTED_MODULE_1__.io)();
 
   constructor(registerFields) {
     this.form = document.getElementById(registerFields.formId);
@@ -1829,6 +1830,7 @@ class Register {
 
   init() {
     this.redirectToRooms();
+    this.socketListeners();
     this.assignListeners();
     this.registerFields();
   }
@@ -1836,24 +1838,7 @@ class Register {
   saveUser(data) {
     const allUSers = this.local.getLocalStorage("users");
     const newUser = data;
-
-    if (!allUSers || allUSers.length === 0) {
-      this.local.setLocalStorage("users", [newUser]);
-      this.resetForm();
-      this.showSuccesMessage();
-      return;
-    }
-
-    const existUSer = allUSers.find((user) => user.email === newUser.email);
-    if (existUSer) {
-      this.showErrorMessage("Ya existe un usuario con este email");
-      return;
-    }
-
-    allUSers.push(newUser);
-    this.local.setLocalStorage("users", allUSers);
-    this.resetForm();
-    this.showSuccesMessage();
+    this.socket.emit("register", newUser);
   }
 
   showErrorMessage(message) {
@@ -1907,7 +1892,7 @@ class Register {
     }
 
     const data = {
-      id: (0,uuid__WEBPACK_IMPORTED_MODULE_1__["default"])(),
+      id: (0,uuid__WEBPACK_IMPORTED_MODULE_2__["default"])(),
       name: this.fields.nameInput.value,
       email: this.fields.emailInput.value,
       password: this.fields.passwordInput.value,
@@ -1920,11 +1905,22 @@ class Register {
     this.saveUser(data);
   }
 
-  redirectToRooms(){
+  redirectToRooms() {
     let user = this.local.getLocalStorage("me", "session");
-    if(user){
+    if (user) {
       window.location.href = "/rooms";
     }
+  }
+
+  socketListeners() {
+    this.socket.on("register_exist_user", () => {
+      this.showErrorMessage("Ya existe un usuario con este email");
+    });
+
+    this.socket.on("register_success", () => {
+      this.resetForm();
+      this.showSuccesMessage();
+    });
   }
 }
 
@@ -1944,8 +1940,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/js/constants.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Game */ "./src/js/Game.js");
-/* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/build/esm/index.js");
-
 
 
 
@@ -1959,13 +1953,13 @@ class Room {
   playButtonDiv = document.getElementById("playButton");
   roomBox;
   currentAvatar;
-  socket = (0,socket_io_client__WEBPACK_IMPORTED_MODULE_3__.io)(`127.0.0.1:3000`);
 
-  constructor(id, name, capacity) {
+  constructor(id, name, capacity, socket) {
     this.id = id;
     this.name = name;
     this.capacity = capacity;
     this.roomBox = document.querySelector(`#${id} .m-room-drop-item__image`);
+    this.socket = socket;
   }
 
   initDragListeners() {
@@ -2121,23 +2115,31 @@ class Room {
   }
 
   initStorageEvents() {
-    this.socket.on("room", (e) => {
-      // por cada sala se lanza este evento
-      if (e.key === "roomsList") {
-        const roomsList = JSON.parse(e.newValue);
-        this.storage.setLocalStorage("roomsList", roomsList);
-
-        switch (roomsList.eventType) {
-          case _constants__WEBPACK_IMPORTED_MODULE_0__.EVENT_TYPES.ADD_USER_TO_ROOM:
-            this.handleEventAddUser(roomsList);
-            break;
-          case _constants__WEBPACK_IMPORTED_MODULE_0__.EVENT_TYPES.PLAY_GAME:
-            this.handleEventPlayGame(roomsList);
-            break;
-          default:
-            return;
+    this.socket.on("addedPlayerToRoom", (player) => {
+      const currentRoomList = this.storage.getLocalStorage("roomsList");
+      const roomsList = currentRoomList.rooms.map((room) => {
+        if (room.id === this.id) {
+          room.usersRoom.push(player);
         }
-      }
+        return room;
+      });
+      this.handleEventAddUser(roomsList);
+
+      // if (e.key === "roomsList") {
+      //   const roomsList = JSON.parse(e.newValue);
+      //   this.storage.setLocalStorage("roomsList", roomsList);
+
+      //   switch (roomsList.eventType) {
+      //     case EVENT_TYPES.ADD_USER_TO_ROOM:
+      //       this.handleEventAddUser(roomsList);
+      //       break;
+      //     case EVENT_TYPES.PLAY_GAME:
+      //       this.handleEventPlayGame(roomsList);
+      //       break;
+      //     default:
+      //       return;
+      //   }
+      // }
     });
   }
 

@@ -1,7 +1,6 @@
 import { EVENT_TYPES, MESSAGE_TYPES } from "./constants";
 import LocalStorage from "./utils";
 import Game from "./Game";
-import { io } from "socket.io-client";
 class Room {
   capacity = 4;
   isOpen = true;
@@ -12,13 +11,17 @@ class Room {
   playButtonDiv = document.getElementById("playButton");
   roomBox;
   currentAvatar;
+<<<<<<< HEAD
   socket = io();
+=======
+>>>>>>> ferran/canvas
 
-  constructor(id, name, capacity) {
+  constructor(id, name, capacity, socket) {
     this.id = id;
     this.name = name;
     this.capacity = capacity;
     this.roomBox = document.querySelector(`#${id} .m-room-drop-item__image`);
+    this.socket = socket;
   }
 
   initDragListeners() {
@@ -178,24 +181,24 @@ class Room {
         this.storage.setLocalStorage("roomsList", roomsList);
         this.handleEventAddUser(roomsList);
     });
-    this.socket.on("room", (e) => {
-      // por cada sala se lanza este evento
-      if (e.key === "roomsList") {
-        const roomsList = JSON.parse(e.newValue);
-        this.storage.setLocalStorage("roomsList", roomsList);
+    // this.socket.on("room", (e) => {
+    //   // por cada sala se lanza este evento
+    //   if (e.key === "roomsList") {
+    //     const roomsList = JSON.parse(e.newValue);
+    //     this.storage.setLocalStorage("roomsList", roomsList);
 
-        switch (roomsList.eventType) {
-          case EVENT_TYPES.ADD_USER_TO_ROOM:
-            this.handleEventAddUser(roomsList);
-            break;
-          case EVENT_TYPES.PLAY_GAME:
-            this.handleEventPlayGame(roomsList);
-            break;
-          default:
-            return;
-        }
-      }
-    });
+    //     switch (roomsList.eventType) {
+    //       case EVENT_TYPES.ADD_USER_TO_ROOM:
+    //         this.handleEventAddUser(roomsList);
+    //         break;
+    //       case EVENT_TYPES.PLAY_GAME:
+    //         this.handleEventPlayGame(roomsList);
+    //         break;
+    //       default:
+    //         return;
+    //     }
+    //     return room;
+    // });
   }
 
   handleEventAddUser(roomsList) {
