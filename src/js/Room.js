@@ -11,10 +11,6 @@ class Room {
   playButtonDiv = document.getElementById("playButton");
   roomBox;
   currentAvatar;
-<<<<<<< HEAD
-  socket = io();
-=======
->>>>>>> ferran/canvas
 
   constructor(id, name, capacity, socket) {
     this.id = id;
@@ -177,9 +173,9 @@ class Room {
 
   initStorageEvents() {
     this.socket.on("addUserToRoom", (e) => {
-        const roomsList = JSON.parse(e.newValue);
-        this.storage.setLocalStorage("roomsList", roomsList);
-        this.handleEventAddUser(roomsList);
+      const roomsList = JSON.parse(e.newValue);
+      this.storage.setLocalStorage("roomsList", roomsList);
+      this.handleEventAddUser(roomsList);
     });
     // this.socket.on("room", (e) => {
     //   // por cada sala se lanza este evento

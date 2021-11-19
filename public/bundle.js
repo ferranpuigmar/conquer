@@ -2044,12 +2044,11 @@ class Room {
       return room;
     });
     const updateRoomsList = {
-      eventType: _constants__WEBPACK_IMPORTED_MODULE_0__.EVENT_TYPES.ADD_USER_TO_ROOM,
-      roomEventId: this.id,
+      roomId: this.id,
       rooms: updateRooms,
     };
 
-    this.socket.emit("room", updateRoomsList);
+    this.socket.emit("addUserToRoom", updateRoomsList);
 
     // Mostramos panel superior sala
     const gameTopPannelDiv = document.getElementById("gameTopPannel");
@@ -2115,32 +2114,29 @@ class Room {
   }
 
   initStorageEvents() {
-    this.socket.on("addedPlayerToRoom", (player) => {
-      const currentRoomList = this.storage.getLocalStorage("roomsList");
-      const roomsList = currentRoomList.rooms.map((room) => {
-        if (room.id === this.id) {
-          room.usersRoom.push(player);
-        }
-        return room;
-      });
+    this.socket.on("addUserToRoom", (e) => {
+      const roomsList = JSON.parse(e.newValue);
+      this.storage.setLocalStorage("roomsList", roomsList);
       this.handleEventAddUser(roomsList);
-
-      // if (e.key === "roomsList") {
-      //   const roomsList = JSON.parse(e.newValue);
-      //   this.storage.setLocalStorage("roomsList", roomsList);
-
-      //   switch (roomsList.eventType) {
-      //     case EVENT_TYPES.ADD_USER_TO_ROOM:
-      //       this.handleEventAddUser(roomsList);
-      //       break;
-      //     case EVENT_TYPES.PLAY_GAME:
-      //       this.handleEventPlayGame(roomsList);
-      //       break;
-      //     default:
-      //       return;
-      //   }
-      // }
     });
+    // this.socket.on("room", (e) => {
+    //   // por cada sala se lanza este evento
+    //   if (e.key === "roomsList") {
+    //     const roomsList = JSON.parse(e.newValue);
+    //     this.storage.setLocalStorage("roomsList", roomsList);
+
+    //     switch (roomsList.eventType) {
+    //       case EVENT_TYPES.ADD_USER_TO_ROOM:
+    //         this.handleEventAddUser(roomsList);
+    //         break;
+    //       case EVENT_TYPES.PLAY_GAME:
+    //         this.handleEventPlayGame(roomsList);
+    //         break;
+    //       default:
+    //         return;
+    //     }
+    //     return room;
+    // });
   }
 
   handleEventAddUser(roomsList) {
