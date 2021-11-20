@@ -180,8 +180,6 @@ class Game {
 
     this.checkOtherPlayerLoss(currentPlayerTurn.id);
 
-    //!Temporal
-    this.round.roundNumber++;
   }
 
   fillCell(cell, color) {
