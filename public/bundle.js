@@ -1016,6 +1016,8 @@ class Game {
       this.hideRoomMessage();
     }
 
+console.log(game);
+
     // Actualizamos juego para el jugador
     this.roundTitle.querySelector("span").innerHTML = game.round.roundNumber;
 
@@ -1099,8 +1101,6 @@ class Game {
 
     this.checkOtherPlayerLoss(currentPlayerTurn.id);
 
-    //!Temporal
-    this.round.roundNumber++;
   }
 
   fillCell(cell, color) {
@@ -1317,7 +1317,7 @@ class Game {
     this.generateCanvas();
     this.initCanvasEvents();
     this.calculateTotalCellsToWin(this.totalCells, this.players);
-    this.initStorageEvents();
+    this.initSocketsEvents();
     this.roundTitle.querySelector("span").innerHTML = 1;
     this.roundTitle.classList.remove("d-none");
     this.createLegend();
@@ -1338,7 +1338,7 @@ class Game {
         round: this.round,
         totalCellsToWin: this.totalCellsToWin,
       };
-
+      console.log(initNewGameToStorage);
       this.updateGame(initNewGameToStorage);
     }
   }
@@ -1357,7 +1357,7 @@ class Game {
   }
 
   // Método que añade el evento storage al juego
-  initStorageEvents() {
+  initSocketsEvents() {
 
     this.socket.on("notifyUpdateGame", (room, roomId) => {
       if(this.id === roomId){
@@ -2072,9 +2072,10 @@ class Room {
       }
 
     });
-    this.socket.on("notifyPlayGame", (data, roomId) => {
+    this.socket.on("notifyPlayGame", (data, roomId, userId) => {
       if(this.id === roomId){
-        this.initGame(data);
+        const user = this.storage.getLocalStorage('me','session');
+        this.initGame(data, !(userId === user.id));
       }
     });
   }
@@ -2095,7 +2096,8 @@ class Room {
   }
 
   playGame() {
-    this.socket.emit("playGame", { roomId: this.id });
+    const user = this.storage.getLocalStorage('me','session');
+    this.socket.emit("playGame", { roomId: this.id, userId: user.id});
   }
 
   prepareGame() {

@@ -97,6 +97,8 @@ class Game {
       this.hideRoomMessage();
     }
 
+console.log(game);
+
     // Actualizamos juego para el jugador
     this.roundTitle.querySelector("span").innerHTML = game.round.roundNumber;
 
@@ -145,6 +147,7 @@ class Game {
     //!Temporal if (!this.isMyTurn(this.round)) return;
 
     const currentPlayerTurn = this.round.player;
+    console.log(currentPlayerTurn);
 
     let currentCell;
     let gridIndex;
@@ -179,7 +182,8 @@ class Game {
     this.addConqueredCell(currentPlayerTurn.id, gridIndex);
 
     this.checkOtherPlayerLoss(currentPlayerTurn.id);
-
+    
+    this.socket.emit("",)
   }
 
   fillCell(cell, color) {
@@ -396,7 +400,7 @@ class Game {
     this.generateCanvas();
     this.initCanvasEvents();
     this.calculateTotalCellsToWin(this.totalCells, this.players);
-    this.initStorageEvents();
+    this.initSocketsEvents();
     this.roundTitle.querySelector("span").innerHTML = 1;
     this.roundTitle.classList.remove("d-none");
     this.createLegend();
@@ -417,7 +421,7 @@ class Game {
         round: this.round,
         totalCellsToWin: this.totalCellsToWin,
       };
-
+      console.log(initNewGameToStorage);
       this.updateGame(initNewGameToStorage);
     }
   }
@@ -436,13 +440,16 @@ class Game {
   }
 
   // Método que añade el evento storage al juego
-  initStorageEvents() {
+  initSocketsEvents() {
 
     this.socket.on("notifyUpdateGame", (room, roomId) => {
       if(this.id === roomId){
         this.handleUpdateEventGame(room);
       }
     });
+
+
+    
     // this.socket.on("notifySomeoneLost", (data) => {
     //     !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);
     // });

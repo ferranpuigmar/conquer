@@ -143,9 +143,10 @@ class Room {
       }
 
     });
-    this.socket.on("notifyPlayGame", (data, roomId) => {
+    this.socket.on("notifyPlayGame", (data, roomId, userId) => {
       if(this.id === roomId){
-        this.initGame(data);
+        const user = this.storage.getLocalStorage('me','session');
+        this.initGame(data, !(userId === user.id));
       }
     });
   }
@@ -166,7 +167,8 @@ class Room {
   }
 
   playGame() {
-    this.socket.emit("playGame", { roomId: this.id });
+    const user = this.storage.getLocalStorage('me','session');
+    this.socket.emit("playGame", { roomId: this.id, userId: user.id});
   }
 
   prepareGame() {
