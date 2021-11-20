@@ -39,16 +39,14 @@ const loadSockets = (io) => {
     });
 
     socket.on("updateGame", ({roomId, newGameInfo}) => {
+      console.log(newGameInfo);
       rooms = rooms.map((room) => {
         if (room.id === this.roomId) {
           room.game = newGameInfo;
         }
         return room;
       });
-
-      console.log(newGameInfo);
-
-      io.to(roomId).emit("notifyUpdateGame", newGameInfo, roomId);
+      socket.to(roomId).emit("notifyUpdateGame", newGameInfo, roomId);
     });
 
     socket.on("register", (user) => {

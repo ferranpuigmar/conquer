@@ -52,7 +52,7 @@ class Room {
     if (this.players.length === this.capacity) {
       this.isOpen = false;
       this.disableRoom(this.id);
-      console.log("sala llena!");
+      //console.log("sala llena!");
       return;
     }
 
@@ -145,8 +145,9 @@ class Room {
     });
     this.socket.on("notifyPlayGame", (data, roomId, userId) => {
       if(this.id === roomId){
+        console.log(data);
         const user = this.storage.getLocalStorage('me','session');
-        this.initGame(data, !(userId === user.id));
+        this.initGame(data);
       }
     });
   }

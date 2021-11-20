@@ -194,7 +194,6 @@ class Register {
 
   saveUser(data) {
     const newUser = data;
-    console.log(newUser);
     this.socket.emit("register", newUser);
   }
 

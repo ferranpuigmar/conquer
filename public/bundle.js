@@ -1016,22 +1016,8 @@ class Game {
       this.hideRoomMessage();
     }
 
-console.log(game);
-
     // Actualizamos juego para el jugador
     this.roundTitle.querySelector("span").innerHTML = game.round.roundNumber;
-
-    // Iteramos sobre las celdas del grid del DOM
-    // las cotejamos con nuestro grid actualizado del localStorage
-    // Si existe un id dentro del grid que es = a el del id de la cell
-    // cambiamos el color de la celda
-    const cells = this.wrapper.querySelectorAll(".m-game-grid__cell");
-    cells.forEach((cell, index) => {
-      const cellId = cell.id;
-      if (this.grid[index].id && this.grid[index].id === cellId) {
-        cell.style.backgroundColor = this.grid[index].color;
-      }
-    });
   }
 
   checkValidCellClick(cellObj, id) {
@@ -1050,20 +1036,23 @@ console.log(game);
     ];
 
     const validClick = [];
-
+    let tCell = [];
     for (let i = 0; i < nearCells.length; i++) {
       const targetCell = this.grid.find((cell) => {
         return cell.id === nearCells[i];
       });
       if (targetCell && targetCell.playerId === id) {
+        console.log(true);
         validClick.push({ validCell: true });
       }
     }
+
+    console.log(tCell);
     return validClick.some((el) => el.validCell);
   }
 
   checkFillCell(e) {
-    //!Temporal if (!this.isMyTurn(this.round)) return;
+    if (!this.isMyTurn(this.round)) return;
 
     const currentPlayerTurn = this.round.player;
 
@@ -1072,7 +1061,7 @@ console.log(game);
     for (let i = 0; i < this.cells.length; i++) {
       let cellPath = this.cells[i];
       if (this.context.isPointInPath(cellPath, e.offsetX, e.offsetY)) {
-        console.log("cell " + i);
+        //console.log("cell " + i);
         currentCell = this.grid[i];
         gridIndex = i;
       }
@@ -1096,11 +1085,32 @@ console.log(game);
       }
     }
 
+    console.log({
+      defeatedPlayers: this.defeatedPlayers,
+      grid: this.grid,
+      players: this.players,
+      round: this.round,
+      totalCellsToWin: this.totalCellsToWin,
+    })
+
     this.fillCell(currentCell);
     this.addConqueredCell(currentPlayerTurn.id, gridIndex);
-
     this.checkOtherPlayerLoss(currentPlayerTurn.id);
+    this.round = this.calculateNewRoundInfo();
 
+    const updateGameToStorage = {
+      defeatedPlayers: this.defeatedPlayers,
+      grid: this.grid,
+      players: this.players,
+      round: this.round,
+      totalCellsToWin: this.totalCellsToWin,
+    };
+    console.log(updateGameToStorage);
+
+    this.checkTurn(updateGameToStorage);
+    this.updateGame(updateGameToStorage);
+
+    
   }
 
   fillCell(cell, color) {
@@ -1136,8 +1146,11 @@ console.log(game);
 
       if (conqueredCells.length > 0) {
         conqueredCells.forEach((cellObj) => {
-          if (this.checkValidCellClick(cellObj, player.id)) {
+          if (this.checkValidCellClick(cellObj, null)) {
+            console.log("es valida", cellObj);
             playerHasLost = false;
+          }else{
+            console.log("no es valida", cellObj);
           }
         });
       } else {
@@ -1147,7 +1160,7 @@ console.log(game);
         defeated.push(player);
       }
     });
-
+    console.log("defeated",defeated);
     if (defeated.length > 0) {
       defeated.forEach((player) => {
         this.defeatedPlayers.push(player);
@@ -1180,28 +1193,26 @@ console.log(game);
       playerId: this.round.player.id,
       color: this.round.player.color,
     };
-    console.log(this.grid);
   }
 
   defeatPlayer(player) {
     this.defeatedPlayers.push(player);
     this.players = this.players.filter((oplayer) => oplayer.id !== player.id);
-    console.log(`El jugador ${player.name} ha perdido!!!`);
+    //console.log(`El jugador ${player.name} ha perdido!!!`);
   }
 
-  takeOutFromGame(player) {
-    let is_in = this.players.find(
-      (current_player) => current_player.id === player.id
-    );
-    if (!!is_in) {
-      this.defeatPlayer(player);
-      this.calculateTotalCellsToWin(this.totalCells, this.players);
-    }
-  }
+  // takeOutFromGame(player) {
+  //   let is_in = this.players.find(
+  //     (current_player) => current_player.id === player.id
+  //   );
+  //   if (!!is_in) {
+  //     this.defeatPlayer(player);
+  //     this.calculateTotalCellsToWin(this.totalCells, this.players);
+  //   }
+  // }
 
   generateCanvas() {
     this.clearCanvas();
-    console.log("generating canvas....");
 
     let colCounter = 0;
     let rowCounter = 0;
@@ -1249,7 +1260,6 @@ console.log(game);
 
       colCounter++;
     }
-    console.log(this.grid);
   }
 
   clearCanvas() {
@@ -1310,6 +1320,7 @@ console.log(game);
     };
 
     this.socket.emit("updatePlayerLost", roomListUpdate);
+  
   }
 
   // Método que inicializa el juego
@@ -1326,21 +1337,15 @@ console.log(game);
       this.showRoomMessage(_constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.WAITTING_TURN);
     }
 
-    // Inicializamos los datos del juego partiendo del orden establecido
-    // por orden de conexión a la sala, que viene dado por el userRomms del localStorage
-    // mediante isCallWithEvent, si el juego se ha inciado por evento no lo hacemos ya que
-    // inicialmente ya lo ha iniciado el primero que le ha dado al botón de play
-    if (!isCallWithEvent) {
       const initNewGameToStorage = {
         defeatedPlayers: this.defeatedPlayers,
         grid: this.grid,
         players: this.players,
         round: this.round,
         totalCellsToWin: this.totalCellsToWin,
-      };
-      console.log(initNewGameToStorage);
+      } 
       this.updateGame(initNewGameToStorage);
-    }
+
   }
 
   // Método que actualiza el localStorage del juego
@@ -1359,11 +1364,14 @@ console.log(game);
   // Método que añade el evento storage al juego
   initSocketsEvents() {
 
-    this.socket.on("notifyUpdateGame", (room, roomId) => {
-      if(this.id === roomId){
-        this.handleUpdateEventGame(room);
+    this.socket.on("notifyUpdateGame", (game, roomId) => {
+      if(this.roomId === roomId){
+        this.handleUpdateEventGame(game);
       }
     });
+
+
+    
     // this.socket.on("notifySomeoneLost", (data) => {
     //     !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);
     // });
@@ -1379,7 +1387,7 @@ console.log(game);
     this.round = game.round;
     this.totalCellsToWin = game.totalCellsToWin;
     this.players = game.players;
-
+    this.generateCanvas();
     // Chequeamos el turno del jugador
     this.checkTurn(game);
   }
@@ -1821,7 +1829,6 @@ class Register {
 
   saveUser(data) {
     const newUser = data;
-    console.log(newUser);
     this.socket.emit("register", newUser);
   }
 
@@ -1981,7 +1988,7 @@ class Room {
     if (this.players.length === this.capacity) {
       this.isOpen = false;
       this.disableRoom(this.id);
-      console.log("sala llena!");
+      //console.log("sala llena!");
       return;
     }
 
@@ -2074,8 +2081,9 @@ class Room {
     });
     this.socket.on("notifyPlayGame", (data, roomId, userId) => {
       if(this.id === roomId){
+        console.log(data);
         const user = this.storage.getLocalStorage('me','session');
-        this.initGame(data, !(userId === user.id));
+        this.initGame(data);
       }
     });
   }
