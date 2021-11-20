@@ -193,8 +193,8 @@ class Register {
   }
 
   saveUser(data) {
-    const allUSers = this.local.getLocalStorage("users");
     const newUser = data;
+    console.log(newUser);
     this.socket.emit("register", newUser);
   }
 

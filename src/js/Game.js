@@ -458,20 +458,20 @@ class Game {
   initStorageEvents() {
     this.socket.on("game", (e) => {
       // por cada sala se lanza este evento
-      if (e.key === "roomsList") {
-        const roomsList = JSON.parse(e.newValue);
-        this.storage.setLocalStorage("roomsList", roomsList);
-        switch (roomsList.eventType) {
-          case EVENT_TYPES.UPDATE_GAME:
-            !this.player.hasLost && this.handleUpdateEventGame(roomsList);
-            break;
-          case EVENT_TYPES.SOMEONE_HAS_LOST:
-            !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);
-            break;
-          default:
-            return;
-        }
-      }
+    //   if (e.key === "roomsList") {
+    //     const roomsList = JSON.parse(e.newValue);
+    //     this.storage.setLocalStorage("roomsList", roomsList);
+    //     switch (roomsList.eventType) {
+    //       case EVENT_TYPES.UPDATE_GAME:
+    //         !this.player.hasLost && this.handleUpdateEventGame(roomsList);
+    //         break;
+    //       case EVENT_TYPES.SOMEONE_HAS_LOST:
+    //         !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);
+    //         break;
+    //       default:
+    //         return;
+    //     }
+    //   }
     });
   }
 

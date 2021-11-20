@@ -5,10 +5,6 @@ let rooms = [];
 
 const loadSockets = (io) => {
   io.on("connection", (socket) => {
-    socket.on("game", (data) => {
-      console.log("game");
-      socket.emit("game", data);
-    });
 
     socket.on("addUserToRoom", ({ roomId, newPlayer }) => {
       socket.join(roomId);
@@ -23,7 +19,9 @@ const loadSockets = (io) => {
       } else {
         currentRoom.usersRoom = [...restUsers, newPlayer];
       }
-
+      
+      console.log(currentRoom);
+      
       rooms = rooms.map((room) => {
         if (room.id === roomId) {
           room = currentRoom;
@@ -32,6 +30,11 @@ const loadSockets = (io) => {
       });
 
       io.to(roomId).emit("notifyNewUsertoRoom", currentRoom.usersRoom);
+    });
+
+    socket.on("playGame", (roomId) => {
+      const currentRoom = rooms.find((room) => room.id === roomId);
+      io.to(roomId).emit("notifyPlayGame", currentRoom.usersRoom);
     });
 
     socket.on("register", (user) => {
@@ -44,6 +47,7 @@ const loadSockets = (io) => {
       }
       usersDB.push(user);
       const data = JSON.stringify(usersDB, null, 4);
+      console.log(data);
       utils.writeUserFiles(pathDB, data, socket, io);
     });
 
@@ -60,7 +64,6 @@ const loadSockets = (io) => {
     });
   });
 };
-
 module.exports = {
   loadSockets,
 };

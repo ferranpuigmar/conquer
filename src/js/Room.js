@@ -129,7 +129,7 @@ class Room {
   takeOutFromRoom(player) {
     let is_in = this.players.find(
       (room_player) => room_player.id === player.id
-    );
+    );handleEventPlayGamehandleEventPlayGame
     if (!!is_in) {
       this.game.takeOutFromGame(player);
       //this.players = this.players.filter((room_player)=> room_player.id !== player.id);
@@ -141,52 +141,20 @@ class Room {
       console.log("update!!");
       this.updatePlayers(data);
     });
-    // this.socket.on("notifyNewUsertoRoom", (rooms) => {
-    //   const rooms = this.storage.getLocalStorage("roomsList");
-    //   const currentRoom = rooms.find((room) => room.id === this.id);
-    //   this.players.push(newPlayer);
-    //   const roomsList = rooms;
-    //   this.storage.setLocalStorage("roomsList", roomsList);
-    //   this.handleEventAddUser(roomsList);
-    // });
-    // this.socket.on("room", (e) => {
-    //   // por cada sala se lanza este evento
-    //   if (e.key === "roomsList") {
-    //     const roomsList = JSON.parse(e.newValue);
-    //     this.storage.setLocalStorage("roomsList", roomsList);
-    //     switch (roomsList.eventType) {
-    //       case EVENT_TYPES.ADD_USER_TO_ROOM:
-    //         this.handleEventAddUser(roomsList);
-    //         break;
-    //       case EVENT_TYPES.PLAY_GAME:
-    //         this.handleEventPlayGame(roomsList);
-    //         break;
-    //       default:
-    //         return;
-    //     }
-    //     return room;
-    // });
+    this.socket.on("notifyPlayGame", (data) => {
+      this.initGame();
+    });
   }
 
-  handleEventAddUser(roomsList) {
-    // Si la sala no es la que tiene el evento no hacemos nada
-    if (roomsList.roomId !== this.id) return;
 
-    const currentRoom = roomsList.rooms.find(
-      (room) => room.id === roomsList.roomId
-    );
-
-    this.updatePlayers(currentRoom.usersRoom);
-  }
-
-  handleEventPlayGame(roomsList) {
-    // Si la sala no es la que tiene el evento no hacemos nada
-    if (roomsList.roomEventId !== this.id) return;
-    const currentRoom = roomsList.rooms.find(
-      (room) => room.id === roomsList.roomEventId
-    );
-    this.initGame(currentRoom.usersRoom, true);
-  }
+  // handleEventPlayGame(roomsList) {
+  //   // Si la sala no es la que tiene el evento no hacemos nada
+  //   if (roomsList.roomEventId !== this.id) return;
+  //   const currentRoom = roomsList.rooms.find(
+  //     (room) => room.id === roomsList.roomEventId
+  //   );
+  //   this.initGame(currentRoom.usersRoom, true);
+  // }
 
   renderPlayBtn() {
     this.playButtonDiv.innerHTML = `<button class="btn btn-primary btn-lg btn-rounded px-4" type="button">Empezar a jugar!</button>`;
@@ -194,24 +162,8 @@ class Room {
   }
 
   playGame() {
-    const rooms = this.storage.getLocalStorage("roomsList").rooms;
-    const updateRoomsStorage = rooms.map((room) => {
-      if (room.id === this.id) {
-        room.isOpen = false;
-      }
-      return room;
-    });
-
-    const data = {
-      eventType: EVENT_TYPES.PLAY_GAME,
-      roomEventId: this.id,
-      rooms: updateRoomsStorage,
-    };
-
-    this.socket.emit("room", data);
-
-    const currentRoom = rooms.find((room) => room.id === this.id);
-    this.initGame(currentRoom.usersRoom);
+    this.socket.emit("playGame", { roomId: this.id });
+    this.initGame(true);
   }
 
   prepareGame() {
@@ -225,15 +177,15 @@ class Room {
     this.disableRoom(this.id);
   }
 
-  initGame(players, isCallWithEvent = false) {
-    this.prepareGame(players);
+  initGame(isCallWithEvent = false) {
+    this.prepareGame(this.players);
     // Inicializamos juego
     const gridSize = 20;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
     this.game = new Game(
       this.id,
       currentPlayerInfo,
-      players,
+      this.players,
       this.socket,
       gridSize
     );

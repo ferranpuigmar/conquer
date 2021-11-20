@@ -1,20 +1,20 @@
 [
     {
-        "id": "83ce08cf-f869-4441-8265-253746f584cd",
-        "name": "dani",
-        "email": "dani@gmail.com",
-        "password": "123",
-        "avatar": "mod5",
-        "favouriteRoom": "blue-room-box",
-        "color": "mod5"
-    },
-    {
-        "id": "923f1e77-7a87-475a-8ba2-0c6d7751c99f",
-        "name": "ivan",
+        "id": "be2e17b5-4a78-49d8-a171-f5b4cc20a76f",
+        "name": "Ivan",
         "email": "ivan@gmail.com",
         "password": "123",
-        "avatar": "mod3",
-        "favouriteRoom": "green-room-box",
-        "color": "mod3"
+        "avatar": "mod1",
+        "favouriteRoom": "red-room-box",
+        "color": "mod1"
+    },
+    {
+        "id": "0e91d226-11d3-4806-9f45-51308350009e",
+        "name": "sarah",
+        "email": "sarah@gmail.com",
+        "password": "123",
+        "avatar": "mod1",
+        "favouriteRoom": "red-room-box",
+        "color": "mod1"
     }
 ]
