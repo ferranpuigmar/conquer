@@ -47,7 +47,6 @@ const loadSockets = (io) => {
       }
       usersDB.push(user);
       const data = JSON.stringify(usersDB, null, 4);
-      console.log(data);
       utils.writeUserFiles(pathDB, data, socket, io);
     });
 

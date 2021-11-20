@@ -2102,7 +2102,7 @@ class Room {
       this.updatePlayers(data);
     });
     this.socket.on("notifyPlayGame", (data) => {
-      this.initGame();
+      this.initGame(data);
     });
   }
 
@@ -2123,7 +2123,6 @@ class Room {
 
   playGame() {
     this.socket.emit("playGame", { roomId: this.id });
-    this.initGame(true);
   }
 
   prepareGame() {
@@ -2137,15 +2136,15 @@ class Room {
     this.disableRoom(this.id);
   }
 
-  initGame(isCallWithEvent = false) {
-    this.prepareGame(this.players);
+  initGame(players, isCallWithEvent = false) {
+    this.prepareGame(players);
     // Inicializamos juego
     const gridSize = 20;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
     this.game = new _Game__WEBPACK_IMPORTED_MODULE_2__["default"](
       this.id,
       currentPlayerInfo,
-      this.players,
+      players,
       this.socket,
       gridSize
     );
