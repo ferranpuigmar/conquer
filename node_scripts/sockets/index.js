@@ -32,7 +32,7 @@ const loadSockets = (io) => {
       io.to(roomId).emit("notifyNewUsertoRoom", currentRoom.usersRoom);
     });
 
-    socket.on("playGame", (roomId) => {
+    socket.on("playGame", ({roomId}) => {
       const currentRoom = rooms.find((room) => room.id === roomId);
       io.to(roomId).emit("notifyPlayGame", currentRoom.usersRoom);
     });
@@ -63,7 +63,7 @@ const loadSockets = (io) => {
       }
     });
   });
-};
+}
 module.exports = {
   loadSockets,
-};
+}
