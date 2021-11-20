@@ -38,13 +38,13 @@ const loadSockets = (io) => {
     });
 
     socket.on("updateGame", ({roomId, newGameInfo}) => {
-
-      const updateRooms = this.rooms.map((room) => {
+      rooms = rooms.map((room) => {
         if (room.id === this.roomId) {
           room.game = newGameInfo;
         }
         return room;
       });
+
       io.to(roomId).emit("notifyUpdateGame", newGameInfo);
     });
 

@@ -1009,7 +1009,7 @@ class Game {
     this.waittingDiv.innerHTML = "";
   }
 
-  checkTurn(currentRoom) {
+  checkTurn(game) {
     if (this.round.player.id !== this.player.id) {
       this.showRoomMessage(_constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.WAITTING_TURN);
     } else {
@@ -1017,9 +1017,7 @@ class Game {
     }
 
     // Actualizamos juego para el jugador
-    const updateGame = currentRoom.game;
-    this.roundTitle.querySelector("span").innerHTML =
-      updateGame.round.roundNumber;
+    this.roundTitle.querySelector("span").innerHTML = game.round.roundNumber;
 
     // Iteramos sobre las celdas del grid del DOM
     // las cotejamos con nuestro grid actualizado del localStorage
@@ -1306,20 +1304,12 @@ class Game {
 
   //Evento para notificar que alguien ha perdido
   notifySomeoneHasLost(newGameInfo) {
-    const updateRooms = this.getRoomsList().rooms.map((room) => {
-      if (room.id === this.roomId) {
-        room.game = newGameInfo;
-      }
-      return room;
-    });
-
     const roomListUpdate = {
-      eventType: _constants__WEBPACK_IMPORTED_MODULE_0__.EVENT_TYPES.SOMEONE_HAS_LOST,
       roomEventId: this.roomId,
-      rooms: updateRooms,
+      newGameInfo
     };
 
-    this.socket.emit("game", roomListUpdate);
+    this.socket.emit("updatePlayerLost", roomListUpdate);
   }
 
   // Método que inicializa el juego
@@ -1368,55 +1358,40 @@ class Game {
 
   // Método que añade el evento storage al juego
   initStorageEvents() {
-    this.socket.on("game", (e) => {
-      // por cada sala se lanza este evento
-    //   if (e.key === "roomsList") {
-    //     const roomsList = JSON.parse(e.newValue);
-    //     this.storage.setLocalStorage("roomsList", roomsList);
-    //     switch (roomsList.eventType) {
-    //       case EVENT_TYPES.UPDATE_GAME:
-    //         !this.player.hasLost && this.handleUpdateEventGame(roomsList);
-    //         break;
-    //       case EVENT_TYPES.SOMEONE_HAS_LOST:
-    //         !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);
-    //         break;
-    //       default:
-    //         return;
-    //     }
-    //   }
+
+    this.socket.on("notifyUpdateGame", (room) => {
+      console.log("update!!");
+      this.handleUpdateEventGame(room);
     });
+    // this.socket.on("notifySomeoneLost", (data) => {
+    //     !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);
+    // });
   }
 
   // Recibe el evento update y cambia la info de los demás jugadores
   // que estan conectados a la partida y aún no es su turno
-  handleUpdateEventGame(roomsList) {
+  handleUpdateEventGame(game) {
     console.log("update game from event");
-    // Si la sala no es la que tiene el evento no hacemos nada
-    if (roomsList.roomEventId !== this.roomId) return;
-
-    const currentRoom = roomsList.rooms.find(
-      (room) => room.id === roomsList.roomEventId
-    );
 
     // Actualizamos grid de la clase
-    this.grid = currentRoom.game.grid;
-    this.round = currentRoom.game.round;
-    this.totalCellsToWin = currentRoom.game.totalCellsToWin;
-    this.players = currentRoom.game.players;
+    this.grid = game.grid;
+    this.round = game.round;
+    this.totalCellsToWin = game.totalCellsToWin;
+    this.players = game.players;
 
     // Chequeamos el turno del jugador
-    this.checkTurn(currentRoom);
+    this.checkTurn(game);
   }
 
   // Recibe el evento que alguien ha perdido y lo notifica a aquella id
   // de usuariso que corresponda
   handleSomeoneHasLostEvent(roomsList) {
-    // Si la sala no es la que tiene el evento no hacemos nada
-    if (roomsList.roomEventId !== this.roomId) return;
+    // // Si la sala no es la que tiene el evento no hacemos nada
+    // if (roomsList.roomEventId !== this.roomId) return;
 
-    const currentRoom = roomsList.rooms.find(
-      (room) => roomsList.roomEventId === room.id
-    );
+    // const currentRoom = roomsList.rooms.find(
+    //   (room) => roomsList.roomEventId === room.id
+    // );
 
     // Sacamos las id que hay dentro de los array de jugadores que han perdido
     const defeatedPlayersId = currentRoom.game.defeatedPlayers.map(
