@@ -434,7 +434,7 @@ class Game {
       newGameInfo
     };
 
-    this.socket.emit("game", roomListUpdate);
+    this.socket.emit("updateGame", roomListUpdate);
   }
 
   // Método que añade el evento storage al juego

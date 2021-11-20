@@ -1353,15 +1353,16 @@ class Game {
       newGameInfo
     };
 
-    this.socket.emit("game", roomListUpdate);
+    this.socket.emit("updateGame", roomListUpdate);
   }
 
   // Método que añade el evento storage al juego
   initStorageEvents() {
 
-    this.socket.on("notifyUpdateGame", (room) => {
-      console.log("update!!");
-      this.handleUpdateEventGame(room);
+    this.socket.on("notifyUpdateGame", (room, roomId) => {
+      if(this.id === roomId){
+        this.handleUpdateEventGame(room);
+      }
     });
     // this.socket.on("notifySomeoneLost", (data) => {
     //     !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);
@@ -2065,12 +2066,16 @@ class Room {
   }
 
   initSocketEvents() {
-    this.socket.on("notifyNewUsertoRoom", (data) => {
-      console.log("update!!");
-      this.updatePlayers(data);
+    this.socket.on("notifyNewUsertoRoom", (data, roomId) => {
+      if(this.id === roomId){
+        this.updatePlayers(data);
+      }
+
     });
-    this.socket.on("notifyPlayGame", (data) => {
-      this.initGame(data);
+    this.socket.on("notifyPlayGame", (data, roomId) => {
+      if(this.id === roomId){
+        this.initGame(data);
+      }
     });
   }
 
