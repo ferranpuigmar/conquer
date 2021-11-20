@@ -37,6 +37,17 @@ const loadSockets = (io) => {
       io.to(roomId).emit("notifyPlayGame", currentRoom.usersRoom);
     });
 
+    socket.on("updateGame", ({roomId, newGameInfo}) => {
+
+      const updateRooms = this.rooms.map((room) => {
+        if (room.id === this.roomId) {
+          room.game = newGameInfo;
+        }
+        return room;
+      });
+      io.to(roomId).emit("notifyUpdateGame", newGameInfo);
+    });
+
     socket.on("register", (user) => {
       const usersDB = utils.readUsersFile(pathDB) ?? [];
       const existUSer = usersDB.find((userDB) => userDB.email === user.email);

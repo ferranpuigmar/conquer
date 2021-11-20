@@ -1349,25 +1349,18 @@ class Game {
         totalCellsToWin: this.totalCellsToWin,
       };
 
-      this.updateGame(this.getRoomsList(), initNewGameToStorage);
+      this.updateGame(initNewGameToStorage);
     }
   }
 
   // Método que actualiza el localStorage del juego
   // y añade un evento del tipo update para que el listener del storage
   // reaccione en el resto de tabs de jugador
-  updateGame(roomsList, newGameInfo) {
-    const updateRooms = roomsList.rooms.map((room) => {
-      if (room.id === this.roomId) {
-        room.game = newGameInfo;
-      }
-      return room;
-    });
+  updateGame(newGameInfo) {
 
     const roomListUpdate = {
-      eventType: _constants__WEBPACK_IMPORTED_MODULE_0__.EVENT_TYPES.UPDATE_GAME,
-      roomEventId: this.roomId,
-      rooms: updateRooms,
+      roomId: this.roomId,
+      newGameInfo
     };
 
     this.socket.emit("game", roomListUpdate);
