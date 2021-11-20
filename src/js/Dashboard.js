@@ -43,7 +43,7 @@ class Dashboard {
       // Generamos las instancias de las salas
       this.roomsList[index] = new Room(box.id, roomName, 4, this.socket);
       // Iniciamos listeners para eventos del tipo storage
-      this.roomsList[index].initStorageEvents();
+      this.roomsList[index].initSocketEvents();
       this.roomsList[index].initDragListeners();
 
       const boxDiv = document.getElementById(box.id);
@@ -61,33 +61,24 @@ class Dashboard {
   }
 
   generateStorageRooms() {
-    // Comprobamos si ya hay rooms en el LocalStorage
-    const existRooms = this.localStorage.getLocalStorage("roomsList");
-    if (!existRooms) {
-      // Generamos localStorage inicial para las rooms
-      const roomsDataToStorage = this.roomsList.map((room) => ({
-        id: room.id,
-        usersRoom: [],
-        isOpen: true,
-        game: {
-          grid: [],
-          players: [],
-          defeatedPlaters: [],
-          totalCellsToWin: 0,
-          round: {
-            turn: 0,
-            roundNumber: 0,
-            player: null,
-          },
+    const roomsData = this.roomsList.map((room) => ({
+      id: room.id,
+      usersRoom: [],
+      isOpen: true,
+      game: {
+        grid: [],
+        players: [],
+        defeatedPlaters: [],
+        totalCellsToWin: 0,
+        round: {
+          turn: 0,
+          roundNumber: 0,
+          player: null,
         },
-      }));
-      const roomsDataType = {
-        eventType: null,
-        roomEventId: null,
-        rooms: roomsDataToStorage,
-      };
-      this.localStorage.setLocalStorage("roomsList", roomsDataType);
-    }
+      },
+    }));
+
+    this.socket.emit("generate_rooms_data", roomsData);
   }
 
   generatePlayerBox() {

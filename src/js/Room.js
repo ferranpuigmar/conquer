@@ -65,50 +65,17 @@ class Room {
   }
 
   addToRoom(user) {
-    // Creamos jugador que recoge los datos del usuario arrastrado
-
-    console.log("user:", user);
-
     const draggedPlayer = {
       name: user.name,
       avatar: user.avatar,
       id: user.id,
     };
 
-    const rooms = this.storage.getLocalStorage("roomsList").rooms;
-    const currentRoom = rooms.find((room) => room.id === this.id);
-    const restUsers = currentRoom.usersRoom.filter(
-      (userRoom) => userRoom.id !== draggedPlayer.id
-    );
-
-    // Si no existen usuarios en la sala
-    if (currentRoom.usersRoom.length === 0) {
-      currentRoom.usersRoom.push(draggedPlayer);
-      this.updatePlayers(currentRoom.usersRoom);
-    } else {
-      // Si no existe el usuario y ya hay usuarios en la sala
-      currentRoom.usersRoom = [...restUsers, draggedPlayer];
-      this.updatePlayers(currentRoom.usersRoom);
-    }
-
-    // Añadimos players a la room
-    this.players = currentRoom.usersRoom;
-
-    // Añadimos rooms actualizado al localStorage
-    const updateRooms = rooms.map((room) => {
-      if (room.id === this.id) {
-        room.usersRoom = currentRoom.usersRoom;
-      }
-      return room;
-    });
-    const updateRoomsList = {
+    this.socket.emit("addUserToRoom", {
       roomId: this.id,
-      rooms: updateRooms,
-    };
+      newPlayer: draggedPlayer,
+    });
 
-    this.socket.emit("addUserToRoom", updateRoomsList);
-
-    // Mostramos panel superior sala
     const gameTopPannelDiv = document.getElementById("gameTopPannel");
     gameTopPannelDiv.classList.remove("d-none");
     setTimeout(() => gameTopPannelDiv.classList.add("has-players"), 1000);
@@ -122,14 +89,12 @@ class Room {
     roomBoxDiv.querySelector(".m-room-drop-item__total span").innerHTML =
       usersRoom.length;
 
-    // Actualizamos listado de los usarios conectados en el tablero
     const listConnectedUSers = document.querySelector(
       "#roomConnectedMessage ul"
     );
     const connectedUsers = usersRoom.map((user) => `<li>${user.name}</li>`);
     listConnectedUSers.innerHTML = connectedUsers.join("");
 
-    // Mostrar posibilidad de empezar a jugar
     if (usersRoom.length > 1) {
       this.renderPlayBtn();
     }
@@ -171,18 +136,24 @@ class Room {
     }
   }
 
-  initStorageEvents() {
-    this.socket.on("addUserToRoom", (e) => {
-      const roomsList = JSON.parse(e.newValue);
-      this.storage.setLocalStorage("roomsList", roomsList);
-      this.handleEventAddUser(roomsList);
+  initSocketEvents() {
+    this.socket.on("notifyNewUsertoRoom", (data) => {
+      console.log("update!!");
+      this.updatePlayers(data);
     });
+    // this.socket.on("notifyNewUsertoRoom", (rooms) => {
+    //   const rooms = this.storage.getLocalStorage("roomsList");
+    //   const currentRoom = rooms.find((room) => room.id === this.id);
+    //   this.players.push(newPlayer);
+    //   const roomsList = rooms;
+    //   this.storage.setLocalStorage("roomsList", roomsList);
+    //   this.handleEventAddUser(roomsList);
+    // });
     // this.socket.on("room", (e) => {
     //   // por cada sala se lanza este evento
     //   if (e.key === "roomsList") {
     //     const roomsList = JSON.parse(e.newValue);
     //     this.storage.setLocalStorage("roomsList", roomsList);
-
     //     switch (roomsList.eventType) {
     //       case EVENT_TYPES.ADD_USER_TO_ROOM:
     //         this.handleEventAddUser(roomsList);
@@ -199,15 +170,13 @@ class Room {
 
   handleEventAddUser(roomsList) {
     // Si la sala no es la que tiene el evento no hacemos nada
-    if (roomsList.roomEventId !== this.id) return;
+    if (roomsList.roomId !== this.id) return;
 
-    const currentEventRoom = roomsList.rooms.find(
-      (room) => room.id === roomsList.roomEventId
+    const currentRoom = roomsList.rooms.find(
+      (room) => room.id === roomsList.roomId
     );
 
-    // Actualizamos la información relacionada con el comienzo del juego en los otros jugadores
-    // caja de sala, mensaje de usuarios conectados en la sala
-    this.updatePlayers(currentEventRoom.usersRoom);
+    this.updatePlayers(currentRoom.usersRoom);
   }
 
   handleEventPlayGame(roomsList) {
