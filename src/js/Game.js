@@ -440,9 +440,10 @@ class Game {
   // Método que añade el evento storage al juego
   initStorageEvents() {
 
-    this.socket.on("notifyUpdateGame", (room) => {
-      console.log("update!!");
-      this.handleUpdateEventGame(room);
+    this.socket.on("notifyUpdateGame", (room, roomId) => {
+      if(this.id === roomId){
+        this.handleUpdateEventGame(room);
+      }
     });
     // this.socket.on("notifySomeoneLost", (data) => {
     //     !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);

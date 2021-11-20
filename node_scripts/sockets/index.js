@@ -29,12 +29,12 @@ const loadSockets = (io) => {
         return room;
       });
 
-      io.to(roomId).emit("notifyNewUsertoRoom", currentRoom.usersRoom);
+      io.to(roomId).emit("notifyNewUsertoRoom", currentRoom.usersRoom, roomId);
     });
 
     socket.on("playGame", ({roomId}) => {
       const currentRoom = rooms.find((room) => room.id === roomId);
-      io.to(roomId).emit("notifyPlayGame", currentRoom.usersRoom);
+      io.to(roomId).emit("notifyPlayGame", currentRoom.usersRoom, roomId);
     });
 
     socket.on("updateGame", ({roomId, newGameInfo}) => {
@@ -45,7 +45,7 @@ const loadSockets = (io) => {
         return room;
       });
 
-      io.to(roomId).emit("notifyUpdateGame", newGameInfo);
+      io.to(roomId).emit("notifyUpdateGame", newGameInfo, roomId);
     });
 
     socket.on("register", (user) => {

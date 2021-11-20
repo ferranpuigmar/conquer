@@ -137,12 +137,16 @@ class Room {
   }
 
   initSocketEvents() {
-    this.socket.on("notifyNewUsertoRoom", (data) => {
-      console.log("update!!");
-      this.updatePlayers(data);
+    this.socket.on("notifyNewUsertoRoom", (data, roomId) => {
+      if(this.id === roomId){
+        this.updatePlayers(data);
+      }
+
     });
-    this.socket.on("notifyPlayGame", (data) => {
-      this.initGame(data);
+    this.socket.on("notifyPlayGame", (data, roomId) => {
+      if(this.id === roomId){
+        this.initGame(data);
+      }
     });
   }
 
