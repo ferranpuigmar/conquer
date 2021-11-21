@@ -737,7 +737,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
 class Dashboard {
   roomsList = [];
   localStorage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
@@ -842,7 +841,7 @@ class Dashboard {
       }
     } else {
       // Aquí va la redicción si el usuario no esta conectado;
-      console.log("usuario no conectado");
+      //console.log("usuario no conectado");
     }
   }
 

@@ -7,6 +7,7 @@ const path = require("path");
 
 // Configuración inicial
 const express = require("express");
+const { engine } = require("express-handlebars");
 const app = express();
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
@@ -32,7 +33,16 @@ app.use(
 
 // Motor de plantilla
 const hbs = require("hbs");
-hbs.registerPartials(__dirname + "/src/views/partials", function (err) {});
+//hbs.registerPartials(__dirname + "/src/views/partials", function (err) {});
+
+app.engine(
+  "hbs",
+  engine({
+    defaultLayout: "main",
+    extname: ".hbs",
+    partialsDir: __dirname + "/src/views/partials/",
+  })
+);
 app.set("view engine", "hbs");
 app.set("views", __dirname + "/src/views");
 

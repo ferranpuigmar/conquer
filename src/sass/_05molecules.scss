@@ -49,19 +49,19 @@
   display: flex;
   flex-flow: column;
 
-  &.room1 {
+  &#red-room-box {
     background-color: $red;
   }
 
-  &.room2 {
+  &#blue-room-box {
     background-color: $blue;
   }
 
-  &.room3 {
+  &#green-room-box {
     background-color: $green;
   }
 
-  &.room4 {
+  &#orange-room-box {
     background-color: $orange;
   }
 
@@ -149,7 +149,6 @@
     display: flex;
 
     span {
-      margin-right: 15px;
       display: inline-block;
     }
 

@@ -1,16 +1,38 @@
 const express = require("express");
 const router = express.Router();
 
-router.get("/login", (req, res) => {
-  res.render("login");
+router.get("/", function (req, res) {
+  const data = {
+    outside: true,
+  };
+  res.render("login", data);
 });
 
-router.get("/register", (req, res, next) => {
-  res.render("register");
+router.get("/login", function (req, res) {
+  const data = {
+    outside: true,
+  };
+  res.render("login", data);
 });
 
-router.get("/rooms", (req, res, next) => {
-  res.render("rooms");
+router.get("/register", function (req, res) {
+  const data = {
+    outside: true,
+  };
+  res.render("register", data);
+});
+
+router.get("/rooms", function (req, res) {
+  const data = {
+    outside: false,
+    boxRooms: [
+      { id: "red-room-box" },
+      { id: "blue-room-box" },
+      { id: "green-room-box" },
+      { id: "orange-room-box" },
+    ],
+  };
+  res.render("rooms", data);
 });
 
 module.exports = router;

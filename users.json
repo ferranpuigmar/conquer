@@ -16,5 +16,14 @@
         "avatar": "mod1",
         "favouriteRoom": "red-room-box",
         "color": "mod1"
+    },
+    {
+        "id": "47271554-e22e-40c4-9a10-59c25dce2b86",
+        "name": "daniel",
+        "email": "daniel@gmail.com",
+        "password": "123",
+        "avatar": "mod1",
+        "favouriteRoom": "red-room-box",
+        "color": "mod1"
     }
 ]
