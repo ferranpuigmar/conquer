@@ -39,22 +39,7 @@ app.set("views", __dirname + "/src/views");
 app.use(express.static(__dirname + "/public"));
 
 const index = require("./routes/index");
-//app.use("/", index);
-app.get("/", function (req, res) {
-  res.render("login");
-});
-
-app.get("/login", function (req, res) {
-  res.render("login");
-});
-
-app.get("/register", function (req, res) {
-  res.render("register");
-});
-
-app.get("/rooms", function (req, res) {
-  res.render("rooms");
-});
+app.use("/", index);
 
 // Iniciar servidor
 http.listen(port, () => {
