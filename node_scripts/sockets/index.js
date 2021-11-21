@@ -1,32 +1,58 @@
 const utils = require("../utils.js");
-const pathDB = "users.json";
-
+const fielUsers = "users.json";
+const fileRooms = "rooms.json";
+const fileGames = "games.json";
 let rooms = [];
 
 const loadSockets = (io) => {
   io.on("connection", (socket) => {
-    socket.on("addUserToRoom", ({ roomId, newPlayer }) => {
+    socket.on("addUserToRoom", async ({ roomId, newPlayer }) => {
+      console.log("ROOMID: ", roomId);
       socket.join(roomId);
 
-      const currentRoom = rooms.find((room) => room.id === roomId);
-      const restUsers = currentRoom.usersRoom.filter(
+      // const currentRoom = rooms.find((room) => room.id === roomId);
+      // const restUsers = currentRoom.usersRoom.filter(
+      //   (userRoom) => userRoom.id !== newPlayer.id
+      // );
+
+      // if (currentRoom.usersRoom.length === 0) {
+      //   currentRoom.usersRoom.push(newPlayer);
+      // } else {
+      //   currentRoom.usersRoom = [...restUsers, newPlayer];
+      // }
+
+      // rooms = rooms.map((room) => {
+      //   if (room.id === roomId) {
+      //     room = currentRoom;
+      //   }
+      //   return room;
+      // });
+
+      /////////////////////////////////////////////////////
+      let roomsFromDB = await utils.readFile(fileRooms);
+      // console.log("roomsFromDB init: ", roomsFromDB);
+      const currentRoomFDB = roomsFromDB.find((room) => room.id === roomId);
+      const restUsersFDB = currentRoomFDB.usersRoom.filter(
         (userRoom) => userRoom.id !== newPlayer.id
       );
-
-      if (currentRoom.usersRoom.length === 0) {
-        currentRoom.usersRoom.push(newPlayer);
+      console.log("restUsersFDB: ", restUsersFDB);
+      if (currentRoomFDB.usersRoom.length === 0) {
+        currentRoomFDB.usersRoom.push(newPlayer);
       } else {
-        currentRoom.usersRoom = [...restUsers, newPlayer];
+        currentRoomFDB.usersRoom = [...restUsersFDB, newPlayer];
       }
-
-      rooms = rooms.map((room) => {
+      roomsFromDB = roomsFromDB.map((room) => {
         if (room.id === roomId) {
-          room = currentRoom;
+          return currentRoomFDB;
         }
         return room;
       });
 
-      io.to(roomId).emit("notifyNewUsertoRoom", currentRoom.usersRoom, roomId);
+      utils.writeFile(fileRooms, roomsFromDB, () =>
+        io
+          .to(roomId)
+          .emit("notifyNewUsertoRoom", currentRoomFDB.usersRoom, roomId)
+      );
     });
 
     socket.on("playGame", ({ roomId, userId }) => {
@@ -51,7 +77,7 @@ const loadSockets = (io) => {
     });
 
     socket.on("register", (user) => {
-      const usersDB = utils.readUsersFile(pathDB) ?? [];
+      const usersDB = utils.readFile(fielUsers) ?? [];
       const existUSer = usersDB.find((userDB) => userDB.email === user.email);
 
       if (existUSer) {
@@ -59,18 +85,61 @@ const loadSockets = (io) => {
         return;
       }
       usersDB.push(user);
-      const data = JSON.stringify(usersDB, null, 4);
-      utils.writeUserFiles(pathDB, data, socket, io);
+      const registerUser = utils.writeFile(fielUsers, usersDB);
+      if (registerUser) {
+        io.to(socket.id).emit("register_success");
+      }
     });
 
     socket.on("load_db_users", () => {
-      const usersDB = utils.readUsersFile(pathDB) ?? [];
+      const usersDB = utils.readFile(fielUsers) ?? [];
       io.to(socket.id).emit("get_db_users", usersDB);
     });
 
-    socket.on("generate_rooms_data", (rooms_data) => {
+    socket.on("generate_rooms_data", async (rooms_data) => {
+      let roomsArr = [];
+      let gamesArr = [];
+
       if (rooms.length === 0) {
         rooms = rooms_data;
+      }
+
+      const roomsDB = await utils.readFile(fileRooms);
+      const gamesDB = await utils.readFile(fileGames);
+
+      console.log("roomsDB: ", roomsDB);
+      console.log("gamesDB: ", gamesDB);
+
+      if (
+        !roomsDB ||
+        !gamesDB ||
+        (roomsDB?.length === 0 && gamesDB?.length === 0)
+      ) {
+        roomsArr = rooms_data.map((room) => {
+          gamesArr.push({
+            roomId: room.id,
+            grid: [],
+            players: [],
+            defeatedPlaters: [],
+            totalCellsToWin: 0,
+            round: {
+              turn: 0,
+              roundNumber: 0,
+              player: null,
+            },
+          });
+          return {
+            id: room.id,
+            usersRoom: [],
+            isOpen: true,
+            usersRoom: [],
+          };
+        });
+        const gameFile = "games.json";
+        utils.writeFile(gameFile, gamesArr);
+
+        const roomsFile = "rooms.json";
+        utils.writeFile(roomsFile, roomsArr);
       }
     });
   });

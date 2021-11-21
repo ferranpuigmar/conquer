@@ -2003,6 +2003,7 @@ class Room {
   initSocketEvents() {
     this.socket.on("notifyNewUsertoRoom", (data, roomId) => {
       if (this.id === roomId) {
+        console.log("hola...");
         this.updatePlayers(data);
       }
     });
