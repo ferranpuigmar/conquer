@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev_m": "webpack -w & nodemon server.js",
-    "dev_w": "webpack & nodemon server.js & open http://localhost:3000/",
+    "dev_w": "webpack & nodemon server.js",
     "build": "webpack --mode development & node server.js"
   },
   "keywords": [],
