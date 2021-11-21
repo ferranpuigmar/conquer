@@ -915,6 +915,7 @@ class Game {
   pannelInfo = document.getElementById("roomPannelInfo");
   canvas = document.getElementById("game");
   cells = [];
+  eventCheckFillCellHandler = this.checkFillCell.bind(this);
 
   constructor(roomId, playerInfo, players, socket, gameSize) {
     this.player = playerInfo;
@@ -940,11 +941,6 @@ class Game {
     return round.player.id === this.player.id;
   }
 
-  getPlayers() {
-    return this.players;
-  }
-
-  // Método que calcula la nueva info del Round después de un movimiento
   calculateNewRoundInfo() {
     const newTurn = this.round.turn + 1;
     const isTurnEnd = newTurn > this.players.length;
@@ -952,8 +948,6 @@ class Game {
       ? this.round.roundNumber + 1
       : this.round.roundNumber;
 
-    // Si el último jugador ha movido cambiamos el número del Round
-    // si no, aumentamos en 1 el turno
     if (isTurnEnd) {
       this.roundTitle.querySelector("span").innerHTML = newRoundTitle;
     }
@@ -998,7 +992,6 @@ class Game {
       this.hideRoomMessage();
     }
 
-    // Actualizamos juego para el jugador
     this.roundTitle.querySelector("span").innerHTML = game.round.roundNumber;
   }
 
@@ -1018,18 +1011,14 @@ class Game {
     ];
 
     const validClick = [];
-    let tCell = [];
     for (let i = 0; i < nearCells.length; i++) {
       const targetCell = this.grid.find((cell) => {
         return cell.id === nearCells[i];
       });
       if (targetCell && targetCell.playerId === id) {
-        console.log(true);
         validClick.push({ validCell: true });
       }
     }
-
-    console.log(tCell);
     return validClick.some((el) => el.validCell);
   }
 
@@ -1043,11 +1032,13 @@ class Game {
     for (let i = 0; i < this.cells.length; i++) {
       let cellPath = this.cells[i];
       if (this.context.isPointInPath(cellPath, e.offsetX, e.offsetY)) {
-        //console.log("cell " + i);
         currentCell = this.grid[i];
         gridIndex = i;
+        break;
       }
     }
+
+    if (currentCell.playerId !== null) return;
 
     const cellObj = {
       row: currentCell.row,
@@ -1067,14 +1058,6 @@ class Game {
       }
     }
 
-    console.log({
-      defeatedPlayers: this.defeatedPlayers,
-      grid: this.grid,
-      players: this.players,
-      round: this.round,
-      totalCellsToWin: this.totalCellsToWin,
-    })
-
     this.fillCell(currentCell);
     this.addConqueredCell(currentPlayerTurn.id, gridIndex);
     this.checkOtherPlayerLoss(currentPlayerTurn.id);
@@ -1087,12 +1070,9 @@ class Game {
       round: this.round,
       totalCellsToWin: this.totalCellsToWin,
     };
-    console.log(updateGameToStorage);
 
     this.checkTurn(updateGameToStorage);
     this.updateGame(updateGameToStorage);
-
-    
   }
 
   fillCell(cell, color) {
@@ -1108,11 +1088,6 @@ class Game {
     this.context.fillStyle = color ?? this.round.player.color;
     this.context.fill();
     this.context.stroke();
-  }
-
-  // Devuelve la key roomsList del localStorage
-  getRoomsList() {
-    return this.storage.getLocalStorage("roomsList");
   }
 
   checkOtherPlayerLoss(currentPlayerId) {
@@ -1139,14 +1114,13 @@ class Game {
         defeated.push(player);
       }
     });
-    console.log("defeated",defeated);
+
     if (defeated.length > 0) {
       defeated.forEach((player) => {
         this.defeatedPlayers.push(player);
         this.players = this.players.filter(
           (oplayer) => oplayer.id !== player.id
         );
-        // Enviamos evento que el user ha perdido
         const newGameToStorage = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getNewGameInfo)(this);
         this.notifySomeoneHasLost(newGameToStorage);
       });
@@ -1166,7 +1140,6 @@ class Game {
       return player;
     });
 
-    // Actualizamos grid de referencia
     this.grid[index] = {
       ...this.grid[index],
       playerId: this.round.player.id,
@@ -1191,6 +1164,7 @@ class Game {
   // }
 
   generateCanvas() {
+    console.log("generating canvas...");
     this.clearCanvas();
 
     let colCounter = 0;
@@ -1239,13 +1213,20 @@ class Game {
 
       colCounter++;
     }
+
+    this.canvas.addEventListener("click", this.eventCheckFillCellHandler);
   }
 
   clearCanvas() {
-    this.context.clearRect(0, 0, 1000, 1000);
+    this.canvas.removeEventListener("click", this.eventCheckFillCellHandler);
     this.context = this.canvas.getContext("2d");
-    this.canvas.addEventListener("click", this.checkFillCell.bind(this));
+    this.context.clearRect(0, 0, 1000, 1000);
+    this.context.beginPath();
     this.cells = [];
+    this.canvas.width = this.canvas.offsetWidth;
+    this.canvas.height = this.canvas.offsetHeight;
+    this.cellWidth = this.canvas.width / this.gridSize;
+    this.cellHeight = this.canvas.height / this.gridSize;
   }
 
   createLegend(players) {
@@ -1259,13 +1240,10 @@ class Game {
     this.pannelInfo.innerHTML = `<span>Jugadores:</span> <ul>${userLegend}</ul>`;
   }
 
-  // Método que inicializa el registro de grid según las dimensiones
   generateGrid(gridSize) {
     return [...Array(gridSize * gridSize)];
   }
 
-  // Método que transforma los datos que nos llegan de los usuarios
-  // a datos de jugador que necesitamos para gestionar el juego
   userToPlayerDTO(players) {
     return players.map((player, index) => ({
       id: player.id,
@@ -1295,15 +1273,13 @@ class Game {
   notifySomeoneHasLost(newGameInfo) {
     const roomListUpdate = {
       roomEventId: this.roomId,
-      newGameInfo
+      newGameInfo,
     };
 
     this.socket.emit("updatePlayerLost", roomListUpdate);
-  
   }
 
-  // Método que inicializa el juego
-  init(isCallWithEvent) {
+  init() {
     this.generateCanvas();
     this.initCanvasEvents();
     this.calculateTotalCellsToWin(this.totalCells, this.players);
@@ -1316,63 +1292,45 @@ class Game {
       this.showRoomMessage(_constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.WAITTING_TURN);
     }
 
-      const initNewGameToStorage = {
-        defeatedPlayers: this.defeatedPlayers,
-        grid: this.grid,
-        players: this.players,
-        round: this.round,
-        totalCellsToWin: this.totalCellsToWin,
-      } 
-      this.updateGame(initNewGameToStorage);
-
+    const initNewGameToStorage = {
+      defeatedPlayers: this.defeatedPlayers,
+      grid: this.grid,
+      players: this.players,
+      round: this.round,
+      totalCellsToWin: this.totalCellsToWin,
+    };
+    this.updateGame(initNewGameToStorage);
   }
 
-  // Método que actualiza el localStorage del juego
-  // y añade un evento del tipo update para que el listener del storage
-  // reaccione en el resto de tabs de jugador
   updateGame(newGameInfo) {
-
     const roomListUpdate = {
       roomId: this.roomId,
-      newGameInfo
+      newGameInfo,
     };
 
     this.socket.emit("updateGame", roomListUpdate);
   }
 
-  // Método que añade el evento storage al juego
   initSocketsEvents() {
-
     this.socket.on("notifyUpdateGame", (game, roomId) => {
-      if(this.roomId === roomId){
+      if (this.roomId === roomId) {
         this.handleUpdateEventGame(game);
       }
     });
-
-
-    
-    // this.socket.on("notifySomeoneLost", (data) => {
-    //     !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);
-    // });
+    this.socket.on("notifySomeoneLost", (data) => {
+      !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);
+    });
   }
 
-  // Recibe el evento update y cambia la info de los demás jugadores
-  // que estan conectados a la partida y aún no es su turno
   handleUpdateEventGame(game) {
-    console.log("update game from event");
-
-    // Actualizamos grid de la clase
     this.grid = game.grid;
     this.round = game.round;
     this.totalCellsToWin = game.totalCellsToWin;
     this.players = game.players;
     this.generateCanvas();
-    // Chequeamos el turno del jugador
     this.checkTurn(game);
   }
 
-  // Recibe el evento que alguien ha perdido y lo notifica a aquella id
-  // de usuariso que corresponda
   handleSomeoneHasLostEvent(roomsList) {
     // // Si la sala no es la que tiene el evento no hacemos nada
     // if (roomsList.roomEventId !== this.roomId) return;
@@ -2035,7 +1993,8 @@ class Room {
   takeOutFromRoom(player) {
     let is_in = this.players.find(
       (room_player) => room_player.id === player.id
-    );handleEventPlayGamehandleEventPlayGame
+    );
+    handleEventPlayGamehandleEventPlayGame;
     if (!!is_in) {
       this.game.takeOutFromGame(player);
       //this.players = this.players.filter((room_player)=> room_player.id !== player.id);
@@ -2044,20 +2003,17 @@ class Room {
 
   initSocketEvents() {
     this.socket.on("notifyNewUsertoRoom", (data, roomId) => {
-      if(this.id === roomId){
+      if (this.id === roomId) {
         this.updatePlayers(data);
       }
-
     });
     this.socket.on("notifyPlayGame", (data, roomId, userId) => {
-      if(this.id === roomId){
-        console.log(data);
-        const user = this.storage.getLocalStorage('me','session');
+      if (this.id === roomId) {
+        const user = this.storage.getLocalStorage("me", "session");
         this.initGame(data);
       }
     });
   }
-
 
   // handleEventPlayGame(roomsList) {
   //   // Si la sala no es la que tiene el evento no hacemos nada
@@ -2074,8 +2030,8 @@ class Room {
   }
 
   playGame() {
-    const user = this.storage.getLocalStorage('me','session');
-    this.socket.emit("playGame", { roomId: this.id, userId: user.id});
+    const user = this.storage.getLocalStorage("me", "session");
+    this.socket.emit("playGame", { roomId: this.id, userId: user.id });
   }
 
   prepareGame() {

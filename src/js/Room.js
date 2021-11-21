@@ -129,7 +129,8 @@ class Room {
   takeOutFromRoom(player) {
     let is_in = this.players.find(
       (room_player) => room_player.id === player.id
-    );handleEventPlayGamehandleEventPlayGame
+    );
+    handleEventPlayGamehandleEventPlayGame;
     if (!!is_in) {
       this.game.takeOutFromGame(player);
       //this.players = this.players.filter((room_player)=> room_player.id !== player.id);
@@ -138,20 +139,17 @@ class Room {
 
   initSocketEvents() {
     this.socket.on("notifyNewUsertoRoom", (data, roomId) => {
-      if(this.id === roomId){
+      if (this.id === roomId) {
         this.updatePlayers(data);
       }
-
     });
     this.socket.on("notifyPlayGame", (data, roomId, userId) => {
-      if(this.id === roomId){
-        console.log(data);
-        const user = this.storage.getLocalStorage('me','session');
+      if (this.id === roomId) {
+        const user = this.storage.getLocalStorage("me", "session");
         this.initGame(data);
       }
     });
   }
-
 
   // handleEventPlayGame(roomsList) {
   //   // Si la sala no es la que tiene el evento no hacemos nada
@@ -168,8 +166,8 @@ class Room {
   }
 
   playGame() {
-    const user = this.storage.getLocalStorage('me','session');
-    this.socket.emit("playGame", { roomId: this.id, userId: user.id});
+    const user = this.storage.getLocalStorage("me", "session");
+    this.socket.emit("playGame", { roomId: this.id, userId: user.id });
   }
 
   prepareGame() {

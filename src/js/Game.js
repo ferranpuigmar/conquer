@@ -14,6 +14,7 @@ class Game {
   pannelInfo = document.getElementById("roomPannelInfo");
   canvas = document.getElementById("game");
   cells = [];
+  eventCheckFillCellHandler = this.checkFillCell.bind(this);
 
   constructor(roomId, playerInfo, players, socket, gameSize) {
     this.player = playerInfo;
@@ -132,8 +133,11 @@ class Game {
       if (this.context.isPointInPath(cellPath, e.offsetX, e.offsetY)) {
         currentCell = this.grid[i];
         gridIndex = i;
+        break;
       }
     }
+
+    if (currentCell.playerId !== null) return;
 
     const cellObj = {
       row: currentCell.row,
@@ -259,6 +263,7 @@ class Game {
   // }
 
   generateCanvas() {
+    console.log("generating canvas...");
     this.clearCanvas();
 
     let colCounter = 0;
@@ -307,13 +312,20 @@ class Game {
 
       colCounter++;
     }
+
+    this.canvas.addEventListener("click", this.eventCheckFillCellHandler);
   }
 
   clearCanvas() {
-    this.context.clearRect(0, 0, 1000, 1000);
+    this.canvas.removeEventListener("click", this.eventCheckFillCellHandler);
     this.context = this.canvas.getContext("2d");
-    this.canvas.addEventListener("click", this.checkFillCell.bind(this));
+    this.context.clearRect(0, 0, 1000, 1000);
+    this.context.beginPath();
     this.cells = [];
+    this.canvas.width = this.canvas.offsetWidth;
+    this.canvas.height = this.canvas.offsetHeight;
+    this.cellWidth = this.canvas.width / this.gridSize;
+    this.cellHeight = this.canvas.height / this.gridSize;
   }
 
   createLegend(players) {

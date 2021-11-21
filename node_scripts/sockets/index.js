@@ -5,7 +5,6 @@ let rooms = [];
 
 const loadSockets = (io) => {
   io.on("connection", (socket) => {
-
     socket.on("addUserToRoom", ({ roomId, newPlayer }) => {
       socket.join(roomId);
 
@@ -19,9 +18,7 @@ const loadSockets = (io) => {
       } else {
         currentRoom.usersRoom = [...restUsers, newPlayer];
       }
-      
-      console.log(currentRoom);
-      
+
       rooms = rooms.map((room) => {
         if (room.id === roomId) {
           room = currentRoom;
@@ -32,14 +29,18 @@ const loadSockets = (io) => {
       io.to(roomId).emit("notifyNewUsertoRoom", currentRoom.usersRoom, roomId);
     });
 
-    socket.on("playGame", ({roomId,userId}) => {
+    socket.on("playGame", ({ roomId, userId }) => {
       const currentRoom = rooms.find((room) => room.id === roomId);
 
-      io.to(roomId).emit("notifyPlayGame", currentRoom.usersRoom, roomId, userId);
+      io.to(roomId).emit(
+        "notifyPlayGame",
+        currentRoom.usersRoom,
+        roomId,
+        userId
+      );
     });
 
-    socket.on("updateGame", ({roomId, newGameInfo}) => {
-      console.log(newGameInfo);
+    socket.on("updateGame", ({ roomId, newGameInfo }) => {
       rooms = rooms.map((room) => {
         if (room.id === this.roomId) {
           room.game = newGameInfo;
@@ -70,11 +71,10 @@ const loadSockets = (io) => {
     socket.on("generate_rooms_data", (rooms_data) => {
       if (rooms.length === 0) {
         rooms = rooms_data;
-        console.log("rooms: ", rooms);
       }
     });
   });
-}
+};
 module.exports = {
   loadSockets,
-}
+};
