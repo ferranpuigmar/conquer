@@ -52,12 +52,12 @@ class Room {
     if (this.players.length === this.capacity) {
       this.isOpen = false;
       this.disableRoom(this.id);
-      //console.log("sala llena!");
+      // console.log("sala llena!");
       return;
     }
 
     if (this.players.length > this.capacity || !this.isOpen) {
-      //   console.log("La sala no acepta más jugadores");
+      // console.log("La sala no acepta más jugadores");
       return;
     }
 

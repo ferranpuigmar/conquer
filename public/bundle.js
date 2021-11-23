@@ -1163,7 +1163,6 @@ class Game {
   // }
 
   generateCanvas() {
-    console.log("generating canvas...");
     this.clearCanvas();
 
     let colCounter = 0;
@@ -1472,6 +1471,7 @@ class Login {
   loginUser(data) {
     const newUser = data;
     const user = this.usersDb.find((user) => user.email === newUser.email);
+
     if (!user) {
       this.showErrorMessage("No existe nadie con este email");
       return;
@@ -1915,12 +1915,12 @@ class Room {
     if (this.players.length === this.capacity) {
       this.isOpen = false;
       this.disableRoom(this.id);
-      //console.log("sala llena!");
+      // console.log("sala llena!");
       return;
     }
 
     if (this.players.length > this.capacity || !this.isOpen) {
-      //   console.log("La sala no acepta más jugadores");
+      // console.log("La sala no acepta más jugadores");
       return;
     }
 

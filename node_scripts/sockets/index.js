@@ -1,5 +1,5 @@
 const utils = require("../utils.js");
-const pathDB = "users.json";
+const usersFile = "users.json";
 
 let rooms = [];
 
@@ -51,7 +51,9 @@ const loadSockets = (io) => {
     });
 
     socket.on("register", (user) => {
-      const usersDB = utils.readUsersFile(pathDB) ?? [];
+      const usersDB = utils.readFile(usersFile) ?? [];
+      console.log("usersDB: ", usersDB);
+
       const existUSer = usersDB.find((userDB) => userDB.email === user.email);
 
       if (existUSer) {
@@ -60,11 +62,11 @@ const loadSockets = (io) => {
       }
       usersDB.push(user);
       const data = JSON.stringify(usersDB, null, 4);
-      utils.writeUserFiles(pathDB, data, socket, io);
+      utils.writeFile(usersFile, data, socket, io);
     });
 
-    socket.on("load_db_users", () => {
-      const usersDB = utils.readUsersFile(pathDB) ?? [];
+    socket.on("load_db_users", async () => {
+      const usersDB = (await utils.readFile(usersFile)) ?? [];
       io.to(socket.id).emit("get_db_users", usersDB);
     });
 

@@ -1,44 +1,51 @@
 const fs = require("fs");
 const root = process.env.PWD;
+const modelsPath = `${root}/models`;
 
-const readUsersFile = (path) => {
-  let users;
-  const absolutePath = `${root}/${path}`;
+const readFile = async (path) => {
+  let data;
+  const route = `${modelsPath}/${path}`;
   try {
-    if (fs.existsSync(absolutePath)) {
-      users = fs.readFileSync(absolutePath, "utf-8", (err, data) => {
+    if (fs.existsSync(route)) {
+      data = fs.readFileSync(route, "utf-8", (err, dataFile) => {
         if (err) {
+          console.log("err: ", err);
           return null;
         }
-
-        return data;
+        return dataFile;
       });
-      return JSON.parse(users);
-    } else {
-      fs.writeFileSync(absolutePath, "");
 
+      if (data === "") {
+        return null;
+      }
+      return JSON.parse(data);
+    } else {
       return null;
     }
   } catch (err) {
     console.log("ERROR: ", err);
-
     return;
   }
 };
 
-const writeUserFiles = (path, data, socket, io) => {
-  const absolutePath = `${root}/${path}`;
-
-  fs.writeFile(absolutePath, data, { flag: "w" }, (err) => {
-    if (err) {
-      throw err;
-    } else {
-      io.to(socket.id).emit("register_success");
-    }
-  });
+const writeFile = (path, data, callback) => {
+  const route = `${modelsPath}/${path}`;
+  const dataToJSON = JSON.stringify(data, null, 4);
+  try {
+    return fs.writeFile(route, dataToJSON, { flag: "w" }, (err) => {
+      if (err) {
+        return false;
+      } else {
+        callback();
+      }
+    });
+  } catch (err) {
+    console.log("err: ", err);
+    return false;
+  }
 };
 
 module.exports = {
-  readUsersFile,
-  writeUserFiles,
+  readFile,
+  writeFile,
 };
