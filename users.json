@@ -1,29 +1,20 @@
 [
     {
-        "id": "be2e17b5-4a78-49d8-a171-f5b4cc20a76f",
-        "name": "Ivan",
+        "id": "5d5e8ec3-b679-4bc0-abaa-d1ce21eb942f",
+        "name": "ivan",
         "email": "ivan@gmail.com",
         "password": "123",
-        "avatar": "mod1",
-        "favouriteRoom": "red-room-box",
-        "color": "mod1"
+        "avatar": "mod2",
+        "favouriteRoom": "blue-room-box",
+        "color": "mod2"
     },
     {
-        "id": "0e91d226-11d3-4806-9f45-51308350009e",
-        "name": "sarah",
-        "email": "sarah@gmail.com",
+        "id": "10ce921f-c9bb-4d39-b79a-b85b0419c7b5",
+        "name": "dani",
+        "email": "dani@gmail.com",
         "password": "123",
-        "avatar": "mod1",
-        "favouriteRoom": "red-room-box",
-        "color": "mod1"
-    },
-    {
-        "id": "47271554-e22e-40c4-9a10-59c25dce2b86",
-        "name": "daniel",
-        "email": "daniel@gmail.com",
-        "password": "123",
-        "avatar": "mod1",
-        "favouriteRoom": "red-room-box",
-        "color": "mod1"
+        "avatar": "mod2",
+        "favouriteRoom": "blue-room-box",
+        "color": "mod2"
     }
 ]
