@@ -25,5 +25,14 @@
         "avatar": "mod1",
         "favouriteRoom": "red-room-box",
         "color": "mod1"
+    },
+    {
+        "id": "81d462b8-de23-4d84-b01d-d57898303fb5",
+        "name": "sarah",
+        "email": "sarah@mail.com",
+        "password": "1234",
+        "avatar": "mod1",
+        "favouriteRoom": "red-room-box",
+        "color": "mod1"
     }
 ]

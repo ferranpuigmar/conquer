@@ -752,7 +752,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
 class Dashboard {
   roomsList = [];
   localStorage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
