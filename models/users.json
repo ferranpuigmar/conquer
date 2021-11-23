@@ -5,12 +5,12 @@
         "email": "ivan@gmail.com",
         "password": "123",
         "avatar": "mod2",
-        "favouriteRoom": "blue-room-box",
+        "favouriteRoom": "green-room-box",
         "color": "mod2"
     },
     {
-        "id": "10ce921f-c9bb-4d39-b79a-b85b0419c7b5",
-        "name": "dani",
+        "id": "55220db7-3e40-4b6c-bbb4-14cb2979452d",
+        "name": "david",
         "email": "dani@gmail.com",
         "password": "123",
         "avatar": "mod2",
