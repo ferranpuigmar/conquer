@@ -263,7 +263,6 @@ class Game {
   // }
 
   generateCanvas() {
-    console.log("generating canvas...");
     this.clearCanvas();
 
     let colCounter = 0;
