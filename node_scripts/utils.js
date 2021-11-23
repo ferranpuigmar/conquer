@@ -1,6 +1,5 @@
 const fs = require("fs");
 const root = process.platform === "win32" ? process.cwd() : process.env.PWD;
-console.log(process.platform)
 
 const readFile = async (path) => {
   let data;
