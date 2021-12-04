@@ -8,4 +8,8 @@
     a. macOS: debe introducir "run_m" en la terminal
     b. Windows: debe introducir "run_w" en la terminal
 
-4. La prueba de difetenes usuarios debe ser en diferentes tabs dentro del mismo navegador
+4. La prueba se tiene que realizar en distintos navegadores
+
+5. Hemos añadido unos usarios de prueba:
+- ivan@gmail.com / 123
+- dani@gmail.com / 123
