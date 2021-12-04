@@ -614,6 +614,7 @@ class Game {
     console.log(`El jugador ${player.name} ha perdido!!!`);
   }
 
+<<<<<<< HEAD
   takeOutFromGame(player) {
     let is_in = this.players.find(
       (current_player) => current_player.id === player.id
@@ -623,6 +624,30 @@ class Game {
       this.calculateTotalCellsToWin(this.totalCells, this.players);
     }
   }
+=======
+  // takeOutFromGame(player) {
+  //   let is_in = this.players.find(
+  //     (current_player) => current_player.id === player.id
+  //   );
+  //   if (!!is_in) {
+  //     this.defeatPlayer(player);
+  //     this.calculateTotalCellsToWin(this.totalCells, this.players);
+  //   }
+  // }
+
+  generateCanvas() {
+    console.log("generating canvas...");
+    this.clearCanvas();
+
+    let colCounter = 0;
+    let rowCounter = 0;
+
+    for (let cell = 0; cell < this.totalCells; cell++) {
+      if (cell !== 0 && cell % 20 === 0) {
+        colCounter = 0;
+        rowCounter++;
+      }
+>>>>>>> parent of 1b7d21b (Merge branch 'develop' of https://github.com/ferranpuigmar/conquer into develop)
 
   createDomGrid() {
     const size = this.gridSize;
@@ -968,7 +993,11 @@ class Login {
   loginUser(data) {
     const allUSers = this.storage.getLocalStorage("users");
     const newUser = data;
+<<<<<<< HEAD
     const user = allUSers?.find((user) => user.email === newUser.email);
+=======
+    const user = this.usersDb.find((user) => user.email === newUser.email);
+>>>>>>> parent of 1b7d21b (Merge branch 'develop' of https://github.com/ferranpuigmar/conquer into develop)
     if (!user) {
       this.showErrorMessage("No existe nadie con este email");
       return;
@@ -1411,6 +1440,7 @@ class Room {
     avatarMobile.parentNode.removeChild(avatarMobile);
     
 
+<<<<<<< HEAD
      if (this.players.length === this.capacity) {
        this.isOpen = false;
        this.disableRoom(this.id);
@@ -1422,6 +1452,19 @@ class Room {
     //   console.log("La sala no acepta más jugadores");
        return;
      }
+=======
+    if (this.players.length === this.capacity) {
+      this.isOpen = false;
+      this.disableRoom(this.id);
+      //console.log("sala llena!");
+      return;
+    }
+
+    if (this.players.length > this.capacity || !this.isOpen) {
+      //   console.log("La sala no acepta más jugadores");
+      return;
+    }
+>>>>>>> parent of 1b7d21b (Merge branch 'develop' of https://github.com/ferranpuigmar/conquer into develop)
 
     this.addToRoom(dragUSer);
   }

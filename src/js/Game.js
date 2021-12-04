@@ -288,15 +288,28 @@ class Game {
     console.log(`El jugador ${player.name} ha perdido!!!`);
   }
 
-  takeOutFromGame(player) {
-    let is_in = this.players.find(
-      (current_player) => current_player.id === player.id
-    );
-    if (!!is_in) {
-      this.defeatPlayer(player);
-      this.calculateTotalCellsToWin(this.totalCells, this.players);
-    }
-  }
+  // takeOutFromGame(player) {
+  //   let is_in = this.players.find(
+  //     (current_player) => current_player.id === player.id
+  //   );
+  //   if (!!is_in) {
+  //     this.defeatPlayer(player);
+  //     this.calculateTotalCellsToWin(this.totalCells, this.players);
+  //   }
+  // }
+
+  generateCanvas() {
+    console.log("generating canvas...");
+    this.clearCanvas();
+
+    let colCounter = 0;
+    let rowCounter = 0;
+
+    for (let cell = 0; cell < this.totalCells; cell++) {
+      if (cell !== 0 && cell % 20 === 0) {
+        colCounter = 0;
+        rowCounter++;
+      }
 
   createDomGrid() {
     const size = this.gridSize;
