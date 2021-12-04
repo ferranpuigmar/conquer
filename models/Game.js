@@ -1,19 +1,53 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
 
-const GameSchema = new Schema({
+const playerSchema = {
   id: String,
-  usersRoom: [
+  name: String,
+  cellsConquered: Number,
+  color: String,
+  hasLost: Boolean,
+};
+
+const GameSchema = new Schema({
+  roomId: { type: Schema.Types.ObjectId, ref: "Room" },
+  grid: [
     {
-      name: String,
-      avatar: String,
       id: String,
+      row: Number,
+      cell: Number,
+      cell_x: Number,
+      cell_y: Number,
+      playerId: {
+        type: String,
+        default: null,
+      },
+      color: {
+        type: String,
+        default: null,
+      },
     },
   ],
-  isOpen: Boolean,
+  players: [playerSchema],
+  defeatedPlaters: [
+    {
+      id: String,
+      name: String,
+      cellsConquered: Number,
+    },
+  ],
+  totalCellsToWin: Number,
+  round: {
+    turn: Number,
+    roundNumber: Number,
+    player: {
+      type: playerSchema,
+      default: null,
+    },
+  },
 });
 
-RoomSchema.set("timestamps", true);
+GameSchema.set("timestamps", true);
 
-const Room = mongoose.model("Room", RoomSchema);
-module.exports = Room;
+const Game = mongoose.model("Game", GameSchema);
+module.exports = Game;

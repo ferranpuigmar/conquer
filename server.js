@@ -4,7 +4,6 @@ const sassMiddleware = require("node-sass-middleware");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const path = require("path");
-const mongoose = require("mongoose");
 
 // Configuración inicial
 const express = require("express");
@@ -15,6 +14,9 @@ const io = require("socket.io")(http);
 const port = process.env.PORT || 3000;
 const srcPath = __dirname + "/src/sass";
 const destPath = __dirname + "/public/css";
+
+// DB Config Connection
+require("./config/db.js");
 
 //MiddleWares
 app.use(bodyParser.json());
@@ -50,27 +52,10 @@ app.set("views", __dirname + "/src/views");
 app.use(express.static(__dirname + "/public"));
 
 const index = require("./routes/index");
-//app.use("/", index);
-app.get("/", function (req, res) {
-  const data = {
-    outside: true,
-  };
-  res.render("login", data);
-});
+app.use("/", index);
 
-app.get("/login", function (req, res) {
-  const data = {
-    outside: true,
-  };
-  res.render("login", data);
-});
-
-app.get("/register", function (req, res) {
-  const data = {
-    outside: true,
-  };
-  res.render("register", data);
-});
+const api = require("./routes/api");
+app.use("/api", api);
 
 app.get("/rooms", function (req, res) {
   const data = {
