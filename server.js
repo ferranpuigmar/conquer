@@ -4,10 +4,11 @@ const sassMiddleware = require("node-sass-middleware");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const path = require("path");
+const mongoose = require("mongoose");
 
 // Configuración inicial
 const express = require("express");
-const {engine} = require('express-handlebars');
+const { engine } = require("express-handlebars");
 const app = express();
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
@@ -35,12 +36,15 @@ app.use(
 const hbs = require("hbs");
 //hbs.registerPartials(__dirname + "/src/views/partials", function (err) {});
 
-app.engine('hbs', engine({
-  defaultLayout: 'main',
-  extname: '.hbs',
-  partialsDir: __dirname + '/src/views/partials/'
-}));
-app.set('view engine', 'hbs');
+app.engine(
+  "hbs",
+  engine({
+    defaultLayout: "main",
+    extname: ".hbs",
+    partialsDir: __dirname + "/src/views/partials/",
+  })
+);
+app.set("view engine", "hbs");
 app.set("views", __dirname + "/src/views");
 
 app.use(express.static(__dirname + "/public"));
@@ -48,36 +52,36 @@ app.use(express.static(__dirname + "/public"));
 const index = require("./routes/index");
 //app.use("/", index);
 app.get("/", function (req, res) {
-  const data = { 
-    outside: true
-  }
+  const data = {
+    outside: true,
+  };
   res.render("login", data);
 });
 
 app.get("/login", function (req, res) {
-  const data = { 
-    outside: true
-  }
-  res.render("login",data);
+  const data = {
+    outside: true,
+  };
+  res.render("login", data);
 });
 
 app.get("/register", function (req, res) {
-  const data = { 
-    outside: true
-  }
+  const data = {
+    outside: true,
+  };
   res.render("register", data);
 });
 
 app.get("/rooms", function (req, res) {
-  const data = { 
+  const data = {
     outside: false,
     boxRooms: [
-      {id: 'red-room-box'},
-      {id: 'blue-room-box'},
-      {id: 'green-room-box'},
-      {id: 'orange-room-box'}
-    ]
-  }
+      { id: "red-room-box" },
+      { id: "blue-room-box" },
+      { id: "green-room-box" },
+      { id: "orange-room-box" },
+    ],
+  };
   res.render("rooms", data);
 });
 
