@@ -41,17 +41,17 @@ class Room {
     avatarMobile.parentNode.removeChild(avatarMobile);
     
 
-    if (this.players.length === this.capacity) {
-      this.isOpen = false;
-      this.disableRoom(this.id);
-      //console.log("sala llena!");
-      return;
-    }
+     if (this.players.length === this.capacity) {
+       this.isOpen = false;
+       this.disableRoom(this.id);
+       console.log("sala llena!");
+       return;
+     }
 
-    if (this.players.length > this.capacity || !this.isOpen) {
-      //   console.log("La sala no acepta más jugadores");
-      return;
-    }
+     if (this.players.length > this.capacity || !this.isOpen) {
+    //   console.log("La sala no acepta más jugadores");
+       return;
+     }
 
     this.addToRoom(dragUSer);
   }

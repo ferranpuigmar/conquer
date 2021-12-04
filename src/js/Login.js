@@ -100,7 +100,7 @@ class Login {
   loginUser(data) {
     const allUSers = this.storage.getLocalStorage("users");
     const newUser = data;
-    const user = this.usersDb.find((user) => user.email === newUser.email);
+    const user = allUSers?.find((user) => user.email === newUser.email);
     if (!user) {
       this.showErrorMessage("No existe nadie con este email");
       return;
