@@ -10,6 +10,6 @@
 
 4. La prueba se tiene que realizar en distintos navegadores
 
-5. Hemos añadido unos usarios de prueba:
+5. Hemos añadido unos usarios de prueba, con lo que ya se puede empezar sin registrar, directamente de la url raiz, o /login
 - ivan@gmail.com / 123
 - dani@gmail.com / 123
