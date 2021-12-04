@@ -1,10 +1,12 @@
 import LocalStorage from "./utils";
 import { v4 as uuidv4 } from "uuid";
+import { io } from "socket.io-client";
 
 class Register {
   fields = {};
   errors = {};
   local = new LocalStorage();
+  socket = io();
 
   constructor(registerFields) {
     this.form = document.getElementById(registerFields.formId);
@@ -185,31 +187,14 @@ class Register {
 
   init() {
     this.redirectToRooms();
+    this.socketListeners();
     this.assignListeners();
     this.registerFields();
   }
 
   saveUser(data) {
-    const allUSers = this.local.getLocalStorage("users");
     const newUser = data;
-
-    if (!allUSers || allUSers.length === 0) {
-      this.local.setLocalStorage("users", [newUser]);
-      this.resetForm();
-      this.showSuccesMessage();
-      return;
-    }
-
-    const existUSer = allUSers.find((user) => user.email === newUser.email);
-    if (existUSer) {
-      this.showErrorMessage("Ya existe un usuario con este email");
-      return;
-    }
-
-    allUSers.push(newUser);
-    this.local.setLocalStorage("users", allUSers);
-    this.resetForm();
-    this.showSuccesMessage();
+    this.socket.emit("register", newUser);
   }
 
   showErrorMessage(message) {
@@ -276,11 +261,22 @@ class Register {
     this.saveUser(data);
   }
 
-  redirectToRooms(){
+  redirectToRooms() {
     let user = this.local.getLocalStorage("me", "session");
-    if(user){
+    if (user) {
       window.location.href = "/rooms";
     }
+  }
+
+  socketListeners() {
+    this.socket.on("register_exist_user", () => {
+      this.showErrorMessage("Ya existe un usuario con este email");
+    });
+
+    this.socket.on("register_success", () => {
+      this.resetForm();
+      this.showSuccesMessage();
+    });
   }
 }
 

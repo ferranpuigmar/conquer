@@ -49,19 +49,19 @@
   display: flex;
   flex-flow: column;
 
-  &.room1 {
+  &#red-room-box {
     background-color: $red;
   }
 
-  &.room2 {
+  &#blue-room-box {
     background-color: $blue;
   }
 
-  &.room3 {
+  &#green-room-box {
     background-color: $green;
   }
 
-  &.room4 {
+  &#orange-room-box {
     background-color: $orange;
   }
 
@@ -108,15 +108,18 @@
     .a-avatar {
       opacity: 1;
     }
-    
   }
 }
-
 
 .m-game {
   position: relative;
   overflow: hidden;
   height: calc((20px * 32) + 44px + 10px);
+
+  canvas {
+    width: 100%;
+    height: calc(100% - 100px);
+  }
 
   header {
     background-color: $white;
@@ -146,7 +149,6 @@
     display: flex;
 
     span {
-      margin-right: 15px;
       display: inline-block;
     }
 

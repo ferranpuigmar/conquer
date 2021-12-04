@@ -1,21 +1,57 @@
-//Carga de módulos
-const http = require( 'http' );
-const fs = require( 'fs' );
-const router = require( './router/router.js' );
+require("dotenv").config();
+const sockets = require("./node_scripts/sockets");
+const sassMiddleware = require("node-sass-middleware");
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+const path = require("path");
 
-//Configuraciones del servidor
-const serverConfigFile = fs.readFileSync( `${ __dirname }/config/env.json`, 'utf-8' );
-const serverConfig = JSON.parse( serverConfigFile );
-const hostname = serverConfig[ 'hostname' ];
-const port = serverConfig[ 'port' ];
+// Configuración inicial
+const express = require("express");
+const { engine } = require("express-handlebars");
+const app = express();
+const http = require("http").Server(app);
+const io = require("socket.io")(http);
+const port = process.env.PORT || 3000;
+const srcPath = __dirname + "/src/sass";
+const destPath = __dirname + "/public/css";
 
-//Crear servidor
-const server = http.createServer( ( req, res ) =>
-{
-  router.init( req, res );
-} )
+//MiddleWares
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 
-server.listen( port, hostname, () =>
-{
-  console.log( `Server running at http://${ hostname }:${ port }` )
-} )
+app.use(
+  sassMiddleware({
+    src: srcPath,
+    dest: destPath,
+    debug: true,
+    outputStyle: "compressed",
+    prefix: "/css",
+  }),
+  express.static(path.join(__dirname, "public"))
+);
+
+// Motor de plantilla
+app.engine(
+  "hbs",
+  engine({
+    defaultLayout: "main",
+    extname: ".hbs",
+    partialsDir: __dirname + "/src/views/partials/",
+  })
+);
+app.set("view engine", "hbs");
+app.set("views", __dirname + "/src/views");
+
+app.use(express.static(__dirname + "/public"));
+
+const index = require("./routes/index");
+app.use("/", index);
+
+// Iniciar servidor
+http.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`);
+});
+
+// Init sockets
+sockets.loadSockets(io);
