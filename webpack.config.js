@@ -1,17 +1,26 @@
-const path = require("path");
-const NodemonPlugin = require("nodemon-webpack-plugin");
+const path = require( 'path' );
+const MiniCssExtractPlugin = require( 'mini-css-extract-plugin' );
+const npm_package = require('./package.json')
 
 module.exports = {
-  entry: ["./src/js/index.js"],
+  entry: ['./src/sass/style.scss', './src/js/index.js'],
   output: {
-    filename: "bundle.js",
-    path: path.resolve(__dirname, "public"),
-    library: "Conquer",
+    filename: 'bundle.js',
+    path: path.resolve( __dirname, 'public' ),
+    library: 'Conquer'
   },
-  plugins: [new NodemonPlugin()],
+  plugins: [
+    new MiniCssExtractPlugin( { filename: 'css/style.css' } )
+  ],
   module: {
-    rules: [],
+    rules: [
+      {
+        test: /\.s[ac]ss$/i,
+        use: [ MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader' ],
+        exclude: /node_modules/
+      }
+    ]
   },
-  devtool: "source-map",
-  mode: "development",
+  devtool: 'source-map',
+  mode: 'development'
 };

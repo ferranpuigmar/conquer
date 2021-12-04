@@ -1,12 +1,10 @@
 import LocalStorage from "./utils";
-import { io } from "socket.io-client";
+import { v4 as uuidv4 } from "uuid";
 
 class Login {
   fields = {};
   errors = {};
   storage = new LocalStorage();
-  socket = io();
-  usersDb = [];
 
   constructor(loginFields) {
     this.form = document.getElementById(loginFields.formId);
@@ -94,23 +92,22 @@ class Login {
   }
 
   init() {
-    this.socketListeners();
     this.redirectToRooms();
     this.registerLoginFields();
     this.assignListeners();
-    this.socket.emit("load_db_users");
   }
 
   loginUser(data) {
+    const allUSers = this.storage.getLocalStorage("users");
     const newUser = data;
-    const user = this.usersDb.find((user) => user.email === newUser.email);
-
+    const user = allUSers?.find((user) => user.email === newUser.email);
     if (!user) {
       this.showErrorMessage("No existe nadie con este email");
       return;
     }
-    const passWordIsValid = user.password === newUser.password;
-
+    const passWordIsValid = allUSers.find(
+      (user) => user.password === newUser.password
+    );
     if (!passWordIsValid) {
       this.showErrorMessage("La contraseña no es válida");
       return;
@@ -118,6 +115,20 @@ class Login {
 
     // Aqui va la lógica para poner al "user" (línea 95) dentro de los usuarios conectados
     this.storage.setLocalStorage("me", user, "session");
+
+    //!Temporal
+    const connectedUsers = this.storage.getLocalStorage("connectedUsers");
+    if (!connectedUsers) {
+      this.storage.setLocalStorage("connectedUsers", [user]);
+    } else {
+      const existConnectedUser = connectedUsers.find(
+        (connectedUser) => connectedUser.id === user.id
+      );
+      if (!existConnectedUser) {
+        connectedUsers.push(user);
+        this.storage.setLocalStorage("connectedUsers", connectedUsers);
+      }
+    }
 
     // También se tiene que redirigir al usuario a la ruta /rooms
     window.location.href = "/rooms";
@@ -171,12 +182,6 @@ class Login {
 
     // Método para enviar la información al localStorage, al apartado de usuaros conectados
     this.loginUser(data);
-  }
-
-  socketListeners() {
-    this.socket.on("get_db_users", (data) => {
-      this.usersDb = data;
-    });
   }
 }
 
