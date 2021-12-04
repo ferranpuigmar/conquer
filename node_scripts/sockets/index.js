@@ -1,3 +1,4 @@
+const { apiClient } = require("../../config/apiClient.js");
 const utils = require("../utils.js");
 const pathDB = "users.json";
 
@@ -50,7 +51,7 @@ const loadSockets = (io) => {
       socket.to(roomId).emit("notifyUpdateGame", newGameInfo, roomId);
     });
 
-    socket.on("register", (user) => {
+    socket.on("register", async (user) => {
       const usersDB = utils.readUsersFile(pathDB) ?? [];
       const existUSer = usersDB.find((userDB) => userDB.email === user.email);
 
@@ -59,8 +60,10 @@ const loadSockets = (io) => {
         return;
       }
       usersDB.push(user);
-      const data = JSON.stringify(usersDB, null, 4);
-      utils.writeUserFiles(pathDB, data, socket, io);
+      const saveUser = await apiClient("/user", user).post();
+      console.log(saveUser);
+      // const data = JSON.stringify(usersDB, null, 4);
+      // utils.writeUserFiles(pathDB, data, socket, io);
     });
 
     socket.on("load_db_users", () => {

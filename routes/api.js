@@ -1,14 +1,22 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
+const User = require("../models/User");
+const bcryptSalt = 10;
 
-router.post("/user", (req, res) => {
+router.post("/user", async (req, res) => {
   try {
-    const { id, name, email, password, avatar, favouriteRoom, color } =
-      req.body;
+    const userData = req.body;
+    // encriptamos password usuario para la BD
+    const salt = bcrypt.genSaltSync(bcryptSalt);
+    const hashPass = bcrypt.hashSync(userData.password, salt);
+    userData.password = hashPass;
 
-    console.log("NAME: ", name);
+    const user = new User(userData);
+    await user.save();
+    res.status(200).json(user);
   } catch (error) {
-    console.log(err);
+    res.status(500).json(error.message);
   }
 });
 

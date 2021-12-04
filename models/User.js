@@ -1,11 +1,11 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
   id: String,
   name: String,
   email: String,
-  password: Number,
+  password: String,
   avatar: String,
   favouriteRoom: String,
   color: String,
