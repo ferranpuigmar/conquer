@@ -1,0 +1,20 @@
+[
+    {
+        "id": "4aa75653-2ed6-43b7-86fd-f8267bd57de3",
+        "name": "ivan",
+        "email": "ivan@gmail.com",
+        "password": "123",
+        "avatar": "mod2",
+        "favouriteRoom": "red-room-box",
+        "color": "mod2"
+    },
+    {
+        "id": "97891636-167c-4dab-9229-ab823f534f69",
+        "name": "dani",
+        "email": "dani@gmail.com",
+        "password": "123",
+        "avatar": "mod2",
+        "favouriteRoom": "blue-room-box",
+        "color": "mod2"
+    }
+]
