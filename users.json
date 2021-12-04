@@ -16,5 +16,14 @@
         "avatar": "mod2",
         "favouriteRoom": "blue-room-box",
         "color": "mod2"
+    },
+    {
+        "id": "935e7a56-585f-4b26-abc7-f6b818e8f9f7",
+        "name": "rosita",
+        "email": "rosita@gmail.com",
+        "password": "123",
+        "avatar": "mod2",
+        "favouriteRoom": "green-room-box",
+        "color": "mod2"
     }
 ]
