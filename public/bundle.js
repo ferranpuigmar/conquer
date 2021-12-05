@@ -14,6 +14,15 @@ const client = axios.create({
   baseURL: "http://localhost:3000/api",
 });
 
+client.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (err) => {
+    return Promise.reject(err.response);
+  }
+);
+
 const prepareDataToDB = (data) => {
   return JSON.stringify(data);
 };
@@ -2937,6 +2946,10 @@ const createUSer = (data) => {
   return apiClient("/user", data).post();
 };
 
+const loginInUser = (data) => {
+  return apiClient("/user/login", data).post();
+};
+
 const getUsers = () => {
   return apiClient("/users").get();
 };
@@ -2944,6 +2957,7 @@ const getUsers = () => {
 module.exports = {
   createUSer,
   getUsers,
+  loginInUser,
 };
 
 
@@ -3693,25 +3707,15 @@ class Login {
 
   async loginUser(data) {
     const newUser = data;
-    const users = await (0,_services_users_users__WEBPACK_IMPORTED_MODULE_0__.getUsers)();
-    console.log("users: ", users);
-    const user = users.find((user) => user.email === newUser.email);
-    if (!user) {
-      this.showErrorMessage("No existe nadie con este email");
-      return;
+    try {
+      const loginUSer = await (0,_services_users_users__WEBPACK_IMPORTED_MODULE_0__.loginInUser)(newUser);
+      if (loginUSer) {
+        this.storage.setLocalStorage("me", loginUSer, "session");
+        window.location.href = "/rooms";
+      }
+    } catch (error) {
+      this.showErrorMessage(error.data.message);
     }
-    const passWordIsValid = user.password === newUser.password;
-
-    if (!passWordIsValid) {
-      this.showErrorMessage("La contraseña no es válida");
-      return;
-    }
-
-    // Aqui va la lógica para poner al "user" (línea 95) dentro de los usuarios conectados
-    this.storage.setLocalStorage("me", user, "session");
-
-    // También se tiene que redirigir al usuario a la ruta /rooms
-    window.location.href = "/rooms";
   }
 
   showErrorMessage(message) {

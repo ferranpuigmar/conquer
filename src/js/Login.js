@@ -1,4 +1,4 @@
-import { getUsers, loginInUser } from "../../services/users/users";
+import { loginInUser } from "../../services/users/users";
 import LocalStorage from "./utils";
 class Login {
   fields = {};
@@ -98,26 +98,15 @@ class Login {
 
   async loginUser(data) {
     const newUser = data;
-    const loginUser = await loginInUser(newUser);
-    console.log("loginUser: ", loginUser);
-
-    // const user = users.find((user) => user.email === newUser.email);
-    // if (!user) {
-    //   this.showErrorMessage("No existe nadie con este email");
-    //   return;
-    // }
-    // const passWordIsValid = user.password === newUser.password;
-
-    // if (!passWordIsValid) {
-    //   this.showErrorMessage("La contraseña no es válida");
-    //   return;
-    // }
-
-    // // Aqui va la lógica para poner al "user" (línea 95) dentro de los usuarios conectados
-    // this.storage.setLocalStorage("me", user, "session");
-
-    // // También se tiene que redirigir al usuario a la ruta /rooms
-    // window.location.href = "/rooms";
+    try {
+      const loginUSer = await loginInUser(newUser);
+      if (loginUSer) {
+        this.storage.setLocalStorage("me", loginUSer, "session");
+        window.location.href = "/rooms";
+      }
+    } catch (error) {
+      this.showErrorMessage(error.data.message);
+    }
   }
 
   showErrorMessage(message) {

@@ -9,6 +9,16 @@ const UserSchema = new Schema({
   avatar: String,
   favouriteRoom: String,
   color: String,
+  rankingStatus: {
+    cellsConquered: {
+      type: Number,
+      default: 0,
+    },
+    wins: {
+      type: Number,
+      default: 0,
+    },
+  },
 });
 
 UserSchema.set("timestamps", true);

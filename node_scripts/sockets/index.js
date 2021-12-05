@@ -18,12 +18,14 @@ const loadSockets = (io) => {
         currentRoom.usersRoom = [...restUsers, newPlayer];
       }
 
+      // Lógica para añadir info room en mongo
       rooms = rooms.map((room) => {
         if (room.id === roomId) {
           room = currentRoom;
         }
         return room;
       });
+      // END Lógica
 
       io.to(roomId).emit("notifyNewUsertoRoom", currentRoom.usersRoom, roomId);
     });

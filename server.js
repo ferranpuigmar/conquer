@@ -3,6 +3,8 @@ const sockets = require("./node_scripts/sockets");
 const sassMiddleware = require("node-sass-middleware");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const { handleError } = require("./helpers/error");
+
 const path = require("path");
 
 // Configuración inicial
@@ -57,17 +59,8 @@ app.use("/", index);
 const api = require("./routes/api");
 app.use("/api", api);
 
-app.get("/rooms", function (req, res) {
-  const data = {
-    outside: false,
-    boxRooms: [
-      { id: "red-room-box" },
-      { id: "blue-room-box" },
-      { id: "green-room-box" },
-      { id: "orange-room-box" },
-    ],
-  };
-  res.render("rooms", data);
+app.use(function (err, req, res, next) {
+  handleError(err, res);
 });
 
 // Iniciar servidor
