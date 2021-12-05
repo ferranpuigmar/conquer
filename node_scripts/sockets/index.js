@@ -1,6 +1,4 @@
-const { createUSer } = require("../../services/users/users.js");
-const utils = require("../utils.js");
-const pathDB = "users.json";
+const { createUSer, getUsers } = require("../../services/users/users.js");
 
 let rooms = [];
 
@@ -52,7 +50,7 @@ const loadSockets = (io) => {
     });
 
     socket.on("register", async (user) => {
-      const usersDB = utils.readUsersFile(pathDB) ?? [];
+      const usersDB = await getUsers();
       const existUSer = usersDB.find((userDB) => userDB.email === user.email);
 
       if (existUSer) {
@@ -61,13 +59,13 @@ const loadSockets = (io) => {
       }
       usersDB.push(user);
       const saveUser = await createUSer(user);
-      console.log(saveUser);
-      // const data = JSON.stringify(usersDB, null, 4);
-      // utils.writeUserFiles(pathDB, data, socket, io);
+      if (saveUser) {
+        io.to(socket.id).emit("register_success");
+      }
     });
 
-    socket.on("load_db_users", () => {
-      const usersDB = utils.readUsersFile(pathDB) ?? [];
+    socket.on("load_db_users", async () => {
+      const usersDB = await getUsers();
       io.to(socket.id).emit("get_db_users", usersDB);
     });
 

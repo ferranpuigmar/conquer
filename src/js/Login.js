@@ -1,12 +1,9 @@
+import { getUsers, loginInUser } from "../../services/users/users";
 import LocalStorage from "./utils";
-import { io } from "socket.io-client";
-
 class Login {
   fields = {};
   errors = {};
   storage = new LocalStorage();
-  socket = io();
-  usersDb = [];
 
   constructor(loginFields) {
     this.form = document.getElementById(loginFields.formId);
@@ -94,32 +91,33 @@ class Login {
   }
 
   init() {
-    this.socketListeners();
     this.redirectToRooms();
     this.registerLoginFields();
     this.assignListeners();
-    this.socket.emit("load_db_users");
   }
 
-  loginUser(data) {
+  async loginUser(data) {
     const newUser = data;
-    const user = this.usersDb.find((user) => user.email === newUser.email);
-    if (!user) {
-      this.showErrorMessage("No existe nadie con este email");
-      return;
-    }
-    const passWordIsValid = user.password === newUser.password;
+    const loginUser = await loginInUser(newUser);
+    console.log("loginUser: ", loginUser);
 
-    if (!passWordIsValid) {
-      this.showErrorMessage("La contraseña no es válida");
-      return;
-    }
+    // const user = users.find((user) => user.email === newUser.email);
+    // if (!user) {
+    //   this.showErrorMessage("No existe nadie con este email");
+    //   return;
+    // }
+    // const passWordIsValid = user.password === newUser.password;
 
-    // Aqui va la lógica para poner al "user" (línea 95) dentro de los usuarios conectados
-    this.storage.setLocalStorage("me", user, "session");
+    // if (!passWordIsValid) {
+    //   this.showErrorMessage("La contraseña no es válida");
+    //   return;
+    // }
 
-    // También se tiene que redirigir al usuario a la ruta /rooms
-    window.location.href = "/rooms";
+    // // Aqui va la lógica para poner al "user" (línea 95) dentro de los usuarios conectados
+    // this.storage.setLocalStorage("me", user, "session");
+
+    // // También se tiene que redirigir al usuario a la ruta /rooms
+    // window.location.href = "/rooms";
   }
 
   showErrorMessage(message) {
