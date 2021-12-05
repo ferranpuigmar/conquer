@@ -21,10 +21,9 @@
               <div class="form-group  my-2">
                 <select id="registerFavouriteRoom" class="form-select" aria-label="Default select example">
                   <option value="0" selected>Favorite Room</option>
-                  <option value="red-room-box">Sala Roja</option>
-                  <option value="blue-room-box">Sala Azul</option>
-                  <option value="green-room-box">Sala Verde</option>
-                  <option value="orange-room-box">Sala Naranja</option>
+                  {{#each boxRooms}}
+                  <option value="{{{id}}}">Sala {{name}}</option>
+                  {{/each}}
                 </select>
                 <div id="registerFavouriteRoom_error" class="invalid-feedback"></div>
               </div>

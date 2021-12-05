@@ -18,9 +18,11 @@ router.get("/login", (req, res) => {
   res.render("login", data);
 });
 
-router.get("/register", (req, res, next) => {
+router.get("/register", async (req, res, next) => {
+  const rooms = await getRooms();
   const data = {
     outside: true,
+    boxRooms: rooms.map((room) => ({ id: room.id , name: room.name})),
   };
   res.render("register", data);
 });
@@ -29,7 +31,7 @@ router.get("/rooms", async function (req, res) {
   const rooms = await getRooms();
   const data = {
     outside: false,
-    boxRooms: rooms.map((room) => ({ id: room.id })),
+    boxRooms: rooms.map((room) => ({ id: room.id , color: room.color})),
   };
   console.log("data: ", data);
   res.render("rooms", data);

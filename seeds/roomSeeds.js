@@ -1,8 +1,13 @@
 const Room = require("../models/room");
-const roomNames = ["alejandro", "atila", "julio", "napoleon"];
+const roomsBox = [{name: "alejandro", color: 'red'}, 
+               {name: "atila", color: 'blue'},
+               {name: "julio", color: 'green'},
+               {name: "napoleon", color: 'orange'}];
 
-const rooms = roomNames.map((room) => ({
-  id: `${room}-room`,
+const rooms = roomsBox.map((room) => ({
+  id: `${room.name}-room`,
+  name: room.name,
+  color: room.color,
   usersRoom: [],
   isOpen: true,
 }));

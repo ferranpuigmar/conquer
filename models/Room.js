@@ -3,6 +3,8 @@ const { Schema } = mongoose;
 
 const RoomSchema = new Schema({
   id: String,
+  name: String,
+  color: String,
   usersRoom: [
     {
       name: String,

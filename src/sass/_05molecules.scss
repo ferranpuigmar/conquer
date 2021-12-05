@@ -49,22 +49,6 @@
   display: flex;
   flex-flow: column;
 
-  &#red-room-box {
-    background-color: $red;
-  }
-
-  &#blue-room-box {
-    background-color: $blue;
-  }
-
-  &#green-room-box {
-    background-color: $green;
-  }
-
-  &#orange-room-box {
-    background-color: $orange;
-  }
-
   &__header {
     position: relative;
     padding: 0px 20px;
