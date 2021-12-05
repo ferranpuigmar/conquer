@@ -193,9 +193,21 @@ class Register {
     this.registerFields();
   }
 
-  saveUser(data) {
+  async saveUser(data) {
     const newUser = data;
-    createUser(newUser)
+    try{
+      const createdUser = await createUser(newUser);
+      console.log(createUser);
+      if(createdUser){
+        this.showSuccesMessage();
+      }
+
+    }catch(err){
+      console.log("Error data", err.data);
+      this.showErrorMessage(err.data.message);
+    }
+
+
   }
 
   showErrorMessage(message) {

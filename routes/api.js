@@ -64,17 +64,14 @@ router.post("/user/login", async (req, res, next) => {
 
 router.post("/user/register", async (req, res, next) => {
   const userData = req.body;
-  const userFromDb = await User.findOne({ email: userData.email });
-
   try {
-    if (!userFromDb) {
-      const user = new User(userData);
-      const saveUser = await user.save();
-      if (saveUser) {
-        res.status(200).send(saveUser);
-      }
-    }else{
-      throw new ErrorHandler(status.NOT_FOUND, "El usuario no existe");
+    const userFromDb = await User.findOne({ email: userData.email });
+    console.log("user", userFromDb);
+    if (userFromDb) { throw new ErrorHandler(status.CONFLICT, "El usuario existe"); }
+    const user = new User(userData);
+    const saveUser = await user.save();
+    if (saveUser) {
+      res.status(200).send(saveUser);
     }
   } catch (error) {
     next(error);

@@ -51,20 +51,20 @@ const loadSockets = (io) => {
       socket.to(roomId).emit("notifyUpdateGame", newGameInfo, roomId);
     });
 
-    socket.on("register", async (user) => {
-      const usersDB = await getUsers();
-      const existUSer = usersDB.find((userDB) => userDB.email === user.email);
+    // socket.on("register", async (user) => {
+    //   const usersDB = await getUsers();
+    //   const existUSer = usersDB.find((userDB) => userDB.email === user.email);
 
-      if (existUSer) {
-        io.to(socket.id).emit("register_exist_user");
-        return;
-      }
-      usersDB.push(user);
-      const saveUser = await createUSer(user);
-      if (saveUser) {
-        io.to(socket.id).emit("register_success");
-      }
-    });
+    //   if (existUSer) {
+    //     io.to(socket.id).emit("register_exist_user");
+    //     return;
+    //   }
+    //   usersDB.push(user);
+    //   const saveUser = await createUSer(user);
+    //   if (saveUser) {
+    //     io.to(socket.id).emit("register_success");
+    //   }
+    // });
 
     socket.on("load_db_users", async () => {
       const usersDB = await getUsers();
