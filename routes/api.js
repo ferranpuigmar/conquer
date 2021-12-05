@@ -65,6 +65,10 @@ router.post("/user/login", async (req, res, next) => {
 
 router.post("/user/register", async (req, res, next) => {
   const userData = req.body;
+  // encriptamos password usuario para la BD
+  const salt = bcrypt.genSaltSync(bcryptSalt);
+  const hashPass = bcrypt.hashSync(userData.password, salt);
+  userData.password = hashPass;
   try {
     const userFromDb = await User.findOne({ email: userData.email });
     console.log("user", userFromDb);
