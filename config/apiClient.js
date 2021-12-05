@@ -1,5 +1,4 @@
 const axios = require("axios").default;
-require("dotenv").config();
 
 const client = axios.create({
   baseURL: process.env.API_URL,
