@@ -1,3 +1,4 @@
+import { createUser } from "../../services/users/users";
 import LocalStorage from "./utils";
 import { v4 as uuidv4 } from "uuid";
 import { io } from "socket.io-client";
@@ -194,7 +195,7 @@ class Register {
 
   saveUser(data) {
     const newUser = data;
-    this.socket.emit("register", newUser);
+    createUser(newUser)
   }
 
   showErrorMessage(message) {

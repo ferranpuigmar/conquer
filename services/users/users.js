@@ -1,7 +1,7 @@
 const { apiClient } = require("../../config/apiClient.js");
 
-const createUSer = (data) => {
-  return apiClient("/user", data).post();
+const createUser = (data) => {
+  return apiClient("/user/register", data).post();
 };
 
 const loginInUser = (data) => {
@@ -13,7 +13,7 @@ const getUsers = () => {
 };
 
 module.exports = {
-  createUSer,
+  createUser,
   getUsers,
   loginInUser,
 };

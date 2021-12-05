@@ -41,6 +41,46 @@ router.post("/user/login", async (req, res, next) => {
   }
 });
 
+
+router.post("/user/login", async (req, res, next) => {
+  const userData = req.body;
+  const userFromDb = await User.findOne({ email: userData.email });
+
+  try {
+    if (!userFromDb) {
+      throw new ErrorHandler(status.NOT_FOUND, "El usuario no existe");
+    }
+
+    if (bcrypt.compareSync(userData.password, userFromDb.password)) {
+      res.status(200).send(userFromDb);
+    } else {
+      throw new ErrorHandler(status.BAD_REQUEST, "El password no es correcto");
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+router.post("/user/register", async (req, res, next) => {
+  const userData = req.body;
+  const userFromDb = await User.findOne({ email: userData.email });
+
+  try {
+    if (!userFromDb) {
+      const user = new User(userData);
+      const saveUser = await user.save();
+      if (saveUser) {
+        res.status(200).send(saveUser);
+      }
+    }else{
+      throw new ErrorHandler(status.NOT_FOUND, "El usuario no existe");
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get("/users", async (req, res) => {
   try {
     const users = await User.find();
