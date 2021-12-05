@@ -1,4 +1,4 @@
-const { apiClient } = require("../../config/apiClient.js");
+const { createUSer } = require("../../services/users/users.js");
 const utils = require("../utils.js");
 const pathDB = "users.json";
 
@@ -60,7 +60,7 @@ const loadSockets = (io) => {
         return;
       }
       usersDB.push(user);
-      const saveUser = await apiClient("/user", user).post();
+      const saveUser = await createUSer(user);
       console.log(saveUser);
       // const data = JSON.stringify(usersDB, null, 4);
       // utils.writeUserFiles(pathDB, data, socket, io);
