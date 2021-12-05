@@ -5,6 +5,7 @@ const User = require("../models/User");
 const bcryptSalt = 10;
 const status = require("http-status");
 const { ErrorHandler } = require("../helpers/error");
+const Room = require("../models/room");
 
 router.post("/user", async (req, res) => {
   try {
@@ -48,6 +49,15 @@ router.get("/users", async (req, res) => {
       throw new ErrorHandler(status.NOT_FOUND, "No existen usuarios");
     }
     res.status(200).json(users);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/rooms", async (req, res) => {
+  try {
+    const rooms = await Room.find();
+    res.status(200).json(rooms);
   } catch (error) {
     next(error);
   }

@@ -1,4 +1,5 @@
 const express = require("express");
+const { getRooms } = require("../services/users/rooms");
 const router = express.Router();
 
 router.get("/", (req, res) => {
@@ -13,16 +14,13 @@ router.get("/register", (req, res, next) => {
   res.render("register");
 });
 
-router.get("/rooms", function (req, res) {
+router.get("/rooms", async function (req, res) {
+  const rooms = await getRooms();
   const data = {
     outside: false,
-    boxRooms: [
-      { id: "red-room-box" },
-      { id: "blue-room-box" },
-      { id: "green-room-box" },
-      { id: "orange-room-box" },
-    ],
+    boxRooms: rooms.map((room) => ({ id: room.id })),
   };
+  console.log("data: ", data);
   res.render("rooms", data);
 });
 
