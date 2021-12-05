@@ -4012,9 +4012,21 @@ class Register {
     this.registerFields();
   }
 
-  saveUser(data) {
+  async saveUser(data) {
     const newUser = data;
-    (0,_services_users_users__WEBPACK_IMPORTED_MODULE_0__.createUser)(newUser)
+    try{
+      const createdUser = await (0,_services_users_users__WEBPACK_IMPORTED_MODULE_0__.createUser)(newUser);
+      console.log(_services_users_users__WEBPACK_IMPORTED_MODULE_0__.createUser);
+      if(createdUser){
+        this.showSuccesMessage();
+      }
+
+    }catch(err){
+      console.log("Error data", err.data);
+      this.showErrorMessage(err.data.message);
+    }
+
+
   }
 
   showErrorMessage(message) {

@@ -3,15 +3,26 @@ const { getRooms } = require("../services/users/rooms");
 const router = express.Router();
 
 router.get("/", (req, res) => {
-  res.render("login");
+  const data = {
+    outside: true,
+  };
+  
+  res.render("login", data);
+
 });
 
 router.get("/login", (req, res) => {
-  res.render("login");
+  const data = {
+    outside: true,
+  };
+  res.render("login", data);
 });
 
 router.get("/register", (req, res, next) => {
-  res.render("register");
+  const data = {
+    outside: true,
+  };
+  res.render("register", data);
 });
 
 router.get("/rooms", async function (req, res) {
