@@ -4,6 +4,15 @@ const client = axios.create({
   baseURL: process.env.API_URL,
 });
 
+client.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (err) => {
+    return Promise.reject(err.response);
+  }
+);
+
 const prepareDataToDB = (data) => {
   return JSON.stringify(data);
 };
