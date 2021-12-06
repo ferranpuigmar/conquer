@@ -197,7 +197,6 @@ class Register {
     const newUser = data;
     try{
       const createdUser = await createUser(newUser);
-      console.log(createUser);
       if(createdUser){
         this.showSuccesMessage();
       }
@@ -206,8 +205,6 @@ class Register {
       console.log("Error data", err.data);
       this.showErrorMessage(err.data.message);
     }
-
-
   }
 
   showErrorMessage(message) {

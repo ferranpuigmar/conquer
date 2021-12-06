@@ -145,7 +145,7 @@ class Room {
     });
     this.socket.on("notifyPlayGame", (data, roomId, userId) => {
       if (this.id === roomId) {
-        const user = this.storage.getLocalStorage("me", "session");
+        console.log("hello");
         this.initGame(data);
       }
     });

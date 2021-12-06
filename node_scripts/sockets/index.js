@@ -1,5 +1,5 @@
-const { addUserToRoom }         = require("../../services/users/rooms.js");
-const { createUSer, getUsers }  = require("../../services/users/users.js");
+const { addUserToRoom, getSingleRoom } = require("../../services/users/rooms.js");
+const { createUSer, getUsers }         = require("../../services/users/users.js");
 
 let rooms = [];
 
@@ -18,15 +18,20 @@ const loadSockets = (io) => {
       }
     });
 
-    socket.on("playGame", ({ roomId, userId }) => {
-      const currentRoom = rooms.find((room) => room.id === roomId);
-
-      io.to(roomId).emit(
-        "notifyPlayGame",
-        currentRoom.usersRoom,
-        roomId,
-        userId
-      );
+    socket.on("playGame", async ({ roomId, userId }) => {
+      try{
+        const currentRoom = await getSingleRoom({ roomId });
+        if(currentRoom){
+          io.to(roomId).emit(
+            "notifyPlayGame",
+            currentRoom.usersRoom,
+            roomId,
+            userId
+          );
+        }
+      }catch(error){
+        console.error(error);
+      }
     });
 
     socket.on("updateGame", ({ roomId, newGameInfo }) => {

@@ -33,7 +33,6 @@ router.get("/rooms", async function (req, res) {
     outside: false,
     boxRooms: rooms.map((room) => ({ id: room.id , color: room.color})),
   };
-  console.log("data: ", data);
   res.render("rooms", data);
 });
 

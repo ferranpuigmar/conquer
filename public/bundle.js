@@ -4016,7 +4016,6 @@ class Register {
     const newUser = data;
     try{
       const createdUser = await (0,_services_users_users__WEBPACK_IMPORTED_MODULE_0__.createUser)(newUser);
-      console.log(_services_users_users__WEBPACK_IMPORTED_MODULE_0__.createUser);
       if(createdUser){
         this.showSuccesMessage();
       }
@@ -4025,8 +4024,6 @@ class Register {
       console.log("Error data", err.data);
       this.showErrorMessage(err.data.message);
     }
-
-
   }
 
   showErrorMessage(message) {
@@ -4278,7 +4275,7 @@ class Room {
     });
     this.socket.on("notifyPlayGame", (data, roomId, userId) => {
       if (this.id === roomId) {
-        const user = this.storage.getLocalStorage("me", "session");
+        console.log("hello");
         this.initGame(data);
       }
     });
