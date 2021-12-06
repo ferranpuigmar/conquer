@@ -8,12 +8,9 @@ const addUserToRoom = (data) => {
   return apiClient("/rooms/adduser", data).post();
 };
 
-const getSingleRoom = (roomId) => {
-  return apiClient(`/rooms/${roomId}`).get();
+const getSingleRoom = (data) => {
+  return apiClient(`/rooms/${data.roomId}`).get();
 };
-
-
-
 
 module.exports = {
   getRooms,

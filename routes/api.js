@@ -138,7 +138,7 @@ router.post("/rooms/adduser", async (req, res, next) => {
 
 router.get("/rooms/:id", async (req, res, next) => {
   try {
-    const currentRoom = await Room.findOne({ _id: req.params.id });
+    const currentRoom = await Room.findOne({ id: req.params.id });
     console.log(currentRoom);
     if (currentRoom) {
       res.status(200).send(currentRoom);
