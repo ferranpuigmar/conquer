@@ -71,7 +71,6 @@ router.post("/user/register", async (req, res, next) => {
   userData.password = hashPass;
   try {
     const userFromDb = await User.findOne({ email: userData.email });
-    console.log("user", userFromDb);
     if (userFromDb) { throw new ErrorHandler(status.CONFLICT, "El usuario existe"); }
     const user = new User(userData);
     const saveUser = await user.save();
@@ -99,6 +98,39 @@ router.get("/rooms", async (req, res) => {
   try {
     const rooms = await Room.find();
     res.status(200).json(rooms);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/rooms/adduser", async (req, res, next) => {
+  const data = req.body;
+  try {
+    const newPlayer = data.newPlayer;
+    const currentRoom = await Room.findOne({ id: data.roomId });
+
+    if (currentRoom.usersRoom.length === 0) {
+      currentRoom.usersRoom.push(newPlayer);
+    } else {
+      const restUsers = currentRoom.usersRoom.filter(
+        (userRoom) => userRoom.id !== newPlayer.id
+      );
+
+      if(restUsers.length === currentRoom.usersRoom.length && !currentRoom.isOpen){
+        throw new ErrorHandler(status.CONFLICT, "La habitación no està disponible");
+      }
+
+      currentRoom.usersRoom = [...restUsers, newPlayer];
+
+      if(currentRoom.usersRoom.length === 4){
+        currentRoom.isOpen === false;
+      }
+    }
+
+    const saveRoom = await currentRoom.save();
+    if (saveRoom) {
+      res.status(200).send(saveRoom);
+    }
   } catch (error) {
     next(error);
   }
