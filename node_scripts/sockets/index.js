@@ -5,12 +5,16 @@ let rooms = [];
 
 const loadSockets = (io) => {
   io.on("connection", (socket) => {
-    socket.on("addUserToRoom", ({ roomId, newPlayer }) => {
-      const room = await addUserToRoom({ roomId, newPlayer });
-      // END Lógica
-      if(room){
-        socket.join(roomId);
-        io.to(roomId).emit("notifyNewUsertoRoom", currentRoom.usersRoom, roomId);
+    socket.on("addUserToRoom", async ({ roomId, newPlayer }) => {
+      try{
+        const room = await addUserToRoom({ roomId, newPlayer });
+        // END Lógica
+        if(room){
+          socket.join(roomId);
+          io.to(roomId).emit("notifyNewUsertoRoom", room.usersRoom, roomId);
+        }
+      }catch(error){
+        console.error(error);
       }
     });
 
