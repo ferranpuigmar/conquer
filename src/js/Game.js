@@ -270,7 +270,7 @@ class Game {
     let rowCounter = 0;
 
     for (let cell = 0; cell < this.totalCells; cell++) {
-      if (cell !== 0 && cell % 20 === 0) {
+      if (cell !== 0 && cell % this.gridSize === 0) {
         colCounter = 0;
         rowCounter++;
       }
