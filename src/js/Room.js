@@ -184,7 +184,7 @@ class Room {
   initGame(players, isCallWithEvent = false) {
     this.prepareGame(players);
     // Inicializamos juego
-    const gridSize = 8;
+    const gridSize = 4;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
     this.game = new Game(
       this.id,
