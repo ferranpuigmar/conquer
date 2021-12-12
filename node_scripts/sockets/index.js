@@ -52,14 +52,11 @@ const loadSockets = (io) => {
       }
     });
 
-
     socket.on("removeGame", async ({ roomId }) => {
       const removed = await this.removeGame({roomId});
 
       if(removed){
-        const rooms = rooms.map((r) => { 
-          return { roomId : r.roomId, isPlaying : ((r.roomId === roomId) ?  false : true) }
-        });
+        const rooms = rooms.filter((r) => r.roomId !== roomId );
         socket.to(roomId).emit("notifyUpdateGame", newGameInfo, roomId);
       }
     });
