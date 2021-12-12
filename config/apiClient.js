@@ -44,7 +44,8 @@ const apiClient = (url, data, requestHeader) => {
   };
 
   const del = () => {
-    return client.delete(url, {headers});
+    const res = await client.delete(url, {headers});
+    return res.data;
   }
 
   return {
