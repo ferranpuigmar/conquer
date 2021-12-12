@@ -148,5 +148,52 @@ router.get("/rooms/:id", async (req, res, next) => {
   }
 });
 
+router.post("/games/add", async (req, res, next) => {
+  const data = req.body;
+  try {
+    const newGame = data.newGameInfo;
+    if (currentGame) {
+      const game = new Game(newGame);
+      const saveGame = await game.save();
+      if (saveGame) {
+        res.status(200).send(saveRoom);
+      }
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/games/:id", async (req, res, next) => {
+  const data = req.body;
+  try {
+    const newGame = data.newGameInfo;
+    const _id     = data.roomId;
+
+    Game.findByIdAndUpdate(
+      _id,
+      newGame,
+      (err, updatedGame) => {
+        if (err) {
+          throw new ErrorHandler(status.CONFLICT, "Error al actualizar el tablero");
+        } else {
+          res.status(200).send(updatedGame);
+        }
+      }
+    )
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.del("/games/:id", async (req, res, next) => {
+  const data = req.body;
+  try {
+    const _id  = data.roomId;
+    Game.find({ id: _id }).remove().exec();
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;

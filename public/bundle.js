@@ -48,18 +48,20 @@ const apiClient = (url, data, requestHeader) => {
     const res = await client.post(url, prepareDataToDB(data), { headers });
     return res.data;
   };
+  const put = async () => {
+    const res = await client.put(url, prepareDataToDB(data), { headers });
+    return res.data;
+  };
 
-  // const put = () => {
-  //   return client.put(url, data, {headers});
-  // }
-
-  // const del = () => {
-  //   return client.delete(url, {headers});
-  // }
+  const del = () => {
+    return client.delete(url, {headers});
+  }
 
   return {
     get,
     post,
+    put,
+    del
   };
 };
 
@@ -3583,6 +3585,7 @@ class Game {
     this.grid = game.grid;
     this.round = game.round;
     this.totalCellsToWin = game.totalCellsToWin;
+    this.defeatedPlayers = game.defeatedPlayers;
     this.players = game.players;
     this.generateCanvas();
     this.checkTurn(game);

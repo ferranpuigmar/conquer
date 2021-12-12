@@ -425,6 +425,7 @@ class Game {
     this.grid = game.grid;
     this.round = game.round;
     this.totalCellsToWin = game.totalCellsToWin;
+    this.defeatedPlayers = game.defeatedPlayers;
     this.players = game.players;
     this.generateCanvas();
     this.checkTurn(game);
