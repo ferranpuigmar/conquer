@@ -186,7 +186,7 @@ router.put("/games/:id", async (req, res, next) => {
   }
 });
 
-router.del("/games/:id", async (req, res, next) => {
+router.delete("/games/:id", async (req, res, next) => {
   const data = req.body;
   try {
     const _id  = data.roomId;

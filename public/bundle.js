@@ -53,8 +53,9 @@ const apiClient = (url, data, requestHeader) => {
     return res.data;
   };
 
-  const del = () => {
-    return client.delete(url, {headers});
+  const del = async () => {
+    const res = await client.delete(url, {headers});
+    return res.data;
   }
 
   return {
