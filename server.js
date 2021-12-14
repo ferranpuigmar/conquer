@@ -4,7 +4,6 @@ const sassMiddleware = require("node-sass-middleware");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const { handleError } = require("./helpers/error");
-
 const path = require("path");
 
 // Configuración inicial
@@ -43,6 +42,12 @@ app.engine(
     defaultLayout: "main",
     extname: ".hbs",
     partialsDir: __dirname + "/src/views/partials/",
+    helpers: {
+      incrementedIndex: function () {
+        index++;
+        return index;
+      },
+    },
   })
 );
 app.set("view engine", "hbs");

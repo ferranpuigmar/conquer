@@ -1,4 +1,5 @@
 const express = require("express");
+const { getRanking } = require("../services/users/ranking");
 const { getRooms } = require("../services/users/rooms");
 const router = express.Router();
 
@@ -32,6 +33,16 @@ router.get("/rooms", async function (req, res) {
     boxRooms: rooms.map((room) => ({ id: room.id, color: room.color })),
   };
   res.render("rooms", data);
+});
+
+router.get("/ranking", async function (req, res) {
+  const rankingData = await getRanking();
+  console.log("rankingData: ", rankingData);
+  const data = {
+    outside: false,
+    rankingData,
+  };
+  res.render("ranking", data);
 });
 
 module.exports = router;

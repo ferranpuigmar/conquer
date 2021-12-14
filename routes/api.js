@@ -26,13 +26,15 @@ router.post("/user", async (req, res) => {
 
 router.put("/user/:id/updateRanking", async (req, res, next) => {
   const id = req.params.id;
-  const rankingStatus = req.body;
+  const data = req.body;
+  console.log("id:", id);
+  console.log("data:", data);
   try {
     await User.findOneAndUpdate(id, {
       $set: {
         rankingStatus: {
-          cellsConquered: rankingStatus.cellsConquered,
-          wins: rankingStatus.wins,
+          cellsConquered: data.rankingStatus.cellsConquered,
+          wins: data.rankingStatus.wins,
         },
       },
     });
