@@ -279,3 +279,21 @@
     margin-bottom: 1rem;
   }
 }
+
+.m-logo {
+  display: flex;
+  justify-content: center;
+  max-width: 60px;
+  margin: 0.5rem auto 1rem;
+
+  img {
+    width: 100%;
+    height: auto;
+  }
+}
+
+.card-title {
+  font-size: 19px;
+  padding: 0 1rem;
+  text-align: center;
+}
