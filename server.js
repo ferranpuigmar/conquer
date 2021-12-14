@@ -3,6 +3,8 @@ const sockets = require("./node_scripts/sockets");
 const sassMiddleware = require("node-sass-middleware");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const { handleError } = require("./helpers/error");
+
 const path = require("path");
 
 // Configuración inicial
@@ -14,6 +16,9 @@ const io = require("socket.io")(http);
 const port = process.env.PORT || 3000;
 const srcPath = __dirname + "/src/sass";
 const destPath = __dirname + "/public/css";
+
+// DB Config Connection
+require("./config/db.js");
 
 //MiddleWares
 app.use(bodyParser.json());
@@ -47,6 +52,13 @@ app.use(express.static(__dirname + "/public"));
 
 const index = require("./routes/index");
 app.use("/", index);
+
+const api = require("./routes/api");
+app.use("/api", api);
+
+app.use(function (err, req, res, next) {
+  handleError(err, res);
+});
 
 // Iniciar servidor
 http.listen(port, () => {

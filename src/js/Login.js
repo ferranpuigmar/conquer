@@ -1,12 +1,9 @@
+import { loginInUser } from "../../services/users/users";
 import LocalStorage from "./utils";
-import { io } from "socket.io-client";
-
 class Login {
   fields = {};
   errors = {};
   storage = new LocalStorage();
-  socket = io();
-  usersDb = [];
 
   constructor(loginFields) {
     this.form = document.getElementById(loginFields.formId);
@@ -94,32 +91,22 @@ class Login {
   }
 
   init() {
-    this.socketListeners();
     this.redirectToRooms();
     this.registerLoginFields();
     this.assignListeners();
-    this.socket.emit("load_db_users");
   }
 
-  loginUser(data) {
+  async loginUser(data) {
     const newUser = data;
-    const user = this.usersDb.find((user) => user.email === newUser.email);
-    if (!user) {
-      this.showErrorMessage("No existe nadie con este email");
-      return;
+    try {
+      const loginUSer = await loginInUser(newUser);
+      if (loginUSer) {
+        this.storage.setLocalStorage("me", loginUSer, "session");
+        window.location.href = "/rooms";
+      }
+    } catch (error) {
+      this.showErrorMessage(error.data.message);
     }
-    const passWordIsValid = user.password === newUser.password;
-
-    if (!passWordIsValid) {
-      this.showErrorMessage("La contraseña no es válida");
-      return;
-    }
-
-    // Aqui va la lógica para poner al "user" (línea 95) dentro de los usuarios conectados
-    this.storage.setLocalStorage("me", user, "session");
-
-    // También se tiene que redirigir al usuario a la ruta /rooms
-    window.location.href = "/rooms";
   }
 
   showErrorMessage(message) {

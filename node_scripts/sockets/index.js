@@ -1,43 +1,37 @@
-const utils = require("../utils.js");
-const pathDB = "users.json";
+const { addUserToRoom, getSingleRoom } = require("../../services/users/rooms.js");
+const { createUSer, getUsers }         = require("../../services/users/users.js");
 
 let rooms = [];
 
 const loadSockets = (io) => {
   io.on("connection", (socket) => {
-    socket.on("addUserToRoom", ({ roomId, newPlayer }) => {
-      socket.join(roomId);
-
-      const currentRoom = rooms.find((room) => room.id === roomId);
-      const restUsers = currentRoom.usersRoom.filter(
-        (userRoom) => userRoom.id !== newPlayer.id
-      );
-
-      if (currentRoom.usersRoom.length === 0) {
-        currentRoom.usersRoom.push(newPlayer);
-      } else {
-        currentRoom.usersRoom = [...restUsers, newPlayer];
-      }
-
-      rooms = rooms.map((room) => {
-        if (room.id === roomId) {
-          room = currentRoom;
+    socket.on("addUserToRoom", async ({ roomId, newPlayer }) => {
+      try{
+        const room = await addUserToRoom({ roomId, newPlayer });
+        // END Lógica
+        if(room){
+          socket.join(roomId);
+          io.to(roomId).emit("notifyNewUsertoRoom", room.usersRoom, roomId);
         }
-        return room;
-      });
-
-      io.to(roomId).emit("notifyNewUsertoRoom", currentRoom.usersRoom, roomId);
+      }catch(error){
+        console.error(error);
+      }
     });
 
-    socket.on("playGame", ({ roomId, userId }) => {
-      const currentRoom = rooms.find((room) => room.id === roomId);
-
-      io.to(roomId).emit(
-        "notifyPlayGame",
-        currentRoom.usersRoom,
-        roomId,
-        userId
-      );
+    socket.on("playGame", async ({ roomId, userId }) => {
+      try{
+        const currentRoom = await getSingleRoom({ roomId });
+        if(currentRoom){
+          io.to(roomId).emit(
+            "notifyPlayGame",
+            currentRoom.usersRoom,
+            roomId,
+            userId
+          );
+        }
+      }catch(error){
+        console.error(error);
+      }
     });
 
     socket.on("updateGame", ({ roomId, newGameInfo }) => {
@@ -50,21 +44,8 @@ const loadSockets = (io) => {
       socket.to(roomId).emit("notifyUpdateGame", newGameInfo, roomId);
     });
 
-    socket.on("register", (user) => {
-      const usersDB = utils.readUsersFile(pathDB) ?? [];
-      const existUSer = usersDB.find((userDB) => userDB.email === user.email);
-
-      if (existUSer) {
-        io.to(socket.id).emit("register_exist_user");
-        return;
-      }
-      usersDB.push(user);
-      const data = JSON.stringify(usersDB, null, 4);
-      utils.writeUserFiles(pathDB, data, socket, io);
-    });
-
-    socket.on("load_db_users", () => {
-      const usersDB = utils.readUsersFile(pathDB) ?? [];
+    socket.on("load_db_users", async () => {
+      const usersDB = await getUsers();
       io.to(socket.id).emit("get_db_users", usersDB);
     });
 

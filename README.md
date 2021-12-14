@@ -4,12 +4,10 @@
 
 2. Abrir la carpeta en Visual Studio Code
 
-3. Según si el usuario dispone de macOS o Windows debe utilizar un comando u otro para correr el proyecto, dichos comandos los detallamos a continuacióm:
-    a. macOS: debe introducir "run_m" en la terminal
-    b. Windows: debe introducir "run_w" en la terminal
+3. Crear archivo ".env" y dentro del mismo poner lo siguiente: PORT=3000
 
-4. La prueba se tiene que realizar en distintos navegadores
+4. Según si el usuario dispone de macOS o Windows debe utilizar un comando u otro para correr el proyecto, dichos comandos los detallamos a continuacióm:
+    a. MacOS: debe introducir "npm run dev_m" en la terminal
+    b. Windows: debe introducir "npm run dev_w" en la terminal
 
-5. Hemos añadido unos usarios de prueba, con lo que ya se puede empezar sin registrar, directamente de la url raiz, o /login
-- ivan@gmail.com / 123
-- dani@gmail.com / 123
+5. La prueba de difetenes usuarios debe ser en diferentes tabs dentro del mismo navegador
