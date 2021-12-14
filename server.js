@@ -42,12 +42,7 @@ app.engine(
     defaultLayout: "main",
     extname: ".hbs",
     partialsDir: __dirname + "/src/views/partials/",
-    helpers: {
-      incrementedIndex: function () {
-        index++;
-        return index;
-      },
-    },
+    helpers: require("./helpers/handlebars.js").helpers,
   })
 );
 app.set("view engine", "hbs");

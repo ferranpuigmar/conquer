@@ -37,9 +37,8 @@ router.get("/rooms", async function (req, res) {
 
 router.get("/ranking", async function (req, res) {
   const rankingData = await getRanking();
-  console.log("rankingData: ", rankingData);
   const data = {
-    outside: false,
+    outside: true,
     rankingData,
   };
   res.render("ranking", data);

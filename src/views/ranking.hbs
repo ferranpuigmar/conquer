@@ -4,6 +4,10 @@
     <div class="container">
       <div class="row">
         <div class="col-12">
+          <div class="m-ranking__image">
+            <img src="/img/rank.png" alt="ranking" />
+          </div>
+          <h1 class="m-ranking__title">Ranking Conquer</h1>
           <table class="table table-striped">
             <thead>
               <tr>
@@ -16,7 +20,7 @@
             <tbody>
               {{#each rankingData}}
               <tr>
-                <th scope="row">1</th>
+                <th scope="row">{{incrementedIndex @index}}</th>
                 <td>{{{name}}}</td>
                 <td>{{rankingStatus.cellsConquered}}</td>
                 <td>{{rankingStatus.wins}}</td>

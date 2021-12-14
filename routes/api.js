@@ -167,7 +167,10 @@ router.get("/ranking", async (req, res, next) => {
     const users = await User.find(
       {},
       { avatar: 1, id: 1, name: 1, rankingStatus: 1 }
-    );
+    ).sort({
+      "rankingStatus.wins": -1,
+      "rankingStatus.cellsConquered": -1,
+    });
     res.status(200).json(users);
   } catch (error) {
     next(error);
