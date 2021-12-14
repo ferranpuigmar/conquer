@@ -7,6 +7,7 @@ const status = require("http-status");
 const { ErrorHandler } = require("../helpers/error");
 const Room = require("../models/room");
 
+// USER
 router.post("/user", async (req, res) => {
   try {
     const userData = req.body;
@@ -23,60 +24,22 @@ router.post("/user", async (req, res) => {
   }
 });
 
-router.post("/user/login", async (req, res, next) => {
-  const userData = req.body;
-  const userFromDb = await User.findOne({ email: userData.email });
-
+router.put("/user/:id/updateRanking", async (req, res, next) => {
+  const id = req.params.id;
+  const rankingStatus = req.body;
   try {
-    if (!userFromDb) {
-      throw new ErrorHandler(status.NOT_FOUND, "El usuario no existe");
-    }
-
-    if (bcrypt.compareSync(userData.password, userFromDb.password)) {
-      res.status(200).send(userFromDb);
-    } else {
-      throw new ErrorHandler(status.BAD_REQUEST, "El password no es correcto");
-    }
-  } catch (error) {
-    next(error);
-  }
-});
-
-
-router.post("/user/login", async (req, res, next) => {
-  const userData = req.body;
-  const userFromDb = await User.findOne({ email: userData.email });
-
-  try {
-    if (!userFromDb) {
-      throw new ErrorHandler(status.NOT_FOUND, "El usuario no existe");
-    }
-
-    if (bcrypt.compareSync(userData.password, userFromDb.password)) {
-      res.status(200).send(userFromDb);
-    } else {
-      throw new ErrorHandler(status.BAD_REQUEST, "El password no es correcto");
-    }
-  } catch (error) {
-    next(error);
-  }
-});
-
-
-router.post("/user/register", async (req, res, next) => {
-  const userData = req.body;
-  // encriptamos password usuario para la BD
-  const salt = bcrypt.genSaltSync(bcryptSalt);
-  const hashPass = bcrypt.hashSync(userData.password, salt);
-  userData.password = hashPass;
-  try {
-    const userFromDb = await User.findOne({ email: userData.email });
-    if (userFromDb) { throw new ErrorHandler(status.CONFLICT, "El usuario existe"); }
-    const user = new User(userData);
-    const saveUser = await user.save();
-    if (saveUser) {
-      res.status(200).send(saveUser);
-    }
+    await User.findOneAndUpdate(id, {
+      $set: {
+        rankingStatus: {
+          cellsConquered: rankingStatus.cellsConquered,
+          wins: rankingStatus.wins,
+        },
+      },
+    });
+    res.status(200).json({
+      code: "ok",
+      message: "Success",
+    });
   } catch (error) {
     next(error);
   }
@@ -94,7 +57,49 @@ router.get("/users", async (req, res) => {
   }
 });
 
-router.get("/rooms", async (req, res) => {
+// AUTH
+router.post("/user/login", async (req, res, next) => {
+  const userData = req.body;
+  const userFromDb = await User.findOne({ email: userData.email });
+
+  try {
+    if (!userFromDb) {
+      throw new ErrorHandler(status.NOT_FOUND, "El usuario no existe");
+    }
+
+    if (bcrypt.compareSync(userData.password, userFromDb.password)) {
+      res.status(200).send(userFromDb);
+    } else {
+      throw new ErrorHandler(status.BAD_REQUEST, "El password no es correcto");
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/user/register", async (req, res, next) => {
+  const userData = req.body;
+  // encriptamos password usuario para la BD
+  const salt = bcrypt.genSaltSync(bcryptSalt);
+  const hashPass = bcrypt.hashSync(userData.password, salt);
+  userData.password = hashPass;
+  try {
+    const userFromDb = await User.findOne({ email: userData.email });
+    if (userFromDb) {
+      throw new ErrorHandler(status.CONFLICT, "El usuario existe");
+    }
+    const user = new User(userData);
+    const saveUser = await user.save();
+    if (saveUser) {
+      res.status(200).send(saveUser);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+//ROOMS
+router.get("/rooms", async (req, res, next) => {
   try {
     const rooms = await Room.find();
     res.status(200).json(rooms);
@@ -116,13 +121,19 @@ router.post("/rooms/adduser", async (req, res, next) => {
         (userRoom) => userRoom.id !== newPlayer.id
       );
 
-      if(restUsers.length === currentRoom.usersRoom.length && !currentRoom.isOpen){
-        throw new ErrorHandler(status.CONFLICT, "La habitación no està disponible");
+      if (
+        restUsers.length === currentRoom.usersRoom.length &&
+        !currentRoom.isOpen
+      ) {
+        throw new ErrorHandler(
+          status.CONFLICT,
+          "La habitación no està disponible"
+        );
       }
 
       currentRoom.usersRoom = [...restUsers, newPlayer];
 
-      if(currentRoom.usersRoom.length === 4){
+      if (currentRoom.usersRoom.length === 4) {
         currentRoom.isOpen === false;
       }
     }
@@ -148,5 +159,17 @@ router.get("/rooms/:id", async (req, res, next) => {
   }
 });
 
+//RANKING
+router.get("/ranking", async (req, res, next) => {
+  try {
+    const users = await User.find(
+      {},
+      { avatar: 1, id: 1, name: 1, rankingStatus: 1 }
+    );
+    res.status(200).json(users);
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = router;
