@@ -6,9 +6,24 @@ const bcryptSalt = 10;
 const status = require("http-status");
 const { ErrorHandler } = require("../helpers/error");
 const Room = require("../models/room");
-const Game = require("../models/Game");
 
 // USER
+router.post("/user", async (req, res) => {
+  try {
+    const userData = req.body;
+    // encriptamos password usuario para la BD
+    const salt = bcrypt.genSaltSync(bcryptSalt);
+    const hashPass = bcrypt.hashSync(userData.password, salt);
+    userData.password = hashPass;
+
+    const user = new User(userData);
+    await user.save();
+    res.status(200).json(user);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.put("/user/:id/updateRanking", async (req, res, next) => {
   const id = req.params.id;
   const data = req.body;
