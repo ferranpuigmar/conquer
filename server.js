@@ -4,7 +4,6 @@ const sassMiddleware = require("node-sass-middleware");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const { handleError } = require("./helpers/error");
-
 const path = require("path");
 
 // Configuración inicial
@@ -37,15 +36,13 @@ app.use(
 );
 
 // Motor de plantilla
-const hbs = require("hbs");
-//hbs.registerPartials(__dirname + "/src/views/partials", function (err) {});
-
 app.engine(
   "hbs",
   engine({
     defaultLayout: "main",
     extname: ".hbs",
     partialsDir: __dirname + "/src/views/partials/",
+    helpers: require("./helpers/handlebars.js").helpers,
   })
 );
 app.set("view engine", "hbs");

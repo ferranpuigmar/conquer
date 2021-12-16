@@ -1,6 +1,6 @@
 const { apiClient } = require("../../config/apiClient.js");
 
-const getRooms = (data) => {
+const getRooms = () => {
   return apiClient("/rooms").get();
 };
 
@@ -15,5 +15,5 @@ const getSingleRoom = (data) => {
 module.exports = {
   getRooms,
   addUserToRoom,
-  getSingleRoom
+  getSingleRoom,
 };
