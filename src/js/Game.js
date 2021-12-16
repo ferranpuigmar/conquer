@@ -1,4 +1,5 @@
-import { EVENT_TYPES, MESSAGE_TYPES } from "./constants";
+import { MESSAGE_TYPES } from "./constants";
+const {createGame}    = require("../../services/users/games.js");
 import LocalStorage, { getNewGameInfo } from "./utils";
 
 class Game {
@@ -378,7 +379,7 @@ class Game {
     this.socket.emit("updatePlayerLost", roomListUpdate);
   }
 
-  init() {
+  async init(isCallWithEvent) {
     this.generateCanvas();
     this.initCanvasEvents();
     this.calculateTotalCellsToWin(this.totalCells, this.players);
@@ -392,13 +393,22 @@ class Game {
     }
 
     const initNewGameToStorage = {
-      defeatedPlayers: this.defeatedPlayers,
       grid: this.grid,
       players: this.players,
-      round: this.round,
+      defeatedPlayers: this.defeatedPlayers,
       totalCellsToWin: this.totalCellsToWin,
+      round: this.round,
     };
-    this.updateGame(initNewGameToStorage);
+
+    console.log(isCallWithEvent);
+    if(isCallWithEvent){
+      await createGame({roomId: this.roomId, initNewGameToStorage});
+    }
+
+    //this.updateGame(initNewGameToStorage);
+
+
+
   }
 
   updateGame(newGameInfo) {

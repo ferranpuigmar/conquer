@@ -1,4 +1,4 @@
-const { putGame, addGame, delGame }    = require("../../services/users/games.js");
+const { putGame, createGame, delGame }    = require("../../services/users/games.js");
 const { addUserToRoom, getSingleRoom } = require("../../services/users/rooms.js");
 const { createUSer, getUsers }         = require("../../services/users/users.js");
 
@@ -38,23 +38,8 @@ const loadSockets = (io) => {
 
     socket.on("updateGame", async ({ roomId, newGameInfo }) => {
       try{
-        const room = rooms.find((r) => r.roomId === roomId);
-        let game = false;
-        if(room && !room.isPlaying){
-            game = await addGame({roomId, newGameInfo});
-        }else if(room && room.isPlaying){
-            game = await putGame({roomId, newGameInfo});
-        }
-        console.log('game', game);
-        if(game){
-          if(!room.isPlaying){
-            rooms = rooms.map((r) => {
-              return {isPlaying: (r.roomId === roomId) ? true : r.isPlaying, roomId: r.roomId}
-            });
-          }
-          console.log('rooms', rooms);
-          socket.to(roomId).emit("notifyUpdateGame", newGameInfo, roomId);
-        }
+        await putGame({roomId, newGameInfo});
+        socket.to(roomId).emit("notifyUpdateGame", newGameInfo, roomId);
       }catch(error){
         console.error(error);
       }
@@ -63,13 +48,7 @@ const loadSockets = (io) => {
     socket.on("removeGame", async ({ roomId }) => {
       try{
         const removed = await removeGame({roomId});
-
-        if(removed){
-          rooms = rooms.map((r) => {
-            return {isPlaying: (r.roomId === roomId) ? false : r.isPlaying, roomId: r.roomId}
-          });
-          socket.to(roomId).emit("notifyUpdateGame", newGameInfo, roomId);
-        }
+        socket.to(roomId).emit("notifyUpdateGame", newGameInfo, roomId);
       }catch(error){
         console.error(error);
       }
@@ -83,9 +62,7 @@ const loadSockets = (io) => {
     socket.on("generate_rooms_data", (rooms_data) => {
       if (rooms.length === 0) {
         rooms_data.forEach(
-          (r) => rooms.push(
-            {roomId: r.id, isPlaying: false}
-          )
+          (r) => rooms.push(r)
         )
       }
     });

@@ -170,18 +170,12 @@ router.post("/games/add", async (req, res, next) => {
     const roomId = data.roomId;
     console.log(JSON.stringify(newGame, null, 4));
     console.log(JSON.stringify(roomId, null, 4));
-    const game = new Game({});
-    console.log(game);
-    // await game.save();
-    // res.status(200).send({
-    //   code: "ok",
-    //   message: "Success",
-    // });
-    // const saveGame = await game.save();
-    // conole.log("saveGame");
-    // if (saveGame) {
-    //   res.status(200).send(saveRoom);
-    // }
+    const game = new Game({roomId: roomId, ...newGame});
+    await game.save();
+    res.status(200).send({
+      code: "ok",
+      message: "Success",
+    });
   } catch (error) {
     next(error);
   }
@@ -190,10 +184,11 @@ router.post("/games/add", async (req, res, next) => {
 router.put("/games/:id", async (req, res, next) => {
   const data = req.body;
   try {
-    const newGame = data.newGameInfo;
-    const _id = data.roomId;
+    const roomId = data.roomId;
 
-    Game.findByIdAndUpdate(_id, newGame, (err, updatedGame) => {
+    Game.findByIdAndUpdate(roomId, {
+      $set: { ...data.newGameInfo },
+    }, (err, updatedGame) => {
       if (err) {
         throw new ErrorHandler(
           status.CONFLICT,

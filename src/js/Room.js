@@ -126,16 +126,15 @@ class Room {
     document.getElementById("roomConnectedMessage").innerHTML = "";
   }
 
-  takeOutFromRoom(player) {
-    let is_in = this.players.find(
-      (room_player) => room_player.id === player.id
-    );
-    handleEventPlayGamehandleEventPlayGame;
-    if (!!is_in) {
-      this.game.takeOutFromGame(player);
-      //this.players = this.players.filter((room_player)=> room_player.id !== player.id);
-    }
-  }
+  // takeOutFromRoom(player) {
+  //   let is_in = this.players.find(
+  //     (room_player) => room_player.id === player.id
+  //   );
+  //   if (!!is_in) {
+  //     this.game.takeOutFromGame(player);
+  //     //this.players = this.players.filter((room_player)=> room_player.id !== player.id);
+  //   }
+  // }
 
   initSocketEvents() {
     this.socket.on("notifyNewUsertoRoom", (data, roomId) => {
@@ -145,7 +144,6 @@ class Room {
     });
     this.socket.on("notifyPlayGame", (data, roomId, userId) => {
       if (this.id === roomId) {
-        console.log("hello");
         this.initGame(data);
       }
     });
@@ -167,7 +165,7 @@ class Room {
 
   playGame() {
     const user = this.storage.getLocalStorage("me", "session");
-    this.socket.emit("playGame", { roomId: this.id, userId: user.id });
+    this.initGame([], true);
   }
 
   prepareGame() {
@@ -184,6 +182,8 @@ class Room {
   initGame(players, isCallWithEvent = false) {
     this.prepareGame(players);
     // Inicializamos juego
+    console.log(this.players);
+
     const gridSize = 4;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
     this.game = new Game(
@@ -193,7 +193,10 @@ class Room {
       this.socket,
       gridSize
     );
-    this.game.init(isCallWithEvent);
+    // if(isCallWithEvent){
+    //   this.socket.emit("playGame", { roomId: this.id, userId: currentPlayerInfo.id });
+    // }
+    // this.game.init(isCallWithEvent);
   }
 }
 

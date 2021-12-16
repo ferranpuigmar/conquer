@@ -1,7 +1,7 @@
 const { apiClient } = require("../../config/apiClient.js");
 
 
-const addGame = (data) => {
+const createGame = (data) => {
     return apiClient("/games/add", data).post();
 };
 
@@ -15,7 +15,7 @@ const delGame = (data) => {
 
 
 module.exports = {
-    addGame,
+    createGame,
     putGame,
     delGame
 };
