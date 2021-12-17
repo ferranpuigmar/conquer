@@ -165,7 +165,8 @@ class Room {
 
   playGame() {
     const user = this.storage.getLocalStorage("me", "session");
-    this.initGame([], true);
+    console.log("players: ", this.players);
+    // this.initGame(this.players, true);
   }
 
   prepareGame() {

@@ -6,6 +6,7 @@ const bcryptSalt = 10;
 const status = require("http-status");
 const { ErrorHandler } = require("../helpers/error");
 const Room = require("../models/room");
+const { MAX_BY_ROOM } = require("../contants/rooms");
 
 // USER
 router.post("/user", async (req, res) => {
@@ -115,34 +116,33 @@ router.post("/rooms/adduser", async (req, res, next) => {
   try {
     const newPlayer = data.newPlayer;
     const currentRoom = await Room.findOne({ id: data.roomId });
+    const isFullRoom = currentRoom.usersRoom.length === MAX_BY_ROOM;
+    let currentUSers = currentRoom.usersRoom.length;
 
-    if (currentRoom.usersRoom.length === 0) {
-      currentRoom.usersRoom.push(newPlayer);
-    } else {
-      const restUsers = currentRoom.usersRoom.filter(
-        (userRoom) => userRoom.id !== newPlayer.id
-      );
+    if (!isFullRoom) {
+      const find = { id: data.roomId };
+      const update = { $push: { usersRoom: newPlayer } };
+      await Room.updateOne(find, update);
+      currentUSers++;
 
-      if (
-        restUsers.length === currentRoom.usersRoom.length &&
-        !currentRoom.isOpen
-      ) {
-        throw new ErrorHandler(
-          status.CONFLICT,
-          "La habitación no està disponible"
-        );
-      }
+      res.status(200).json({
+        code: "ok",
+        message: "Success",
+        data: {
+          isOpen: currentUSers === MAX_BY_ROOM ? true : false,
+        },
+      });
 
-      currentRoom.usersRoom = [...restUsers, newPlayer];
-
-      if (currentRoom.usersRoom.length === 4) {
-        currentRoom.isOpen === false;
-      }
+      // Escoger si hacemos el emit aquí en caso que el último jugador haya llenado la sala,
+      // o sea hace en sockets dentro de "addUserToRoom", donde captura la respuesta del res
     }
 
-    const saveRoom = await currentRoom.save();
-    if (saveRoom) {
-      res.status(200).send(saveRoom);
+    if (currentRoom.usersRoom.length === MAX_BY_ROOM) {
+      await Room.updateOne(find, { isOpen: false });
+      throw new ErrorHandler(
+        status.CONFLICT,
+        "La habitación no està disponible"
+      );
     }
   } catch (error) {
     next(error);
@@ -185,7 +185,7 @@ router.post("/games/add", async (req, res, next) => {
     const roomId = data.roomId;
     console.log(JSON.stringify(newGame, null, 4));
     console.log(JSON.stringify(roomId, null, 4));
-    const game = new Game({roomId: roomId, ...newGame});
+    const game = new Game({ roomId: roomId, ...newGame });
     await game.save();
     res.status(200).send({
       code: "ok",
@@ -201,18 +201,22 @@ router.put("/games/:id", async (req, res, next) => {
   try {
     const roomId = data.roomId;
 
-    Game.findByIdAndUpdate(roomId, {
-      $set: { ...data.newGameInfo },
-    }, (err, updatedGame) => {
-      if (err) {
-        throw new ErrorHandler(
-          status.CONFLICT,
-          "Error al actualizar el tablero"
-        );
-      } else {
-        res.status(200).send(updatedGame);
+    Game.findByIdAndUpdate(
+      roomId,
+      {
+        $set: { ...data.newGameInfo },
+      },
+      (err, updatedGame) => {
+        if (err) {
+          throw new ErrorHandler(
+            status.CONFLICT,
+            "Error al actualizar el tablero"
+          );
+        } else {
+          res.status(200).send(updatedGame);
+        }
       }
-    });
+    );
   } catch (error) {
     next(error);
   }

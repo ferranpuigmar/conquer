@@ -1,5 +1,5 @@
 import { MESSAGE_TYPES } from "./constants";
-const {createGame}    = require("../../services/users/games.js");
+const { createGame } = require("../../services/users/games.js");
 import LocalStorage, { getNewGameInfo } from "./utils";
 
 class Game {
@@ -401,14 +401,11 @@ class Game {
     };
 
     console.log(isCallWithEvent);
-    if(isCallWithEvent){
-      await createGame({roomId: this.roomId, initNewGameToStorage});
+    if (isCallWithEvent) {
+      await createGame({ roomId: this.roomId, initNewGameToStorage });
     }
 
     //this.updateGame(initNewGameToStorage);
-
-
-
   }
 
   updateGame(newGameInfo) {
