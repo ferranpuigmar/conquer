@@ -69,6 +69,9 @@ class Game {
       case MESSAGE_TYPES.HAS_LOST:
         message = `Lo sentimos ${this.player.name}, te han dejado sin casillas. ¡Has perdido!`;
         break;
+      case MESSAGE_TYPES.HAS_WON:
+          message = `Fin de la partida. El jugador ${this.players[0].name} ha ganado.`;
+          break;
       default:
         return "";
     }
@@ -86,6 +89,14 @@ class Game {
   }
 
   checkTurn(game) {
+    console.log(this.players.length);
+    if (this.players.length == 1) {
+      this.showRoomMessage(MESSAGE_TYPES.HAS_WON);
+      return;
+    } else {
+      this.hideRoomMessage();
+    }
+
     if (this.round.player.id !== this.player.id) {
       this.showRoomMessage(MESSAGE_TYPES.WAITTING_TURN);
     } else {
