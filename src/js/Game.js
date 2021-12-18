@@ -1,5 +1,5 @@
 import { MESSAGE_TYPES } from "./constants";
-const { createGame } = require("../../services/users/games.js");
+const { createGame } = require("../../services/games.js");
 import LocalStorage, { getNewGameInfo } from "./utils";
 
 class Game {
@@ -264,7 +264,6 @@ class Game {
   // }
 
   generateCanvas() {
-    console.log("generating canvas...");
     this.clearCanvas();
 
     let colCounter = 0;
@@ -400,7 +399,6 @@ class Game {
       round: this.round,
     };
 
-    console.log(isCallWithEvent);
     if (isCallWithEvent) {
       await createGame({ roomId: this.roomId, initNewGameToStorage });
     }

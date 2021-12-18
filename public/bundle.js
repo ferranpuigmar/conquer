@@ -2937,43 +2937,42 @@ module.exports = yeast;
 
 /***/ }),
 
-/***/ "./services/users/games.js":
-/*!*********************************!*\
-  !*** ./services/users/games.js ***!
-  \*********************************/
+/***/ "./services/games.js":
+/*!***************************!*\
+  !*** ./services/games.js ***!
+  \***************************/
 /***/ (function(module, __unused_webpack_exports, __webpack_require__) {
 
-const { apiClient } = __webpack_require__(/*! ../../config/apiClient.js */ "./config/apiClient.js");
-
+const { apiClient } = __webpack_require__(/*! ../config/apiClient.js */ "./config/apiClient.js");
 
 const createGame = (data) => {
-    return apiClient("/games/add", data).post();
+  return apiClient("/games/create", data).post();
 };
 
 const putGame = (data) => {
-    return apiClient(`/games/${data.roomId}`,data).put();
+  return apiClient(`/games/${data.roomId}`, data).put();
 };
 
 const delGame = (data) => {
-    return apiClient(`/games/${data.roomId}`).del();
+  return apiClient(`/games/${data.roomId}`).del();
 };
-
 
 module.exports = {
-    createGame,
-    putGame,
-    delGame
+  createGame,
+  putGame,
+  delGame,
 };
+
 
 /***/ }),
 
-/***/ "./services/users/users.js":
-/*!*********************************!*\
-  !*** ./services/users/users.js ***!
-  \*********************************/
+/***/ "./services/users.js":
+/*!***************************!*\
+  !*** ./services/users.js ***!
+  \***************************/
 /***/ (function(module, __unused_webpack_exports, __webpack_require__) {
 
-const { apiClient } = __webpack_require__(/*! ../../config/apiClient.js */ "./config/apiClient.js");
+const { apiClient } = __webpack_require__(/*! ../config/apiClient.js */ "./config/apiClient.js");
 
 const createUser = (data) => {
   return apiClient("/user/register", data).post();
@@ -3172,7 +3171,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/js/constants.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
-const { createGame } = __webpack_require__(/*! ../../services/users/games.js */ "./services/users/games.js");
+const { createGame } = __webpack_require__(/*! ../../services/games.js */ "./services/games.js");
 
 
 class Game {
@@ -3437,7 +3436,6 @@ class Game {
   // }
 
   generateCanvas() {
-    console.log("generating canvas...");
     this.clearCanvas();
 
     let colCounter = 0;
@@ -3573,7 +3571,6 @@ class Game {
       round: this.round,
     };
 
-    console.log(isCallWithEvent);
     if (isCallWithEvent) {
       await createGame({ roomId: this.roomId, initNewGameToStorage });
     }
@@ -3645,8 +3642,8 @@ class Game {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _services_users_users__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../services/users/users */ "./services/users/users.js");
-/* harmony import */ var _services_users_users__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_services_users_users__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _services_users__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../services/users */ "./services/users.js");
+/* harmony import */ var _services_users__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_services_users__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
 
@@ -3749,7 +3746,7 @@ class Login {
   async loginUser(data) {
     const newUser = data;
     try {
-      const loginUSer = await (0,_services_users_users__WEBPACK_IMPORTED_MODULE_0__.loginInUser)(newUser);
+      const loginUSer = await (0,_services_users__WEBPACK_IMPORTED_MODULE_0__.loginInUser)(newUser);
       if (loginUSer) {
         this.storage.setLocalStorage("me", loginUSer, "session");
         window.location.href = "/rooms";
@@ -3829,8 +3826,8 @@ class Login {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _services_users_users__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../services/users/users */ "./services/users/users.js");
-/* harmony import */ var _services_users_users__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_services_users_users__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _services_users__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../services/users */ "./services/users.js");
+/* harmony import */ var _services_users__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_services_users__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 /* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! uuid */ "./node_modules/uuid/dist/esm-browser/v4.js");
 /* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/build/esm/index.js");
@@ -4031,13 +4028,12 @@ class Register {
 
   async saveUser(data) {
     const newUser = data;
-    try{
-      const createdUser = await (0,_services_users_users__WEBPACK_IMPORTED_MODULE_0__.createUser)(newUser);
-      if(createdUser){
+    try {
+      const createdUser = await (0,_services_users__WEBPACK_IMPORTED_MODULE_0__.createUser)(newUser);
+      if (createdUser) {
         this.showSuccesMessage();
       }
-
-    }catch(err){
+    } catch (err) {
       console.log("Error data", err.data);
       this.showErrorMessage(err.data.message);
     }
@@ -4142,6 +4138,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/js/constants.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Game */ "./src/js/Game.js");
+/* harmony import */ var _services_games__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../services/games */ "./services/games.js");
+/* harmony import */ var _services_games__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_services_games__WEBPACK_IMPORTED_MODULE_3__);
+
 
 
 
@@ -4229,6 +4228,8 @@ class Room {
   }
 
   updatePlayers(usersRoom) {
+    this.players = usersRoom;
+
     const roomBoxDiv = document.getElementById(this.id);
     roomBoxDiv.querySelector("#roomTotalPlayers").innerHTML = usersRoom.length;
 
@@ -4264,9 +4265,6 @@ class Room {
   disableRoom(id) {
     const roomDivElement = document.getElementById(id);
     roomDivElement.classList.add("isFull");
-
-    // quitamos mensaje conectados del panel de juego
-    document.getElementById("roomConnectedMessage").innerHTML = "";
   }
 
   // takeOutFromRoom(player) {
@@ -4285,13 +4283,14 @@ class Room {
         this.updatePlayers(data);
       }
     });
+
     this.socket.on("notifyPlayGame", (data, roomId, userId) => {
       if (this.id === roomId) {
         this.initGame(data);
       }
     });
+
     this.socket.on("disableRoom", (roomId) => {
-      console.log("room is full!");
       if (this.id === roomId) {
         this.disableRoom(roomId);
       }
@@ -4313,9 +4312,7 @@ class Room {
   }
 
   playGame() {
-    const user = this.storage.getLocalStorage("me", "session");
-    console.log("players: ", this.players);
-    // this.initGame(this.players, true);
+    this.initGame(this.players, true);
   }
 
   prepareGame() {
@@ -4329,11 +4326,9 @@ class Room {
     this.disableRoom(this.id);
   }
 
-  initGame(players, isCallWithEvent = false) {
-    this.prepareGame(players);
+  async initGame(players, isCallWithEvent = false) {
+    console.log("players: ", players);
     // Inicializamos juego
-    console.log(this.players);
-
     const gridSize = 4;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
     this.game = new _Game__WEBPACK_IMPORTED_MODULE_2__["default"](
@@ -4343,10 +4338,17 @@ class Room {
       this.socket,
       gridSize
     );
-    // if(isCallWithEvent){
-    //   this.socket.emit("playGame", { roomId: this.id, userId: currentPlayerInfo.id });
-    // }
-    // this.game.init(isCallWithEvent);
+
+    document.getElementById("roomConnectedMessage").innerHTML = "";
+    this.prepareGame(players);
+    this.game.init(isCallWithEvent);
+
+    if (isCallWithEvent) {
+      this.socket.emit("playGame", {
+        roomId: this.id,
+        userId: currentPlayerInfo.id,
+      });
+    }
   }
 }
 

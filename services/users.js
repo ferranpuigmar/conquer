@@ -1,4 +1,4 @@
-const { apiClient } = require("../../config/apiClient.js");
+const { apiClient } = require("../config/apiClient.js");
 
 const createUser = (data) => {
   return apiClient("/user/register", data).post();

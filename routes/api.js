@@ -7,6 +7,7 @@ const status = require("http-status");
 const { ErrorHandler } = require("../helpers/error");
 const Room = require("../models/room");
 const { MAX_BY_ROOM } = require("../contants/rooms");
+const Game = require("../models/Game");
 
 // USER
 router.post("/user", async (req, res) => {
@@ -28,8 +29,7 @@ router.post("/user", async (req, res) => {
 router.put("/user/:id/updateRanking", async (req, res, next) => {
   const id = req.params.id;
   const data = req.body;
-  console.log("id:", id);
-  console.log("data:", data);
+
   try {
     await User.findOneAndUpdate(id, {
       $set: {
@@ -147,7 +147,6 @@ router.post("/rooms/adduser", async (req, res, next) => {
 router.get("/rooms/:id", async (req, res, next) => {
   try {
     const currentRoom = await Room.findOne({ id: req.params.id });
-    console.log(currentRoom);
     if (currentRoom) {
       res.status(200).send(currentRoom);
     }
@@ -173,14 +172,13 @@ router.get("/ranking", async (req, res, next) => {
 });
 
 // GAME
-router.post("/games/add", async (req, res, next) => {
+router.post("/games/create", async (req, res, next) => {
   const data = req.body;
+  console.log(JSON.stringify(data, null, 4));
   try {
-    const newGame = data.newGameInfo;
+    const newGame = data.initNewGameToStorage;
     const roomId = data.roomId;
-    console.log(JSON.stringify(newGame, null, 4));
-    console.log(JSON.stringify(roomId, null, 4));
-    const game = new Game({ roomId: roomId, ...newGame });
+    const game = new Game({ roomId, ...newGame });
     await game.save();
     res.status(200).send({
       code: "ok",

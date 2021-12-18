@@ -1,16 +1,7 @@
-const {
-  putGame,
-  createGame,
-  delGame,
-} = require("../../services/users/games.js");
-const {
-  addUserToRoom,
-  getSingleRoom,
-  getRooms,
-} = require("../../services/users/rooms.js");
-const { createUSer, getUsers } = require("../../services/users/users.js");
+const { putGame, delGame } = require("../../services/games.js");
+const { addUserToRoom, getSingleRoom } = require("../../services/rooms.js");
+const { getUsers } = require("../../services/users.js");
 
-//{idRoom: id, isPlaying: true/false }
 let rooms = [];
 
 const loadSockets = (io) => {

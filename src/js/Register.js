@@ -1,4 +1,4 @@
-import { createUser } from "../../services/users/users";
+import { createUser } from "../../services/users";
 import LocalStorage from "./utils";
 import { v4 as uuidv4 } from "uuid";
 import { io } from "socket.io-client";
@@ -195,13 +195,12 @@ class Register {
 
   async saveUser(data) {
     const newUser = data;
-    try{
+    try {
       const createdUser = await createUser(newUser);
-      if(createdUser){
+      if (createdUser) {
         this.showSuccesMessage();
       }
-
-    }catch(err){
+    } catch (err) {
       console.log("Error data", err.data);
       this.showErrorMessage(err.data.message);
     }

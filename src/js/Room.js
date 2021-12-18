@@ -1,6 +1,7 @@
 import { EVENT_TYPES, MESSAGE_TYPES } from "./constants";
 import LocalStorage from "./utils";
 import Game from "./Game";
+import { createGame } from "../../services/games";
 class Room {
   capacity = 4;
   isOpen = true;
@@ -85,6 +86,8 @@ class Room {
   }
 
   updatePlayers(usersRoom) {
+    this.players = usersRoom;
+
     const roomBoxDiv = document.getElementById(this.id);
     roomBoxDiv.querySelector("#roomTotalPlayers").innerHTML = usersRoom.length;
 
@@ -120,9 +123,6 @@ class Room {
   disableRoom(id) {
     const roomDivElement = document.getElementById(id);
     roomDivElement.classList.add("isFull");
-
-    // quitamos mensaje conectados del panel de juego
-    document.getElementById("roomConnectedMessage").innerHTML = "";
   }
 
   // takeOutFromRoom(player) {
@@ -141,13 +141,14 @@ class Room {
         this.updatePlayers(data);
       }
     });
+
     this.socket.on("notifyPlayGame", (data, roomId, userId) => {
       if (this.id === roomId) {
         this.initGame(data);
       }
     });
+
     this.socket.on("disableRoom", (roomId) => {
-      console.log("room is full!");
       if (this.id === roomId) {
         this.disableRoom(roomId);
       }
@@ -169,9 +170,7 @@ class Room {
   }
 
   playGame() {
-    const user = this.storage.getLocalStorage("me", "session");
-    console.log("players: ", this.players);
-    // this.initGame(this.players, true);
+    this.initGame(this.players, true);
   }
 
   prepareGame() {
@@ -185,11 +184,9 @@ class Room {
     this.disableRoom(this.id);
   }
 
-  initGame(players, isCallWithEvent = false) {
-    this.prepareGame(players);
+  async initGame(players, isCallWithEvent = false) {
+    console.log("players: ", players);
     // Inicializamos juego
-    console.log(this.players);
-
     const gridSize = 4;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
     this.game = new Game(
@@ -199,10 +196,17 @@ class Room {
       this.socket,
       gridSize
     );
-    // if(isCallWithEvent){
-    //   this.socket.emit("playGame", { roomId: this.id, userId: currentPlayerInfo.id });
-    // }
-    // this.game.init(isCallWithEvent);
+
+    document.getElementById("roomConnectedMessage").innerHTML = "";
+    this.prepareGame(players);
+    this.game.init(isCallWithEvent);
+
+    if (isCallWithEvent) {
+      this.socket.emit("playGame", {
+        roomId: this.id,
+        userId: currentPlayerInfo.id,
+      });
+    }
   }
 }
 
