@@ -6,16 +6,19 @@ class Game {
   colors = ["Purple", "Aquamarine", "CadetBlue", "DeepPink"];
   grid = [];
   defeatedPlayers = [];
-  wrapper = document.getElementById("grid");
   totalCellsToWin = 0;
   storage = new LocalStorage();
-  waittingDiv = document.querySelector("#roomMessage"); // Div del mensaje de espera
   roomsList;
-  roundTitle = document.getElementById("roundTitle"); // Número del Round
-  pannelInfo = document.getElementById("roomPannelInfo");
   canvas = document.getElementById("game");
   cells = [];
   eventCheckFillCellHandler = this.checkFillCell.bind(this);
+  wrapper = document.getElementById("grid");
+  waittingDiv = document.querySelector("#roomMessage"); // Div del mensaje de espera
+  roundTitle = document.getElementById("roundTitle"); // Número del Round
+  pannelInfo = document.getElementById("roomPannelInfo");
+  gameInfo = document.querySelector('.m-game__info');
+  cellsToWinInfo = document.getElementById("cellsToWinInfo");
+  conqueredCellsInfo = document.getElementById("conqueredCellsInfo");
 
   constructor(roomId, playerInfo, players, socket, gameSize) {
     this.player = playerInfo;
@@ -70,8 +73,8 @@ class Game {
         message = `Lo sentimos ${this.player.name}, te han dejado sin casillas. ¡Has perdido!`;
         break;
       case MESSAGE_TYPES.HAS_WON:
-          message = `Fin de la partida. El jugador ${this.players[0].name} ha ganado.`;
-          break;
+        message = `Fin de la partida. El jugador ${this.players[0].name} ha ganado.`;
+        break;
       default:
         return "";
     }
@@ -89,7 +92,6 @@ class Game {
   }
 
   checkTurn(game) {
-    console.log(this.players.length);
     if (this.players.length == 1) {
       this.showRoomMessage(MESSAGE_TYPES.HAS_WON);
       return;
@@ -103,7 +105,12 @@ class Game {
       this.hideRoomMessage();
     }
 
+    console.log("hola...");
+
     this.roundTitle.querySelector("span").innerHTML = game.round.roundNumber;
+    this.conqueredCellsInfo.innerHTML = this.players.find(
+      (player) => player.id === this.player.id
+    ).cellsConquered;
   }
 
   checkValidCellClick(cellObj, id) {
@@ -261,7 +268,6 @@ class Game {
   defeatPlayer(player) {
     this.defeatedPlayers.push(player);
     this.players = this.players.filter((oplayer) => oplayer.id !== player.id);
-    //console.log(`El jugador ${player.name} ha perdido!!!`);
   }
 
   // takeOutFromGame(player) {
@@ -364,8 +370,6 @@ class Game {
     }));
   }
 
-  // Método que calcula el total de celdas que tiene
-  // que rellenar un jugador para ganar
   calculateTotalCellsToWin(totalCells, players) {
     const numPlayers = players.length;
     let totalDefeatedCells = 0;
@@ -379,7 +383,6 @@ class Game {
       Math.floor((totalCells - totalDefeatedCells) / numPlayers) + 1;
   }
 
-  //Evento para notificar que alguien ha perdido
   notifySomeoneHasLost(newGameInfo) {
     const roomListUpdate = {
       roomEventId: this.roomId,
@@ -413,8 +416,8 @@ class Game {
     if (isCallWithEvent) {
       await createGame({ roomId: this.roomId, initNewGameToStorage });
     }
-
-    //this.updateGame(initNewGameToStorage);
+    this.gameInfo.classList.remove('d-none');
+    this.cellsToWinInfo.innerHTML = this.totalCellsToWin;
   }
 
   updateGame(newGameInfo) {

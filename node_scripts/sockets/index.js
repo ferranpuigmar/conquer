@@ -10,7 +10,6 @@ const loadSockets = (io) => {
       try {
         const room = await addUserToRoom({ roomId, newPlayer });
         socket.join(roomId);
-        console.log(room);
         io.to(roomId).emit("notifyNewUsertoRoom", room.data.usersRoom, roomId);
 
         if (!room.data.isOpen) {
