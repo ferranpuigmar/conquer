@@ -187,7 +187,7 @@ class Room {
   async initGame(players, isCallWithEvent = false) {
     console.log("players: ", players);
     // Inicializamos juego
-    const gridSize = 4;
+    const gridSize = 3;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
     this.game = new Game(
       this.id,

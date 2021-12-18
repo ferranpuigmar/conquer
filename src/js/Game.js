@@ -89,9 +89,8 @@ class Game {
   }
 
   checkTurn(game) {
-    console.log(this.players.length);
+
     if (this.players.length == 1) {
-      this.showRoomMessage(MESSAGE_TYPES.HAS_WON);
       return;
     } else {
       this.hideRoomMessage();
@@ -173,7 +172,7 @@ class Game {
     this.addConqueredCell(currentPlayerTurn.id, gridIndex);
     this.checkOtherPlayerLoss(currentPlayerTurn.id);
     this.round = this.calculateNewRoundInfo();
-
+    
     const updateGameToStorage = {
       defeatedPlayers: this.defeatedPlayers,
       grid: this.grid,
@@ -182,8 +181,13 @@ class Game {
       totalCellsToWin: this.totalCellsToWin,
     };
 
-    this.checkTurn(updateGameToStorage);
-    this.updateGame(updateGameToStorage);
+    if(this.players.length > 1){
+      this.checkTurn(updateGameToStorage);
+      this.updateGame(updateGameToStorage);
+    }else{
+      this.handleEndGame();
+      this.updateGame(updateGameToStorage);
+    }
   }
 
   fillCell(cell, color) {
@@ -263,16 +267,6 @@ class Game {
     this.players = this.players.filter((oplayer) => oplayer.id !== player.id);
     //console.log(`El jugador ${player.name} ha perdido!!!`);
   }
-
-  // takeOutFromGame(player) {
-  //   let is_in = this.players.find(
-  //     (current_player) => current_player.id === player.id
-  //   );
-  //   if (!!is_in) {
-  //     this.defeatPlayer(player);
-  //     this.calculateTotalCellsToWin(this.totalCells, this.players);
-  //   }
-  // }
 
   generateCanvas() {
     this.clearCanvas();
@@ -361,6 +355,10 @@ class Game {
       cellsConquered: 0,
       color: this.colors[index],
       hasLost: false,
+      rankingStatus: {
+        cellsConquered: player.rankingStatus.cellsConquered,
+        wins: player.rankingStatus.wins
+      }
     }));
   }
 
@@ -447,24 +445,25 @@ class Game {
     this.checkTurn(game);
   }
 
-  handleSomeoneHasLostEvent(roomsList) {
-    // // Si la sala no es la que tiene el evento no hacemos nada
-    // if (roomsList.roomEventId !== this.roomId) return;
+  handleEndGame(){
+    const playersForCount = this.players.concat(this.defeatedPlayers);
+    let totalPlayers = [];
+    
+    console.log(playersForCount);
+    
+    playersForCount.forEach((p) => {
+        if(p.id === this.players[0].id){
+            const reducer = playersForCount.reduce((a, b) => ({cellsConquered: a.cellsConquered + b.cellsConquered}));
+            p.rankingStatus.cellsConquered += (p.cellsConquered + (this.totalCells - reducer.cellsConquered));
+            p.rankingStatus.wins++;
+        }else{
+            p.rankingStatus.cellsConquered += p.cellsConquered;
+        }
+        //Llamada api pasandole p;
+        totalPlayers.push(p);
+    })
+  
 
-    // const currentRoom = roomsList.rooms.find(
-    //   (room) => roomsList.roomEventId === room.id
-    // );
-
-    // Sacamos las id que hay dentro de los array de jugadores que han perdido
-    const defeatedPlayersId = currentRoom.game.defeatedPlayers.map(
-      (defeatedPlayer) => defeatedPlayer.id
-    );
-
-    if (defeatedPlayersId.includes(this.player.id)) {
-      this.showRoomMessage(MESSAGE_TYPES.HAS_LOST);
-      this.player.hasLost = true;
-      this.createLegend(currentRoom.game.players);
-    }
   }
 }
 
