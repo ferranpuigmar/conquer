@@ -26,6 +26,19 @@ router.post("/user", async (req, res) => {
   }
 });
 
+router.get("/user/:id", async (req, res, next) => {
+  try {
+    const user = await User.findOne({id: req.params.id});
+    res.status(200).json({
+      code: "ok",
+      message: "Success",
+      data: user
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.put("/user/:id/updateRanking", async (req, res, next) => {
   const id = req.params.id;
   const data = req.body;

@@ -64,6 +64,11 @@ const loadSockets = (io) => {
         rooms_data.forEach((r) => rooms.push(r));
       }
     });
+
+    socket.on("updateUserSession", async ({roomId}) => {
+      console.log("Hola");
+      io.to(roomId).emit("notifyUserSession", {roomId});
+    });
   });
 };
 module.exports = {

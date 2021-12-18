@@ -13,6 +13,10 @@ const updateRanking = (data) => {
   return apiClient(`/user/${data.id}/updateRanking`,data).put();
 };
 
+const getSingleUser = (data) => {
+  return apiClient(`/user/${data.id}`).get();
+};
+
 const getUsers = () => {
   return apiClient("/users").get();
 };
@@ -22,6 +26,7 @@ const getUsers = () => {
 module.exports = {
   createUser,
   getUsers,
+  getSingleUser,
   loginInUser,
   updateRanking
 };

@@ -1,5 +1,5 @@
 import { MESSAGE_TYPES } from "./constants";
-const { updateRanking } = require("../../services/users.js");
+const { updateRanking, getSingleUser } = require("../../services/users.js");
 const { createGame } = require("../../services/games.js");
 import LocalStorage, { getNewGameInfo } from "./utils";
 
@@ -187,7 +187,7 @@ class Game {
       totalCellsToWin: this.totalCellsToWin,
     };
 
-    if(this.players.length > 1){
+    if(this.players.length > 1 && (this.getTotalCellConquered() !== this.totalCells)){
       this.checkTurn(updateGameToStorage);
       this.updateGame(updateGameToStorage);
     }else{
@@ -211,7 +211,16 @@ class Game {
     this.context.stroke();
   }
 
+  getTotalCellConquered(){
+    let playersForCount = this.players.concat(this.defeatedPlayers);
+    const reducer = playersForCount.reduce((a, b) => ({cellsConquered: a.cellsConquered + b.cellsConquered}))
+    return reducer.cellsConquered;
+  }
+
   checkOtherPlayerLoss(currentPlayerId) {
+
+    if(this.getTotalCellConquered() === this.totalCells) return;
+
     let otherPlayers = this.players.filter(
       (otherPlayer) => otherPlayer.id !== currentPlayerId
     );
@@ -354,7 +363,6 @@ class Game {
   }
 
   userToPlayerDTO(players) {
-    console.log(players);
     return players.map((player, index) => ({
       id: player.id,
       name: player.name,
@@ -436,6 +444,13 @@ class Game {
     this.socket.on("notifySomeoneLost", (data) => {
       !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);
     });
+    this.socket.on("notifyUserSession", ({roomId}) => {
+      console.log("notifyUserSession");
+      if (this.roomId === roomId) {
+        console.log("notifyUserSession 2");
+        this.updateLocalUser();
+      }
+    });
   }
 
   handleUpdateEventGame(game) {
@@ -450,19 +465,26 @@ class Game {
 
   async handleEndGame(){
     const playersForCount = this.players.concat(this.defeatedPlayers);
+    console.log('players',this.players);
+    console.log('defeted players',this.defeatedPlayers);
+    console.log(this.getTotalCellConquered());
+
     await Promise.all(playersForCount.map(async (p) => {
-        if(p.id === this.players[0].id){
-            const reducer = playersForCount.reduce((a, b) => ({cellsConquered: a.cellsConquered + b.cellsConquered}));
-            console.log(reducer);
-            p.rankingStatus.cellsConquered += (p.cellsConquered + (this.totalCells - reducer.cellsConquered));
+        if(this.players.length === 1 && p.id === this.players[0].id){
+            p.rankingStatus.cellsConquered += (p.cellsConquered + (this.totalCells - this.getTotalCellConquered()));
             p.rankingStatus.wins++;
         }else{
             p.rankingStatus.cellsConquered += p.cellsConquered;
         }
-        console.log('pLAYER',p);
         await updateRanking(p);
     }));
+    console.log("handleEndGame");
+    this.socket.emit('updateUserSession', {roomId: this.roomId});
+  }
 
+  async updateLocalUser(){
+    let actualPlayer = await getSingleUser({id: this.player.id});
+    this.storage.setLocalStorage("me",  actualPlayer.data, "session");
   }
 }
 
