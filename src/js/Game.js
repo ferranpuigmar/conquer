@@ -1,4 +1,5 @@
 import { MESSAGE_TYPES } from "./constants";
+const { updateRanking } = require("../../services/users.js");
 const { createGame } = require("../../services/games.js");
 import LocalStorage, { getNewGameInfo } from "./utils";
 
@@ -349,6 +350,7 @@ class Game {
   }
 
   userToPlayerDTO(players) {
+    console.log(players);
     return players.map((player, index) => ({
       id: player.id,
       name: player.name,
@@ -445,24 +447,20 @@ class Game {
     this.checkTurn(game);
   }
 
-  handleEndGame(){
+  async handleEndGame(){
     const playersForCount = this.players.concat(this.defeatedPlayers);
-    let totalPlayers = [];
-    
-    console.log(playersForCount);
-    
-    playersForCount.forEach((p) => {
+    await Promise.all(playersForCount.map(async (p) => {
         if(p.id === this.players[0].id){
             const reducer = playersForCount.reduce((a, b) => ({cellsConquered: a.cellsConquered + b.cellsConquered}));
+            console.log(reducer);
             p.rankingStatus.cellsConquered += (p.cellsConquered + (this.totalCells - reducer.cellsConquered));
             p.rankingStatus.wins++;
         }else{
             p.rankingStatus.cellsConquered += p.cellsConquered;
         }
-        //Llamada api pasandole p;
-        totalPlayers.push(p);
-    })
-  
+        console.log('pLAYER',p);
+        await updateRanking(p);
+    }));
 
   }
 }

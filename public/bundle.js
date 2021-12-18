@@ -2994,14 +2994,22 @@ const loginInUser = (data) => {
   return apiClient("/user/login", data).post();
 };
 
+const updateRanking = (data) => {
+  console.log(data);
+  return apiClient(`/user/${data.id}/updateRanking`,data).put();
+};
+
 const getUsers = () => {
   return apiClient("/users").get();
 };
+
+
 
 module.exports = {
   createUser,
   getUsers,
   loginInUser,
+  updateRanking
 };
 
 
@@ -3189,6 +3197,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/js/constants.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
+const { updateRanking } = __webpack_require__(/*! ../../services/users.js */ "./services/users.js");
 const { createGame } = __webpack_require__(/*! ../../services/games.js */ "./services/games.js");
 
 
@@ -3539,12 +3548,17 @@ class Game {
   }
 
   userToPlayerDTO(players) {
+    console.log(players);
     return players.map((player, index) => ({
       id: player.id,
       name: player.name,
       cellsConquered: 0,
       color: this.colors[index],
       hasLost: false,
+      rankingStatus: {
+        cellsConquered: player.rankingStatus.cellsConquered,
+        wins: player.rankingStatus.wins
+      }
     }));
   }
 
@@ -3631,24 +3645,21 @@ class Game {
     this.checkTurn(game);
   }
 
-  handleEndGame(){
+  async handleEndGame(){
     const playersForCount = this.players.concat(this.defeatedPlayers);
-    let totalPlayers = [];
-    
-    console.log(playersForCount);
-    
-    playersForCount.forEach((p) => {
+    await Promise.all(playersForCount.map(async (p) => {
         if(p.id === this.players[0].id){
             const reducer = playersForCount.reduce((a, b) => ({cellsConquered: a.cellsConquered + b.cellsConquered}));
+            console.log(reducer);
             p.rankingStatus.cellsConquered += (p.cellsConquered + (this.totalCells - reducer.cellsConquered));
-            p.rankingStatus.win += 1;
+            p.rankingStatus.wins++;
         }else{
             p.rankingStatus.cellsConquered += p.cellsConquered;
         }
-        totalPlayers.push(p);
-    })
-  
-    console.log(totalPlayers);
+        console.log('pLAYER',p);
+        await updateRanking(p);
+    }));
+
   }
 }
 
@@ -4216,7 +4227,8 @@ class Room {
   }
 
   onDropPlayer(e) {
-    const dragUSer = this.storage.getLocalStorage("me", "session");
+    const dragUser = this.storage.getLocalStorage("me", "session");
+    console.log(dragUser);
     const avatarMobile = document.getElementById(
       e.dataTransfer.getData("userAvatar")
     );
@@ -4236,16 +4248,17 @@ class Room {
       return;
     }
 
-    this.addToRoom(dragUSer);
+    this.addToRoom(dragUser);
   }
 
   addToRoom(user) {
     const draggedPlayer = {
       name: user.name,
       avatar: user.avatar,
+      rankingStatus: user.rankingStatus,
       id: user.id,
     };
-
+    console.log(draggedPlayer);
     this.socket.emit("addUserToRoom", {
       roomId: this.id,
       newPlayer: draggedPlayer,
@@ -4361,7 +4374,7 @@ class Room {
   async initGame(players, isCallWithEvent = false) {
     console.log("players: ", players);
     // Inicializamos juego
-    const gridSize = 3;
+    const gridSize = 2;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
     this.game = new _Game__WEBPACK_IMPORTED_MODULE_2__["default"](
       this.id,

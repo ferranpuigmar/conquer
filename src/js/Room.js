@@ -42,7 +42,8 @@ class Room {
   }
 
   onDropPlayer(e) {
-    const dragUSer = this.storage.getLocalStorage("me", "session");
+    const dragUser = this.storage.getLocalStorage("me", "session");
+    console.log(dragUser);
     const avatarMobile = document.getElementById(
       e.dataTransfer.getData("userAvatar")
     );
@@ -62,16 +63,17 @@ class Room {
       return;
     }
 
-    this.addToRoom(dragUSer);
+    this.addToRoom(dragUser);
   }
 
   addToRoom(user) {
     const draggedPlayer = {
       name: user.name,
       avatar: user.avatar,
+      rankingStatus: user.rankingStatus,
       id: user.id,
     };
-
+    console.log(draggedPlayer);
     this.socket.emit("addUserToRoom", {
       roomId: this.id,
       newPlayer: draggedPlayer,
@@ -187,7 +189,7 @@ class Room {
   async initGame(players, isCallWithEvent = false) {
     console.log("players: ", players);
     // Inicializamos juego
-    const gridSize = 3;
+    const gridSize = 2;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
     this.game = new Game(
       this.id,

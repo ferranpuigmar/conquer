@@ -29,15 +29,13 @@ router.post("/user", async (req, res) => {
 router.put("/user/:id/updateRanking", async (req, res, next) => {
   const id = req.params.id;
   const data = req.body;
+  console.log(data.id, id);
 
   try {
-    await User.findOneAndUpdate(id, {
+    await User.findOneAndUpdate({id: req.params.id}, {
       $set: {
-        rankingStatus: {
-          cellsConquered: data.rankingStatus.cellsConquered,
-          wins: data.rankingStatus.wins,
+        rankingStatus: data.rankingStatus,
         },
-      },
     });
     res.status(200).json({
       code: "ok",
@@ -46,6 +44,23 @@ router.put("/user/:id/updateRanking", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+
+  // try {
+  //   await User.findOneAndUpdate(id, {
+  //     $set: {
+  //       rankingStatus: {
+  //         cellsConquered: data.rankingStatus.cellsConquered,
+  //         wins: data.rankingStatus.wins,
+  //       },
+  //     },
+  //   });
+  //   res.status(200).json({
+  //     code: "ok",
+  //     message: "Success",
+  //   });
+  // } catch (error) {
+  //   next(error);
+  // }
 });
 
 router.get("/users", async (req, res) => {
@@ -121,6 +136,8 @@ router.post("/rooms/adduser", async (req, res, next) => {
     let currentUsers = currentRoom.usersRoom.length;
     const find = { id: data.roomId };
     const update = { $push: { usersRoom: newPlayer } };
+
+
 
     if (!isFullRoom) {
       await Room.findOneAndUpdate(find, update);
