@@ -7,6 +7,7 @@
           <section class="my-3 m-game m-game--preparing-game">
             <header id="gameTopPannel" class="d-none">
               <h3 class="m-game__title"><strong></strong></h3>
+              <div class="m-game__info d-none">Has conquistado: <span id="conqueredCellsInfo">0</span> / <span id="cellsToWinInfo">0</span></div>
               <div id="roundTitle" class="m-game__round-title d-none">Round <span></span></div>
             </header>
             <div id="roomMessage" class="m-game-message p-2 d-none">
@@ -47,10 +48,7 @@
                       <div class="m-room-drop-item__header">
                         <h3 class="m-room-drop-item__name">ROOM 1</h3>
                       </div>
-                      <div class="m-room-drop-item__image">
-                        <div class="image drop-item" id="itemDrop">
-                        </div>
-                      </div>
+                      <div class="m-room-drop-item__image"></div>
                       <div class="m-room-drop-item__total">
                         <p><span id="roomTotalPlayers" class="total">0</span>J</p>
                       </div>

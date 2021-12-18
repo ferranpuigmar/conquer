@@ -94,6 +94,17 @@
 
     .a-avatar {
       opacity: 1;
+      margin: 0 -38px;
+
+      &.fit-avatar-list {
+        margin: 0 -43px;
+      }
+
+      @include media-breakpoint-up(md) {
+        &.fit-avatar-list {
+          margin: 0 -36px;
+        }
+      }
     }
   }
 
@@ -151,9 +162,10 @@
       display: flex;
 
       li {
+        margin-left: 10px;
         span {
           display: inline-block;
-          margin-right: 16px;
+          margin-left: 6px;
           &:first-letter {
             text-transform: uppercase;
           }
@@ -161,7 +173,8 @@
         span:first-child {
           width: 10px;
           height: 10px;
-          margin-right: 8px;
+          border-radius: 50%;
+          margin-left: 0;
         }
       }
     }

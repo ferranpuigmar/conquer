@@ -54,12 +54,6 @@ class Room {
     if (this.players.length === this.capacity) {
       this.isOpen = false;
       this.disableRoom(this.id);
-      //console.log("sala llena!");
-      return;
-    }
-
-    if (this.players.length > this.capacity || !this.isOpen) {
-      //   console.log("La sala no acepta más jugadores");
       return;
     }
 
@@ -102,6 +96,10 @@ class Room {
     if (usersRoom.length > 1) {
       this.renderPlayBtn();
     }
+    const bubbles = usersRoom.map((user) => {
+      return this.generateBubble(user, usersRoom.length);
+    });
+    this.roomBox.innerHTML = bubbles.join("");
   }
 
   showRoomMessage(type, user) {
@@ -187,7 +185,6 @@ class Room {
   }
 
   async initGame(players, isCallWithEvent = false) {
-    console.log("players: ", players);
     // Inicializamos juego
     const gridSize = 2;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
@@ -209,6 +206,11 @@ class Room {
         userId: currentPlayerInfo.id,
       });
     }
+  }
+
+  generateBubble(user, usersLength) {
+    let marginClass = usersLength > 3 ? "fit-avatar-list" : "";
+    return `<div class="a-avatar drag-item ${user.avatar} ${marginClass}" data-id="${user.id}" data-color="${user.avatar}" data-avatar="${user.avatar}"><i class="fas fa-user"></i></div>`;
   }
 }
 
