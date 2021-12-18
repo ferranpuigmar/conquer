@@ -48,6 +48,9 @@
   padding: 10px 3px;
   display: flex;
   flex-flow: column;
+  border-radius: 5px;
+  position: relative;
+  min-height: 112px;
 
   &__header {
     position: relative;
@@ -63,8 +66,9 @@
 
   &__total {
     position: absolute;
-    right: 0px;
-    top: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    top: -10px;
     background-color: white;
     height: 20px;
     padding: 0px 5px;
@@ -91,6 +95,11 @@
     .a-avatar {
       opacity: 1;
     }
+  }
+
+  &.isFull {
+    pointer-events: none;
+    opacity: 0.5;
   }
 }
 

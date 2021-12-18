@@ -116,33 +116,28 @@ router.post("/rooms/adduser", async (req, res, next) => {
   try {
     const newPlayer = data.newPlayer;
     const currentRoom = await Room.findOne({ id: data.roomId });
+    let users = currentRoom.usersRoom;
     const isFullRoom = currentRoom.usersRoom.length === MAX_BY_ROOM;
-    let currentUSers = currentRoom.usersRoom.length;
+    let currentUsers = currentRoom.usersRoom.length;
+    const find = { id: data.roomId };
+    const update = { $push: { usersRoom: newPlayer } };
 
     if (!isFullRoom) {
-      const find = { id: data.roomId };
-      const update = { $push: { usersRoom: newPlayer } };
-      await Room.updateOne(find, update);
-      currentUSers++;
+      await Room.findOneAndUpdate(find, update);
+      currentUsers++;
+      users.push(newPlayer);
 
-      res.status(200).json({
+      res.status(200).send({
         code: "ok",
         message: "Success",
         data: {
-          isOpen: currentUSers === MAX_BY_ROOM ? true : false,
+          usersRoom: users,
+          isOpen: currentUsers === MAX_BY_ROOM ? false : true,
         },
       });
-
-      // Escoger si hacemos el emit aquí en caso que el último jugador haya llenado la sala,
-      // o sea hace en sockets dentro de "addUserToRoom", donde captura la respuesta del res
-    }
-
-    if (currentRoom.usersRoom.length === MAX_BY_ROOM) {
-      await Room.updateOne(find, { isOpen: false });
-      throw new ErrorHandler(
-        status.CONFLICT,
-        "La habitación no està disponible"
-      );
+    } else {
+      await Room.findOneAndUpdate(find, { isOpen: false });
+      throw new ErrorHandler(status.CONFLICT, "Room is closed");
     }
   } catch (error) {
     next(error);

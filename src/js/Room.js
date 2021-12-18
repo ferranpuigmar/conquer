@@ -86,8 +86,7 @@ class Room {
 
   updatePlayers(usersRoom) {
     const roomBoxDiv = document.getElementById(this.id);
-    roomBoxDiv.querySelector(".m-room-drop-item__total span").innerHTML =
-      usersRoom.length;
+    roomBoxDiv.querySelector("#roomTotalPlayers").innerHTML = usersRoom.length;
 
     const listConnectedUSers = document.querySelector(
       "#roomConnectedMessage ul"
@@ -145,6 +144,12 @@ class Room {
     this.socket.on("notifyPlayGame", (data, roomId, userId) => {
       if (this.id === roomId) {
         this.initGame(data);
+      }
+    });
+    this.socket.on("disableRoom", (roomId) => {
+      console.log("room is full!");
+      if (this.id === roomId) {
+        this.disableRoom(roomId);
       }
     });
   }

@@ -1,4 +1,4 @@
-MAX_BY_ROOM = 1;
+MAX_BY_ROOM = 2;
 module.exports = {
   MAX_BY_ROOM,
 };
