@@ -30,7 +30,7 @@ const GameSchema = new Schema({
     },
   ],
   players: [playerSchema],
-  defeatedPlaters: [
+  defeatedPlayers: [
     {
       id: String,
       name: String,

@@ -174,7 +174,6 @@ router.get("/ranking", async (req, res, next) => {
 // GAME
 router.post("/games/create", async (req, res, next) => {
   const data = req.body;
-  console.log(JSON.stringify(data, null, 4));
   try {
     const newGame = data.initNewGameToStorage;
     const roomId = data.roomId;
@@ -189,27 +188,25 @@ router.post("/games/create", async (req, res, next) => {
   }
 });
 
-router.put("/games/:id", async (req, res, next) => {
+router.put("/games/:id/updateGame", async (req, res, next) => {
   const data = req.body;
-  try {
-    const roomId = data.roomId;
 
-    Game.findByIdAndUpdate(
-      roomId,
-      {
-        $set: { ...data.newGameInfo },
-      },
-      (err, updatedGame) => {
-        if (err) {
-          throw new ErrorHandler(
-            status.CONFLICT,
-            "Error al actualizar el tablero"
-          );
-        } else {
-          res.status(200).send(updatedGame);
-        }
+  try {
+    await Game.findOneAndUpdate({roomId: req.params.id},
+    {
+      $set: {
+        defeatedPlayers: data.defeatedPlayers,
+        grid: data.grid,
+        players: data.players,
+        round: data.round,
+        totalCellsToWin: data.totalCellsToWin,
       }
-    );
+    });
+
+    res.status(200).json({
+      code: "ok",
+      message: "Success",
+    });
   } catch (error) {
     next(error);
   }

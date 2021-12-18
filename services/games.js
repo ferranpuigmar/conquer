@@ -5,7 +5,7 @@ const createGame = (data) => {
 };
 
 const putGame = (data) => {
-  return apiClient(`/games/${data.roomId}`, data).put();
+  return apiClient(`/games/${data.roomId}/updateGame`, data.newGameInfo).put();
 };
 
 const delGame = (data) => {
