@@ -56,23 +56,6 @@ router.put("/user/:id/updateRanking", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-
-  // try {
-  //   await User.findOneAndUpdate(id, {
-  //     $set: {
-  //       rankingStatus: {
-  //         cellsConquered: data.rankingStatus.cellsConquered,
-  //         wins: data.rankingStatus.wins,
-  //       },
-  //     },
-  //   });
-  //   res.status(200).json({
-  //     code: "ok",
-  //     message: "Success",
-  //   });
-  // } catch (error) {
-  //   next(error);
-  // }
 });
 
 router.get("/users", async (req, res) => {
