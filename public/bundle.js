@@ -3203,7 +3203,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
 const { updateRanking, getSingleUser } = __webpack_require__(/*! ../../services/users.js */ "./services/users.js");
-const { createGame } = __webpack_require__(/*! ../../services/games.js */ "./services/games.js");
+const { createGame, delGame } = __webpack_require__(/*! ../../services/games.js */ "./services/games.js");
 
 
 class Game {
@@ -3416,6 +3416,7 @@ class Game {
       await this.handleEndGame();
       this.updateGame(updateGameToStorage);
       this.checkTurn(updateGameToStorage);
+      delGame(this.roomId);
     }
   }
 

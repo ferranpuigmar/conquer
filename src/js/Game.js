@@ -1,6 +1,6 @@
 import { MESSAGE_TYPES } from "./constants";
 const { updateRanking, getSingleUser } = require("../../services/users.js");
-const { createGame } = require("../../services/games.js");
+const { createGame, delGame } = require("../../services/games.js");
 import LocalStorage, { getNewGameInfo } from "./utils";
 
 class Game {
@@ -213,6 +213,7 @@ class Game {
       await this.handleEndGame();
       this.updateGame(updateGameToStorage);
       this.checkTurn(updateGameToStorage);
+      delGame(this.roomId);
     }
   }
 
