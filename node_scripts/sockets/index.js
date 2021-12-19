@@ -8,14 +8,18 @@ const loadSockets = (io) => {
   io.on("connection", (socket) => {
     socket.on("addUserToRoom", async ({ roomId, newPlayer }) => {
       try {
-        const room = await addUserToRoom({ roomId, newPlayer });
-        socket.join(roomId);
-        io.to(roomId).emit("notifyNewUsertoRoom", room.data.usersRoom, roomId);
-
-        if (!room.data.isOpen) {
-          io.to(roomId).emit("disableRoom", roomId);
+        let room = await getSingleRoom({roomId});
+        let usersRoom = room.data.usersRoom;
+        const existUserInRoom = usersRoom?.find(user => user.id === newPlayer.id);
+        if(!existUserInRoom){
+          const updateRoom = await addUserToRoom({ roomId, newPlayer });
+          room = updateRoom;
+          socket.join(roomId);
         }
+        io.emit("notifyNewUsertoRoom", room.data.usersRoom, roomId);
+        !room.data.isOpen && io.emit("disableRoom", roomId);
       } catch (error) {
+        console.log('error: ', error)
         console.error(error);
       }
     });
@@ -26,7 +30,7 @@ const loadSockets = (io) => {
         if (currentRoom) {
           io.to(roomId).emit(
             "notifyPlayGame",
-            currentRoom.usersRoom,
+            currentRoom.data.usersRoom,
             roomId,
             userId
           );

@@ -28,11 +28,11 @@ router.post("/user", async (req, res) => {
 
 router.get("/user/:id", async (req, res, next) => {
   try {
-    const user = await User.findOne({id: req.params.id});
+    const user = await User.findOne({ id: req.params.id });
     res.status(200).json({
       code: "ok",
       message: "Success",
-      data: user
+      data: user,
     });
   } catch (error) {
     next(error);
@@ -45,11 +45,14 @@ router.put("/user/:id/updateRanking", async (req, res, next) => {
   console.log(data.id, id);
 
   try {
-    await User.findOneAndUpdate({id: req.params.id}, {
-      $set: {
-        rankingStatus: data.rankingStatus,
+    await User.findOneAndUpdate(
+      { id: req.params.id },
+      {
+        $set: {
+          rankingStatus: data.rankingStatus,
         },
-    });
+      }
+    );
     res.status(200).json({
       code: "ok",
       message: "Success",
@@ -139,7 +142,7 @@ router.get("/rooms", async (req, res, next) => {
   }
 });
 
-router.post("/rooms/adduser", async (req, res, next) => {
+router.post("/rooms/addUser", async (req, res, next) => {
   const data = req.body;
   try {
     const newPlayer = data.newPlayer;
@@ -149,8 +152,6 @@ router.post("/rooms/adduser", async (req, res, next) => {
     let currentUsers = currentRoom.usersRoom.length;
     const find = { id: data.roomId };
     const update = { $push: { usersRoom: newPlayer } };
-
-
 
     if (!isFullRoom) {
       await Room.findOneAndUpdate(find, update);
@@ -174,11 +175,41 @@ router.post("/rooms/adduser", async (req, res, next) => {
   }
 });
 
+router.delete("/rooms/deleteUser", async (req, res, next) => {
+  const { roomId, playerId } = req.body;
+  console.log("roomId: ", roomId);
+  console.log("playerId: ", playerId);
+
+  try {
+    const find = { id: roomId };
+
+    const currentRoom = await Room.find(find);
+    let players = currentRoom.usersRoom;
+    const deletedPlayer = players.find((player) => player.id === playerId);
+    let newPlayers = players.filter((player) => player.id !== playerId);
+
+    const update = { $set: { usersRoom: newPlayers } };
+    await Room.findOneAndUpdate(find, update);
+
+    res.status(200).send({
+      code: "ok",
+      message: `El jugador ${deletedPlayer.name} ha salido de la sala`,
+      data: deletedPlayer,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get("/rooms/:id", async (req, res, next) => {
   try {
     const currentRoom = await Room.findOne({ id: req.params.id });
     if (currentRoom) {
-      res.status(200).send(currentRoom);
+      res.status(200).send({
+        code: "ok",
+        message: "Success",
+        data: currentRoom,
+      });
     }
   } catch (error) {
     next(error);
@@ -222,16 +253,18 @@ router.put("/games/:id/updateGame", async (req, res, next) => {
   const data = req.body;
 
   try {
-    await Game.findOneAndUpdate({roomId: req.params.id},
-    {
-      $set: {
-        defeatedPlayers: data.defeatedPlayers,
-        grid: data.grid,
-        players: data.players,
-        round: data.round,
-        totalCellsToWin: data.totalCellsToWin,
+    await Game.findOneAndUpdate(
+      { roomId: req.params.id },
+      {
+        $set: {
+          defeatedPlayers: data.defeatedPlayers,
+          grid: data.grid,
+          players: data.players,
+          round: data.round,
+          totalCellsToWin: data.totalCellsToWin,
+        },
       }
-    });
+    );
 
     res.status(200).json({
       code: "ok",

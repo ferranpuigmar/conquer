@@ -1,7 +1,7 @@
-import { EVENT_TYPES, MESSAGE_TYPES } from "./constants";
+import { MESSAGE_TYPES } from "./constants";
 import LocalStorage from "./utils";
 import Game from "./Game";
-import { createGame } from "../../services/games";
+import { delUserFromRoom } from "../../services/rooms";
 class Room {
   capacity = 4;
   isOpen = true;
@@ -43,7 +43,6 @@ class Room {
 
   onDropPlayer(e) {
     const dragUser = this.storage.getLocalStorage("me", "session");
-    console.log(dragUser);
     const avatarMobile = document.getElementById(
       e.dataTransfer.getData("userAvatar")
     );
@@ -67,7 +66,7 @@ class Room {
       rankingStatus: user.rankingStatus,
       id: user.id,
     };
-    console.log(draggedPlayer);
+
     this.socket.emit("addUserToRoom", {
       roomId: this.id,
       newPlayer: draggedPlayer,
@@ -82,24 +81,24 @@ class Room {
   }
 
   updatePlayers(usersRoom) {
-    this.players = usersRoom;
-
-    const roomBoxDiv = document.getElementById(this.id);
-    roomBoxDiv.querySelector("#roomTotalPlayers").innerHTML = usersRoom.length;
-
-    const listConnectedUSers = document.querySelector(
-      "#roomConnectedMessage ul"
-    );
-    const connectedUsers = usersRoom.map((user) => `<li>${user.name}</li>`);
-    listConnectedUSers.innerHTML = connectedUsers.join("");
-
-    if (usersRoom.length > 1) {
-      this.renderPlayBtn();
-    }
+    let me = this.storage.getLocalStorage("me", "session");
+    const existUserInRoom = usersRoom.find((user) => user.id === me.id);
     const bubbles = usersRoom.map((user) => {
       return this.generateBubble(user, usersRoom.length);
     });
     this.roomBox.innerHTML = bubbles.join("");
+    const roomBoxDiv = document.getElementById(this.id);
+    roomBoxDiv.querySelector("#roomTotalPlayers").innerHTML = usersRoom.length;
+
+    if (existUserInRoom) {
+      this.players = usersRoom;
+      const listConnectedUSers = document.querySelector(
+        "#roomConnectedMessage ul"
+      );
+      const connectedUsers = usersRoom.map((user) => `<li>${user.name}</li>`);
+      listConnectedUSers.innerHTML = connectedUsers.join("");
+      usersRoom.length > 1 && this.renderPlayBtn();
+    }
   }
 
   showRoomMessage(type, user) {
@@ -125,18 +124,21 @@ class Room {
     roomDivElement.classList.add("isFull");
   }
 
-  // takeOutFromRoom(player) {
-  //   let is_in = this.players.find(
-  //     (room_player) => room_player.id === player.id
-  //   );
-  //   if (!!is_in) {
-  //     this.game.takeOutFromGame(player);
-  //     //this.players = this.players.filter((room_player)=> room_player.id !== player.id);
-  //   }
-  // }
+  async logOut(player) {
+    // borramos de rooms de la BD
+    try {
+      await delUserFromRoom({ roomId: this.id, playerId: player.id });
+    } catch (error) {
+      console.log(error);
+    }
+    // Si hay un juego en curso
+    if (this.game !== "") {
+    }
+  }
 
   initSocketEvents() {
     this.socket.on("notifyNewUsertoRoom", (data, roomId) => {
+      console.log("hola event!");
       if (this.id === roomId) {
         this.updatePlayers(data);
       }

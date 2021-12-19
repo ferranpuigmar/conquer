@@ -111,10 +111,18 @@ class Dashboard {
 
   generateLogout() {
     const logoutBtn = document.getElementById("logout");
-    const player = this.localStorage.getLocalStorage("me", "session");
+    const user = this.localStorage.getLocalStorage("me", "session");
 
-    logoutBtn.addEventListener("click", function () {
-      this.rooms.takeOutFromRoom(player);
+    logoutBtn.addEventListener("click", () => {
+      this.roomsList.forEach((room) => {
+        const currentRoomPlayers = room.players;
+        const userInAnyRoom = currentRoomPlayers.find(
+          (player) => player.id === user.id
+        );
+        if (userInAnyRoom) {
+          room.logOut(userInAnyRoom);
+        }
+      });
       this.localStorage.setLocalStorage("me", null, "session");
       this.redirectToLogin();
     });

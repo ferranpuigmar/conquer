@@ -5,7 +5,11 @@ const getRooms = () => {
 };
 
 const addUserToRoom = (data) => {
-  return apiClient("/rooms/adduser", data).post();
+  return apiClient("/rooms/addUser", data).post();
+};
+
+const delUserFromRoom = (data) => {
+  return apiClient("/rooms/deleteUser", data).del();
 };
 
 const getSingleRoom = (data) => {
@@ -16,4 +20,5 @@ module.exports = {
   getRooms,
   addUserToRoom,
   getSingleRoom,
+  delUserFromRoom,
 };
