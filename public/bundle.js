@@ -2995,7 +2995,7 @@ const addUserToRoom = (data) => {
 };
 
 const clearRoom = (data) => {
-  return apiClient(`/rooms/${data.roomId}/clearRoom`,).del();
+  return apiClient(`/rooms/${data.roomId}/clearRoom`).put();
 };
 
 const getSingleRoom = (data) => {

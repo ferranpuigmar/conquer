@@ -186,14 +186,13 @@ router.get("/rooms/:id", async (req, res, next) => {
 
 router.put("/rooms/:id/clearRoom", async (req, res, next) => {
   try {
-    const find = { id: req.params.id };
-    const update = { $set: { usersRoom: [] } };
+    const find = { roomId: req.params.id };
+    const update = { $set: { usersRoom: [] }};
     await Room.findOneAndUpdate(find, update);
 
     res.status(200).send({
       code: "ok",
-      message: `El jugador ${deletedPlayer.name} ha salido de la sala`,
-      data: deletedPlayer,
+      message: `La sala esta disponible`,
     });
   } catch (error) {
     next(error);
