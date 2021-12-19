@@ -3330,6 +3330,9 @@ class Game {
         message += `El jugador ${this.players[0].name} ha ganado.<br>`;
         message += this.getTableWinners();
         message += `<a href="/ranking" class="btn btn-primary btn-lg btn-rounded px-4" type="button">Ver ranking completo</a>`;
+        message += `<div class="mb-3 mt-3"><button type="button" class="btn btn-warning btn-rounded px-4" onClick="window.location.reload();">
+                      Salir del juego
+                    </button></div>`
         break;
       default:
         return "";
