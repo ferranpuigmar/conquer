@@ -2978,6 +2978,40 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./services/rooms.js":
+/*!***************************!*\
+  !*** ./services/rooms.js ***!
+  \***************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { apiClient } = __webpack_require__(/*! ../config/apiClient.js */ "./config/apiClient.js");
+
+const getRooms = () => {
+  return apiClient("/rooms").get();
+};
+
+const addUserToRoom = (data) => {
+  return apiClient("/rooms/adduser", data).post();
+};
+
+const putRoom = (data) => {
+  return apiClient(`/rooms/${data.roomId}/updateRoom`, data.players).put();
+};
+
+const getSingleRoom = (data) => {
+  return apiClient(`/rooms/${data.roomId}`).get();
+};
+
+module.exports = {
+  getRooms,
+  addUserToRoom,
+  putRoom,
+  getSingleRoom,
+};
+
+
+/***/ }),
+
 /***/ "./services/users.js":
 /*!***************************!*\
   !*** ./services/users.js ***!
@@ -3204,6 +3238,9 @@ __webpack_require__.r(__webpack_exports__);
 
 const { updateRanking, getSingleUser } = __webpack_require__(/*! ../../services/users.js */ "./services/users.js");
 const { createGame, delGame } = __webpack_require__(/*! ../../services/games.js */ "./services/games.js");
+const { putRoom } = __webpack_require__(/*! ../../services/rooms.js */ "./services/rooms.js");
+
+
 
 
 class Game {
@@ -3416,7 +3453,8 @@ class Game {
       await this.handleEndGame();
       this.updateGame(updateGameToStorage);
       this.checkTurn(updateGameToStorage);
-      delGame(this.roomId);
+      await delGame({roomId: this.roomId});
+      await putRoom({roomId: this.roomId, usersRoom: []});
     }
   }
 

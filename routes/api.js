@@ -42,7 +42,6 @@ router.get("/user/:id", async (req, res, next) => {
 router.put("/user/:id/updateRanking", async (req, res, next) => {
   const id = req.params.id;
   const data = req.body;
-  console.log(data.id, id);
 
   try {
     await User.findOneAndUpdate({id: req.params.id}, {
@@ -185,6 +184,25 @@ router.get("/rooms/:id", async (req, res, next) => {
   }
 });
 
+router.put("/rooms/:id/updateRoom", async (req, res, next) => {
+  const data = req.body;
+  try {
+    await Game.findOneAndUpdate({roomId: req.params.id},
+    {$set: {
+        usersRoom: data,
+      },
+    });
+
+    res.status(200).json({
+      code: "ok",
+      message: "Success",
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+
 // RANKING
 router.get("/ranking", async (req, res, next) => {
   try {
@@ -245,8 +263,11 @@ router.put("/games/:id/updateGame", async (req, res, next) => {
 router.delete("/games/:id", async (req, res, next) => {
   const data = req.body;
   try {
-    const _id = data.roomId;
-    Game.find({ id: _id }).remove().exec();
+    await Game.deleteMany({ roomId: req.params.id });
+    res.status(200).json({
+      code: "ok",
+      message: "Success",
+    });
   } catch (error) {
     next(error);
   }

@@ -66,7 +66,6 @@ const loadSockets = (io) => {
     });
 
     socket.on("updateUserSession", async ({roomId}) => {
-      console.log("Hola");
       io.to(roomId).emit("notifyUserSession", {roomId});
     });
   });
