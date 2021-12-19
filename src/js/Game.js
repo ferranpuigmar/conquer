@@ -63,6 +63,18 @@ class Game {
     };
   }
 
+  getTableWinners(){
+    let playersForCount = this.players.concat(this.defeatedPlayers);
+    let orderedPlayers = playersForCount.sort((a, b) => a.cellsConquered < b.cellsConquered && 1 || -1);
+    let table = `<table>`;
+        table += `<tr><th>Jugador</th><th>Total</th></tr>`;
+        orderedPlayers.forEach((oplayer)=>{
+          table += `<tr><td>${oplayer.name}</td><td>${oplayer.cellsConquered}</td></tr>`;
+        });
+        table += `</table>`;
+    return table;
+  }
+
   showRoomMessage(type) {
     let message;
     const messageDiv = document.querySelector("#roomMessage");
@@ -74,7 +86,10 @@ class Game {
         message = `Lo sentimos ${this.player.name}, te han dejado sin casillas. ¡Has perdido!`;
         break;
       case MESSAGE_TYPES.HAS_WON:
-        message = `Fin de la partida. El jugador ${this.players[0].name} ha ganado.`;
+        message = `Fin de la partida. <br>`;
+        message += `El jugador ${this.players[0].name} ha ganado.<br>`;
+        message += this.getTableWinners();
+        message += `<a href="/ranking" class="btn btn-primary btn-lg btn-rounded px-4" type="button">Ver ranking completo</a>`;
         break;
       default:
         return "";
@@ -87,13 +102,17 @@ class Game {
     messageDiv.innerHTML = messageContentDiv;
   }
 
+
+
   hideRoomMessage() {
     this.waittingDiv.classList.add("d-none");
     this.waittingDiv.innerHTML = "";
   }
 
   checkTurn(game) {
-    if (this.players.length == 1) {
+    if (this.players.length == 1 || this.getTotalCellConquered() === this.totalCells) {
+      this.showRoomMessage(MESSAGE_TYPES.HAS_WON);
+      this.removeGame();
       return;
     } else {
       this.hideRoomMessage();
@@ -138,7 +157,7 @@ class Game {
     return validClick.some((el) => el.validCell);
   }
 
-  checkFillCell(e) {
+  async checkFillCell(e) {
     if (!this.isMyTurn(this.round)) return;
 
     const currentPlayerTurn = this.round.player;
@@ -191,8 +210,9 @@ class Game {
       this.checkTurn(updateGameToStorage);
       this.updateGame(updateGameToStorage);
     }else{
-      this.handleEndGame();
+      await this.handleEndGame();
       this.updateGame(updateGameToStorage);
+      this.checkTurn(updateGameToStorage);
     }
   }
 
@@ -251,8 +271,6 @@ class Game {
         this.players = this.players.filter(
           (oplayer) => oplayer.id !== player.id
         );
-        const newGameToStorage = getNewGameInfo(this);
-        this.notifySomeoneHasLost(newGameToStorage);
       });
 
       this.calculateTotalCellsToWin(this.totalCells, this.players);
@@ -411,6 +429,8 @@ class Game {
       this.showRoomMessage(MESSAGE_TYPES.WAITTING_TURN);
     }
 
+    console.log(this.players);
+
     const initNewGameToStorage = {
       grid: this.grid,
       players: this.players,
@@ -445,9 +465,7 @@ class Game {
       !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);
     });
     this.socket.on("notifyUserSession", ({roomId}) => {
-      console.log("notifyUserSession");
       if (this.roomId === roomId) {
-        console.log("notifyUserSession 2");
         this.updateLocalUser();
       }
     });
@@ -465,26 +483,30 @@ class Game {
 
   async handleEndGame(){
     const playersForCount = this.players.concat(this.defeatedPlayers);
-    console.log('players',this.players);
-    console.log('defeted players',this.defeatedPlayers);
     console.log(this.getTotalCellConquered());
 
     await Promise.all(playersForCount.map(async (p) => {
         if(this.players.length === 1 && p.id === this.players[0].id){
-            p.rankingStatus.cellsConquered += (p.cellsConquered + (this.totalCells - this.getTotalCellConquered()));
+            p.cellsConquered += (this.totalCells - this.getTotalCellConquered());
+            p.rankingStatus.cellsConquered += p.cellsConquered;
             p.rankingStatus.wins++;
         }else{
             p.rankingStatus.cellsConquered += p.cellsConquered;
         }
         await updateRanking(p);
     }));
-    console.log("handleEndGame");
-    this.socket.emit('updateUserSession', {roomId: this.roomId});
+
+    await this.socket.emit('updateUserSession', {roomId: this.roomId});
   }
 
   async updateLocalUser(){
     let actualPlayer = await getSingleUser({id: this.player.id});
     this.storage.setLocalStorage("me",  actualPlayer.data, "session");
+  }
+
+  removeGame(){
+    document.getElementById("gameTopPannel").classList.add("d-none");
+    document.getElementById("waittingTurn").classList.add("d-none");
   }
 }
 

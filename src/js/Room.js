@@ -43,7 +43,6 @@ class Room {
 
   onDropPlayer(e) {
     const dragUser = this.storage.getLocalStorage("me", "session");
-    console.log(dragUser);
     const avatarMobile = document.getElementById(
       e.dataTransfer.getData("userAvatar")
     );
@@ -67,7 +66,6 @@ class Room {
       rankingStatus: user.rankingStatus,
       id: user.id,
     };
-    console.log(draggedPlayer);
     this.socket.emit("addUserToRoom", {
       roomId: this.id,
       newPlayer: draggedPlayer,
@@ -80,6 +78,8 @@ class Room {
       ".m-game__title strong"
     ).innerHTML = `${this.name}`;
   }
+
+
 
   updatePlayers(usersRoom) {
     this.players = usersRoom;
@@ -186,7 +186,7 @@ class Room {
 
   async initGame(players, isCallWithEvent = false) {
     // Inicializamos juego
-    const gridSize = 2;
+    const gridSize = 3;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
     this.game = new Game(
       this.id,
