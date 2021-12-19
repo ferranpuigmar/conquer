@@ -195,6 +195,9 @@ router.put("/rooms/:id/clearRoom", async (req, res, next) => {
       message: `El jugador ${deletedPlayer.name} ha salido de la sala`,
       data: deletedPlayer,
     });
+  } catch (error) {
+    next(error);
+  }
 });
 
 

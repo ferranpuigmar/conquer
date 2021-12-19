@@ -2994,8 +2994,8 @@ const addUserToRoom = (data) => {
   return apiClient("/rooms/adduser", data).post();
 };
 
-const putRoom = (data) => {
-  return apiClient(`/rooms/${data.roomId}/updateRoom`, data.players).put();
+const clearRoom = (data) => {
+  return apiClient(`/rooms/${data.roomId}/clearRoom`,).del();
 };
 
 const getSingleRoom = (data) => {
@@ -3005,7 +3005,7 @@ const getSingleRoom = (data) => {
 module.exports = {
   getRooms,
   addUserToRoom,
-  putRoom,
+  clearRoom,
   getSingleRoom,
 };
 
@@ -3238,7 +3238,7 @@ __webpack_require__.r(__webpack_exports__);
 
 const { updateRanking, getSingleUser } = __webpack_require__(/*! ../../services/users.js */ "./services/users.js");
 const { createGame, delGame } = __webpack_require__(/*! ../../services/games.js */ "./services/games.js");
-const { putRoom } = __webpack_require__(/*! ../../services/rooms.js */ "./services/rooms.js");
+const { clearRoom } = __webpack_require__(/*! ../../services/rooms.js */ "./services/rooms.js");
 
 
 
@@ -3454,7 +3454,7 @@ class Game {
       this.updateGame(updateGameToStorage);
       this.checkTurn(updateGameToStorage);
       await delGame({roomId: this.roomId});
-      await putRoom({roomId: this.roomId, usersRoom: []});
+      await clearRoom({roomId: this.roomId});
     }
   }
 
