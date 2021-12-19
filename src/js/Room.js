@@ -10,8 +10,9 @@ class Room {
   game = "";
   storage = new LocalStorage();
   playButtonDiv = document.getElementById("playButton");
+  gameTopPannelDiv = document.getElementById("gameTopPannel");
   roomBox;
-  currentAvatar;
+  currentAvatar = null;
 
   constructor(id, name, capacity, socket) {
     this.id = id;
@@ -43,12 +44,13 @@ class Room {
 
   onDropPlayer(e) {
     const dragUser = this.storage.getLocalStorage("me", "session");
-    const avatarMobile = document.getElementById(
-      e.dataTransfer.getData("userAvatar")
-    );
-    this.currentAvatar = avatarMobile;
-    this.roomBox.innerHTML = this.currentAvatar.outerHTML;
-    avatarMobile.parentNode.removeChild(avatarMobile);
+    const avatarMobile = document.getElementById("avatarMobile");
+    if (this.currentAvatar === null) {
+      this.currentAvatar = avatarMobile;
+    }
+    document
+      .getElementById("avatarMobile")
+      .parentNode.removeChild(avatarMobile);
 
     if (this.players.length === this.capacity) {
       this.isOpen = false;
@@ -72,24 +74,17 @@ class Room {
       newPlayer: draggedPlayer,
     });
 
-    const gameTopPannelDiv = document.getElementById("gameTopPannel");
-    gameTopPannelDiv.classList.remove("d-none");
-    setTimeout(() => gameTopPannelDiv.classList.add("has-players"), 1000);
-    gameTopPannelDiv.querySelector(
+    this.gameTopPannelDiv.classList.remove("d-none");
+    setTimeout(() => this.gameTopPannelDiv.classList.add("has-players"), 1000);
+    this.gameTopPannelDiv.querySelector(
       ".m-game__title strong"
     ).innerHTML = `${this.name}`;
   }
 
   updatePlayers(usersRoom) {
     let me = this.storage.getLocalStorage("me", "session");
+    this.updateRoomBox(usersRoom);
     const existUserInRoom = usersRoom.find((user) => user.id === me.id);
-    const bubbles = usersRoom.map((user) => {
-      return this.generateBubble(user, usersRoom.length);
-    });
-    this.roomBox.innerHTML = bubbles.join("");
-    const roomBoxDiv = document.getElementById(this.id);
-    roomBoxDiv.querySelector("#roomTotalPlayers").innerHTML = usersRoom.length;
-
     if (existUserInRoom) {
       this.players = usersRoom;
       const listConnectedUSers = document.querySelector(
@@ -99,6 +94,39 @@ class Room {
       listConnectedUSers.innerHTML = connectedUsers.join("");
       usersRoom.length > 1 && this.renderPlayBtn();
     }
+  }
+
+  updateWhenLeftRoom(usersRoom, exitUserId) {
+    this.updateRoomBox(usersRoom);
+    const me = this.storage.getLocalStorage("me", "session");
+    if (usersRoom.length > 1) {
+      this.renderPlayBtn();
+    } else {
+      this.playButtonDiv.innerHTML = "";
+      this.gameTopPannelDiv.classList.add("d-none");
+    }
+    if (exitUserId === me.id) {
+      const avatarUserBox = document.querySelector(
+        ".m-user-item__image .image"
+      );
+      avatarUserBox.innerHTML = this.currentAvatar.outerHTML;
+    }
+  }
+
+  updateRoomBox(userList) {
+    const bubbles = userList.map((user) => {
+      return this.generateBubble(user, userList.length);
+    });
+    this.roomBox.innerHTML = bubbles.join("");
+    const roomBoxDiv = document.getElementById(this.id);
+    roomBoxDiv.querySelector("#roomTotalPlayers").innerHTML = userList.length;
+
+    this.players = userList;
+    const listConnectedUSers = document.querySelector(
+      "#roomConnectedMessage ul"
+    );
+    const connectedUsers = userList.map((user) => `<li>${user.name}</li>`);
+    listConnectedUSers.innerHTML = connectedUsers.join("");
   }
 
   showRoomMessage(type, user) {
@@ -125,22 +153,36 @@ class Room {
   }
 
   async logOut(player) {
-    // borramos de rooms de la BD
     try {
-      await delUserFromRoom({ roomId: this.id, playerId: player.id });
+      const newPlayerList = await delUserFromRoom({
+        playerId: player.id,
+      });
+      //   // Si hay un juego en  curso
+      if (this.game !== "") {
+      } else {
+        this.socket.emit("userLeftRoom", {
+          roomId: this.id,
+          usersRoom: newPlayerList.data,
+          exitUser: player.id,
+        });
+      }
+      this.storage.setLocalStorage("me", null, "session");
+      window.location.href = "/";
     } catch (error) {
       console.log(error);
-    }
-    // Si hay un juego en curso
-    if (this.game !== "") {
     }
   }
 
   initSocketEvents() {
-    this.socket.on("notifyNewUsertoRoom", (data, roomId) => {
-      console.log("hola event!");
+    this.socket.on("notifyUpdateUsertoRoom", (data, roomId) => {
       if (this.id === roomId) {
         this.updatePlayers(data);
+      }
+    });
+
+    this.socket.on("notifyLeftUsertoRoom", (data, roomId, exitUser) => {
+      if (this.id === roomId) {
+        this.updateWhenLeftRoom(data, exitUser);
       }
     });
 
@@ -157,15 +199,6 @@ class Room {
     });
   }
 
-  // handleEventPlayGame(roomsList) {
-  //   // Si la sala no es la que tiene el evento no hacemos nada
-  //   if (roomsList.roomEventId !== this.id) return;
-  //   const currentRoom = roomsList.rooms.find(
-  //     (room) => room.id === roomsList.roomEventId
-  //   );
-  //   this.initGame(currentRoom.usersRoom, true);
-  // }
-
   renderPlayBtn() {
     this.playButtonDiv.innerHTML = `<button class="btn btn-primary btn-lg btn-rounded px-4" type="button">Empezar a jugar!</button>`;
     this.playButtonDiv.addEventListener("click", this.playGame.bind(this));
@@ -176,18 +209,12 @@ class Room {
   }
 
   prepareGame() {
-    // Quitamos botón de play
     this.playButtonDiv.innerHTML = "";
-
-    // seteamos la room a close
     this.isOpen = false;
-
-    // deshabilitamos sala
     this.disableRoom(this.id);
   }
 
   async initGame(players, isCallWithEvent = false) {
-    // Inicializamos juego
     const gridSize = 2;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
     this.game = new Game(
@@ -212,7 +239,7 @@ class Room {
 
   generateBubble(user, usersLength) {
     let marginClass = usersLength > 3 ? "fit-avatar-list" : "";
-    return `<div class="a-avatar drag-item ${user.avatar} ${marginClass}" data-id="${user.id}" data-color="${user.avatar}" data-avatar="${user.avatar}"><i class="fas fa-user"></i></div>`;
+    return `<div class="a-avatar drag-item ${user.avatar} ${marginClass}" id="" draggable="true" data-id="${user.id}" data-color="${user.avatar}" data-avatar="${user.avatar}"><i class="fas fa-user"></i></div>`;
   }
 }
 

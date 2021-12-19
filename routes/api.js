@@ -8,6 +8,7 @@ const { ErrorHandler } = require("../helpers/error");
 const Room = require("../models/room");
 const { MAX_BY_ROOM } = require("../contants/rooms");
 const Game = require("../models/Game");
+const { getRooms } = require("../services/rooms");
 
 // USER
 router.post("/user", async (req, res) => {
@@ -42,7 +43,6 @@ router.get("/user/:id", async (req, res, next) => {
 router.put("/user/:id/updateRanking", async (req, res, next) => {
   const id = req.params.id;
   const data = req.body;
-  console.log(data.id, id);
 
   try {
     await User.findOneAndUpdate(
@@ -175,26 +175,27 @@ router.post("/rooms/addUser", async (req, res, next) => {
   }
 });
 
-router.delete("/rooms/deleteUser", async (req, res, next) => {
-  const { roomId, playerId } = req.body;
-  console.log("roomId: ", roomId);
-  console.log("playerId: ", playerId);
-
+router.delete("/rooms/deleteUser/:playerId", async (req, res, next) => {
+  const playerId = req.params.playerId;
   try {
-    const find = { id: roomId };
-
-    const currentRoom = await Room.find(find);
-    let players = currentRoom.usersRoom;
+    let rooms = await getRooms();
+    const room = rooms.find((room) => {
+      const existPlayer = room.usersRoom.find((user) => user.id === playerId);
+      if (existPlayer) {
+        return room;
+      }
+    });
+    const find = { id: room.id };
+    const players = room.usersRoom;
     const deletedPlayer = players.find((player) => player.id === playerId);
-    let newPlayers = players.filter((player) => player.id !== playerId);
-
+    const newPlayers = players.filter((player) => player.id !== playerId);
     const update = { $set: { usersRoom: newPlayers } };
     await Room.findOneAndUpdate(find, update);
 
     res.status(200).send({
       code: "ok",
       message: `El jugador ${deletedPlayer.name} ha salido de la sala`,
-      data: deletedPlayer,
+      data: newPlayers,
     });
   } catch (error) {
     next(error);

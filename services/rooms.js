@@ -9,7 +9,7 @@ const addUserToRoom = (data) => {
 };
 
 const delUserFromRoom = (data) => {
-  return apiClient("/rooms/deleteUser", data).del();
+  return apiClient(`/rooms/deleteUser/${data.playerId}`).del();
 };
 
 const getSingleRoom = (data) => {

@@ -103,9 +103,6 @@ class Dashboard {
       } else {
         avatarDiv.classList.remove("hidden");
       }
-    } else {
-      // Aquí va la redicción si el usuario no esta conectado;
-      //console.log("usuario no conectado");
     }
   }
 
@@ -113,18 +110,25 @@ class Dashboard {
     const logoutBtn = document.getElementById("logout");
     const user = this.localStorage.getLocalStorage("me", "session");
 
-    logoutBtn.addEventListener("click", () => {
+    logoutBtn.addEventListener("click", async () => {
+      let targetRoom = null;
+      let exitUser = null;
       this.roomsList.forEach((room) => {
         const currentRoomPlayers = room.players;
-        const userInAnyRoom = currentRoomPlayers.find(
+        const userInRoom = currentRoomPlayers.find(
           (player) => player.id === user.id
         );
-        if (userInAnyRoom) {
-          room.logOut(userInAnyRoom);
+        if (userInRoom) {
+          targetRoom = room;
+          exitUser = userInRoom;
         }
       });
-      this.localStorage.setLocalStorage("me", null, "session");
-      this.redirectToLogin();
+      if (targetRoom) {
+        await targetRoom.logOut(exitUser);
+      } else {
+        this.localStorage.setLocalStorage("me", null, "session");
+        this.redirectToLogin();
+      }
     });
   }
 

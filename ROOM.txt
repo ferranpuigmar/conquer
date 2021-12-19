@@ -3,7 +3,7 @@ ROOM
 
 Emmits to Server    => Emmits to Users
 ================       ===================
-addUsertoRoom       => notifyNewUsertoRoom
+addUsertoRoom       => notifyUpdateUsertoRoom
 removeUserFromRoom  => notifyUserGoOuttoRoom
 playGame            => notifyPlayGame
 

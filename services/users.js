@@ -9,8 +9,7 @@ const loginInUser = (data) => {
 };
 
 const updateRanking = (data) => {
-  console.log(data);
-  return apiClient(`/user/${data.id}/updateRanking`,data).put();
+  return apiClient(`/user/${data.id}/updateRanking`, data).put();
 };
 
 const getSingleUser = (data) => {
@@ -21,12 +20,10 @@ const getUsers = () => {
   return apiClient("/users").get();
 };
 
-
-
 module.exports = {
   createUser,
   getUsers,
   getSingleUser,
   loginInUser,
-  updateRanking
+  updateRanking,
 };

@@ -17,7 +17,7 @@ class Game {
   waittingDiv = document.querySelector("#roomMessage"); // Div del mensaje de espera
   roundTitle = document.getElementById("roundTitle"); // Número del Round
   pannelInfo = document.getElementById("roomPannelInfo");
-  gameInfo = document.querySelector('.m-game__info');
+  gameInfo = document.querySelector(".m-game__info");
   cellsToWinInfo = document.getElementById("cellsToWinInfo");
   conqueredCellsInfo = document.getElementById("conqueredCellsInfo");
 
@@ -178,7 +178,7 @@ class Game {
     this.addConqueredCell(currentPlayerTurn.id, gridIndex);
     this.checkOtherPlayerLoss(currentPlayerTurn.id);
     this.round = this.calculateNewRoundInfo();
-    
+
     const updateGameToStorage = {
       defeatedPlayers: this.defeatedPlayers,
       grid: this.grid,
@@ -187,10 +187,13 @@ class Game {
       totalCellsToWin: this.totalCellsToWin,
     };
 
-    if(this.players.length > 1 && (this.getTotalCellConquered() !== this.totalCells)){
+    if (
+      this.players.length > 1 &&
+      this.getTotalCellConquered() !== this.totalCells
+    ) {
       this.checkTurn(updateGameToStorage);
       this.updateGame(updateGameToStorage);
-    }else{
+    } else {
       this.handleEndGame();
       this.updateGame(updateGameToStorage);
     }
@@ -211,15 +214,16 @@ class Game {
     this.context.stroke();
   }
 
-  getTotalCellConquered(){
+  getTotalCellConquered() {
     let playersForCount = this.players.concat(this.defeatedPlayers);
-    const reducer = playersForCount.reduce((a, b) => ({cellsConquered: a.cellsConquered + b.cellsConquered}))
+    const reducer = playersForCount.reduce((a, b) => ({
+      cellsConquered: a.cellsConquered + b.cellsConquered,
+    }));
     return reducer.cellsConquered;
   }
 
   checkOtherPlayerLoss(currentPlayerId) {
-
-    if(this.getTotalCellConquered() === this.totalCells) return;
+    if (this.getTotalCellConquered() === this.totalCells) return;
 
     let otherPlayers = this.players.filter(
       (otherPlayer) => otherPlayer.id !== currentPlayerId
@@ -371,8 +375,8 @@ class Game {
       hasLost: false,
       rankingStatus: {
         cellsConquered: player.rankingStatus.cellsConquered,
-        wins: player.rankingStatus.wins
-      }
+        wins: player.rankingStatus.wins,
+      },
     }));
   }
 
@@ -422,7 +426,7 @@ class Game {
     if (isCallWithEvent) {
       await createGame({ roomId: this.roomId, initNewGameToStorage });
     }
-    this.gameInfo.classList.remove('d-none');
+    this.gameInfo.classList.remove("d-none");
     this.cellsToWinInfo.innerHTML = this.totalCellsToWin;
   }
 
@@ -444,10 +448,8 @@ class Game {
     this.socket.on("notifySomeoneLost", (data) => {
       !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);
     });
-    this.socket.on("notifyUserSession", ({roomId}) => {
-      console.log("notifyUserSession");
+    this.socket.on("notifyUserSession", ({ roomId }) => {
       if (this.roomId === roomId) {
-        console.log("notifyUserSession 2");
         this.updateLocalUser();
       }
     });
@@ -463,28 +465,26 @@ class Game {
     this.checkTurn(game);
   }
 
-  async handleEndGame(){
+  async handleEndGame() {
     const playersForCount = this.players.concat(this.defeatedPlayers);
-    console.log('players',this.players);
-    console.log('defeted players',this.defeatedPlayers);
-    console.log(this.getTotalCellConquered());
-
-    await Promise.all(playersForCount.map(async (p) => {
-        if(this.players.length === 1 && p.id === this.players[0].id){
-            p.rankingStatus.cellsConquered += (p.cellsConquered + (this.totalCells - this.getTotalCellConquered()));
-            p.rankingStatus.wins++;
-        }else{
-            p.rankingStatus.cellsConquered += p.cellsConquered;
+    await Promise.all(
+      playersForCount.map(async (p) => {
+        if (this.players.length === 1 && p.id === this.players[0].id) {
+          p.rankingStatus.cellsConquered +=
+            p.cellsConquered + (this.totalCells - this.getTotalCellConquered());
+          p.rankingStatus.wins++;
+        } else {
+          p.rankingStatus.cellsConquered += p.cellsConquered;
         }
         await updateRanking(p);
-    }));
-    console.log("handleEndGame");
-    this.socket.emit('updateUserSession', {roomId: this.roomId});
+      })
+    );
+    this.socket.emit("updateUserSession", { roomId: this.roomId });
   }
 
-  async updateLocalUser(){
-    let actualPlayer = await getSingleUser({id: this.player.id});
-    this.storage.setLocalStorage("me",  actualPlayer.data, "session");
+  async updateLocalUser() {
+    let actualPlayer = await getSingleUser({ id: this.player.id });
+    this.storage.setLocalStorage("me", actualPlayer.data, "session");
   }
 }
 

@@ -8,18 +8,20 @@ const loadSockets = (io) => {
   io.on("connection", (socket) => {
     socket.on("addUserToRoom", async ({ roomId, newPlayer }) => {
       try {
-        let room = await getSingleRoom({roomId});
+        let room = await getSingleRoom({ roomId });
         let usersRoom = room.data.usersRoom;
-        const existUserInRoom = usersRoom?.find(user => user.id === newPlayer.id);
-        if(!existUserInRoom){
+        const existUserInRoom = usersRoom?.find(
+          (user) => user.id === newPlayer.id
+        );
+        if (!existUserInRoom) {
           const updateRoom = await addUserToRoom({ roomId, newPlayer });
           room = updateRoom;
           socket.join(roomId);
         }
-        io.emit("notifyNewUsertoRoom", room.data.usersRoom, roomId);
+        io.emit("notifyUpdateUsertoRoom", room.data.usersRoom, roomId);
         !room.data.isOpen && io.emit("disableRoom", roomId);
       } catch (error) {
-        console.log('error: ', error)
+        console.log("error: ", error);
         console.error(error);
       }
     });
@@ -58,6 +60,10 @@ const loadSockets = (io) => {
       }
     });
 
+    socket.on("userLeftRoom", ({ roomId, usersRoom, exitUser }) => {
+      io.emit("notifyLeftUsertoRoom", usersRoom, roomId, exitUser);
+    });
+
     socket.on("load_db_users", async () => {
       const usersDB = await getUsers();
       io.to(socket.id).emit("get_db_users", usersDB);
@@ -69,9 +75,8 @@ const loadSockets = (io) => {
       }
     });
 
-    socket.on("updateUserSession", async ({roomId}) => {
-      console.log("Hola");
-      io.to(roomId).emit("notifyUserSession", {roomId});
+    socket.on("updateUserSession", async ({ roomId }) => {
+      io.to(roomId).emit("notifyUserSession", { roomId });
     });
   });
 };

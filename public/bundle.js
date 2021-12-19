@@ -54,15 +54,15 @@ const apiClient = (url, data, requestHeader) => {
   };
 
   const del = async () => {
-    const res = await client.delete(url, {headers});
+    const res = await client.delete(url, { headers });
     return res.data;
-  }
+  };
 
   return {
     get,
     post,
     put,
-    del
+    del,
   };
 };
 
@@ -2983,7 +2983,7 @@ const addUserToRoom = (data) => {
 };
 
 const delUserFromRoom = (data) => {
-  return apiClient("/rooms/deleteUser", data).del();
+  return apiClient(`/rooms/deleteUser/${data.playerId}`).del();
 };
 
 const getSingleRoom = (data) => {
@@ -3017,8 +3017,7 @@ const loginInUser = (data) => {
 };
 
 const updateRanking = (data) => {
-  console.log(data);
-  return apiClient(`/user/${data.id}/updateRanking`,data).put();
+  return apiClient(`/user/${data.id}/updateRanking`, data).put();
 };
 
 const getSingleUser = (data) => {
@@ -3029,14 +3028,12 @@ const getUsers = () => {
   return apiClient("/users").get();
 };
 
-
-
 module.exports = {
   createUser,
   getUsers,
   getSingleUser,
   loginInUser,
-  updateRanking
+  updateRanking,
 };
 
 
@@ -3158,9 +3155,6 @@ class Dashboard {
       } else {
         avatarDiv.classList.remove("hidden");
       }
-    } else {
-      // Aquí va la redicción si el usuario no esta conectado;
-      //console.log("usuario no conectado");
     }
   }
 
@@ -3168,18 +3162,25 @@ class Dashboard {
     const logoutBtn = document.getElementById("logout");
     const user = this.localStorage.getLocalStorage("me", "session");
 
-    logoutBtn.addEventListener("click", () => {
+    logoutBtn.addEventListener("click", async () => {
+      let targetRoom = null;
+      let exitUser = null;
       this.roomsList.forEach((room) => {
         const currentRoomPlayers = room.players;
-        const userInAnyRoom = currentRoomPlayers.find(
+        const userInRoom = currentRoomPlayers.find(
           (player) => player.id === user.id
         );
-        if (userInAnyRoom) {
-          room.logOut(userInAnyRoom);
+        if (userInRoom) {
+          targetRoom = room;
+          exitUser = userInRoom;
         }
       });
-      this.localStorage.setLocalStorage("me", null, "session");
-      this.redirectToLogin();
+      if (targetRoom) {
+        await targetRoom.logOut(exitUser);
+      } else {
+        this.localStorage.setLocalStorage("me", null, "session");
+        this.redirectToLogin();
+      }
     });
   }
 
@@ -3244,7 +3245,7 @@ class Game {
   waittingDiv = document.querySelector("#roomMessage"); // Div del mensaje de espera
   roundTitle = document.getElementById("roundTitle"); // Número del Round
   pannelInfo = document.getElementById("roomPannelInfo");
-  gameInfo = document.querySelector('.m-game__info');
+  gameInfo = document.querySelector(".m-game__info");
   cellsToWinInfo = document.getElementById("cellsToWinInfo");
   conqueredCellsInfo = document.getElementById("conqueredCellsInfo");
 
@@ -3405,7 +3406,7 @@ class Game {
     this.addConqueredCell(currentPlayerTurn.id, gridIndex);
     this.checkOtherPlayerLoss(currentPlayerTurn.id);
     this.round = this.calculateNewRoundInfo();
-    
+
     const updateGameToStorage = {
       defeatedPlayers: this.defeatedPlayers,
       grid: this.grid,
@@ -3414,10 +3415,13 @@ class Game {
       totalCellsToWin: this.totalCellsToWin,
     };
 
-    if(this.players.length > 1 && (this.getTotalCellConquered() !== this.totalCells)){
+    if (
+      this.players.length > 1 &&
+      this.getTotalCellConquered() !== this.totalCells
+    ) {
       this.checkTurn(updateGameToStorage);
       this.updateGame(updateGameToStorage);
-    }else{
+    } else {
       this.handleEndGame();
       this.updateGame(updateGameToStorage);
     }
@@ -3438,15 +3442,16 @@ class Game {
     this.context.stroke();
   }
 
-  getTotalCellConquered(){
+  getTotalCellConquered() {
     let playersForCount = this.players.concat(this.defeatedPlayers);
-    const reducer = playersForCount.reduce((a, b) => ({cellsConquered: a.cellsConquered + b.cellsConquered}))
+    const reducer = playersForCount.reduce((a, b) => ({
+      cellsConquered: a.cellsConquered + b.cellsConquered,
+    }));
     return reducer.cellsConquered;
   }
 
   checkOtherPlayerLoss(currentPlayerId) {
-
-    if(this.getTotalCellConquered() === this.totalCells) return;
+    if (this.getTotalCellConquered() === this.totalCells) return;
 
     let otherPlayers = this.players.filter(
       (otherPlayer) => otherPlayer.id !== currentPlayerId
@@ -3598,8 +3603,8 @@ class Game {
       hasLost: false,
       rankingStatus: {
         cellsConquered: player.rankingStatus.cellsConquered,
-        wins: player.rankingStatus.wins
-      }
+        wins: player.rankingStatus.wins,
+      },
     }));
   }
 
@@ -3649,7 +3654,7 @@ class Game {
     if (isCallWithEvent) {
       await createGame({ roomId: this.roomId, initNewGameToStorage });
     }
-    this.gameInfo.classList.remove('d-none');
+    this.gameInfo.classList.remove("d-none");
     this.cellsToWinInfo.innerHTML = this.totalCellsToWin;
   }
 
@@ -3671,10 +3676,8 @@ class Game {
     this.socket.on("notifySomeoneLost", (data) => {
       !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);
     });
-    this.socket.on("notifyUserSession", ({roomId}) => {
-      console.log("notifyUserSession");
+    this.socket.on("notifyUserSession", ({ roomId }) => {
       if (this.roomId === roomId) {
-        console.log("notifyUserSession 2");
         this.updateLocalUser();
       }
     });
@@ -3690,28 +3693,26 @@ class Game {
     this.checkTurn(game);
   }
 
-  async handleEndGame(){
+  async handleEndGame() {
     const playersForCount = this.players.concat(this.defeatedPlayers);
-    console.log('players',this.players);
-    console.log('defeted players',this.defeatedPlayers);
-    console.log(this.getTotalCellConquered());
-
-    await Promise.all(playersForCount.map(async (p) => {
-        if(this.players.length === 1 && p.id === this.players[0].id){
-            p.rankingStatus.cellsConquered += (p.cellsConquered + (this.totalCells - this.getTotalCellConquered()));
-            p.rankingStatus.wins++;
-        }else{
-            p.rankingStatus.cellsConquered += p.cellsConquered;
+    await Promise.all(
+      playersForCount.map(async (p) => {
+        if (this.players.length === 1 && p.id === this.players[0].id) {
+          p.rankingStatus.cellsConquered +=
+            p.cellsConquered + (this.totalCells - this.getTotalCellConquered());
+          p.rankingStatus.wins++;
+        } else {
+          p.rankingStatus.cellsConquered += p.cellsConquered;
         }
         await updateRanking(p);
-    }));
-    console.log("handleEndGame");
-    this.socket.emit('updateUserSession', {roomId: this.roomId});
+      })
+    );
+    this.socket.emit("updateUserSession", { roomId: this.roomId });
   }
 
-  async updateLocalUser(){
-    let actualPlayer = await getSingleUser({id: this.player.id});
-    this.storage.setLocalStorage("me",  actualPlayer.data, "session");
+  async updateLocalUser() {
+    let actualPlayer = await getSingleUser({ id: this.player.id });
+    this.storage.setLocalStorage("me", actualPlayer.data, "session");
   }
 }
 
@@ -4120,7 +4121,6 @@ class Register {
         this.showSuccesMessage();
       }
     } catch (err) {
-      console.log("Error data", err.data);
       this.showErrorMessage(err.data.message);
     }
   }
@@ -4238,8 +4238,9 @@ class Room {
   game = "";
   storage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
   playButtonDiv = document.getElementById("playButton");
+  gameTopPannelDiv = document.getElementById("gameTopPannel");
   roomBox;
-  currentAvatar;
+  currentAvatar = null;
 
   constructor(id, name, capacity, socket) {
     this.id = id;
@@ -4271,12 +4272,13 @@ class Room {
 
   onDropPlayer(e) {
     const dragUser = this.storage.getLocalStorage("me", "session");
-    const avatarMobile = document.getElementById(
-      e.dataTransfer.getData("userAvatar")
-    );
-    this.currentAvatar = avatarMobile;
-    this.roomBox.innerHTML = this.currentAvatar.outerHTML;
-    avatarMobile.parentNode.removeChild(avatarMobile);
+    const avatarMobile = document.getElementById("avatarMobile");
+    if (this.currentAvatar === null) {
+      this.currentAvatar = avatarMobile;
+    }
+    document
+      .getElementById("avatarMobile")
+      .parentNode.removeChild(avatarMobile);
 
     if (this.players.length === this.capacity) {
       this.isOpen = false;
@@ -4300,24 +4302,17 @@ class Room {
       newPlayer: draggedPlayer,
     });
 
-    const gameTopPannelDiv = document.getElementById("gameTopPannel");
-    gameTopPannelDiv.classList.remove("d-none");
-    setTimeout(() => gameTopPannelDiv.classList.add("has-players"), 1000);
-    gameTopPannelDiv.querySelector(
+    this.gameTopPannelDiv.classList.remove("d-none");
+    setTimeout(() => this.gameTopPannelDiv.classList.add("has-players"), 1000);
+    this.gameTopPannelDiv.querySelector(
       ".m-game__title strong"
     ).innerHTML = `${this.name}`;
   }
 
   updatePlayers(usersRoom) {
     let me = this.storage.getLocalStorage("me", "session");
+    this.updateRoomBox(usersRoom);
     const existUserInRoom = usersRoom.find((user) => user.id === me.id);
-    const bubbles = usersRoom.map((user) => {
-      return this.generateBubble(user, usersRoom.length);
-    });
-    this.roomBox.innerHTML = bubbles.join("");
-    const roomBoxDiv = document.getElementById(this.id);
-    roomBoxDiv.querySelector("#roomTotalPlayers").innerHTML = usersRoom.length;
-
     if (existUserInRoom) {
       this.players = usersRoom;
       const listConnectedUSers = document.querySelector(
@@ -4327,6 +4322,39 @@ class Room {
       listConnectedUSers.innerHTML = connectedUsers.join("");
       usersRoom.length > 1 && this.renderPlayBtn();
     }
+  }
+
+  updateWhenLeftRoom(usersRoom, exitUserId) {
+    this.updateRoomBox(usersRoom);
+    const me = this.storage.getLocalStorage("me", "session");
+    if (usersRoom.length > 1) {
+      this.renderPlayBtn();
+    } else {
+      this.playButtonDiv.innerHTML = "";
+      this.gameTopPannelDiv.classList.add("d-none");
+    }
+    if (exitUserId === me.id) {
+      const avatarUserBox = document.querySelector(
+        ".m-user-item__image .image"
+      );
+      avatarUserBox.innerHTML = this.currentAvatar.outerHTML;
+    }
+  }
+
+  updateRoomBox(userList) {
+    const bubbles = userList.map((user) => {
+      return this.generateBubble(user, userList.length);
+    });
+    this.roomBox.innerHTML = bubbles.join("");
+    const roomBoxDiv = document.getElementById(this.id);
+    roomBoxDiv.querySelector("#roomTotalPlayers").innerHTML = userList.length;
+
+    this.players = userList;
+    const listConnectedUSers = document.querySelector(
+      "#roomConnectedMessage ul"
+    );
+    const connectedUsers = userList.map((user) => `<li>${user.name}</li>`);
+    listConnectedUSers.innerHTML = connectedUsers.join("");
   }
 
   showRoomMessage(type, user) {
@@ -4353,22 +4381,36 @@ class Room {
   }
 
   async logOut(player) {
-    // borramos de rooms de la BD
     try {
-      await (0,_services_rooms__WEBPACK_IMPORTED_MODULE_3__.delUserFromRoom)({ roomId: this.id, playerId: player.id });
+      const newPlayerList = await (0,_services_rooms__WEBPACK_IMPORTED_MODULE_3__.delUserFromRoom)({
+        playerId: player.id,
+      });
+      //   // Si hay un juego en  curso
+      if (this.game !== "") {
+      } else {
+        this.socket.emit("userLeftRoom", {
+          roomId: this.id,
+          usersRoom: newPlayerList.data,
+          exitUser: player.id,
+        });
+      }
+      this.storage.setLocalStorage("me", null, "session");
+      window.location.href = "/";
     } catch (error) {
       console.log(error);
-    }
-    // Si hay un juego en curso
-    if (this.game !== "") {
     }
   }
 
   initSocketEvents() {
-    this.socket.on("notifyNewUsertoRoom", (data, roomId) => {
-      console.log("hola event!");
+    this.socket.on("notifyUpdateUsertoRoom", (data, roomId) => {
       if (this.id === roomId) {
         this.updatePlayers(data);
+      }
+    });
+
+    this.socket.on("notifyLeftUsertoRoom", (data, roomId, exitUser) => {
+      if (this.id === roomId) {
+        this.updateWhenLeftRoom(data, exitUser);
       }
     });
 
@@ -4385,15 +4427,6 @@ class Room {
     });
   }
 
-  // handleEventPlayGame(roomsList) {
-  //   // Si la sala no es la que tiene el evento no hacemos nada
-  //   if (roomsList.roomEventId !== this.id) return;
-  //   const currentRoom = roomsList.rooms.find(
-  //     (room) => room.id === roomsList.roomEventId
-  //   );
-  //   this.initGame(currentRoom.usersRoom, true);
-  // }
-
   renderPlayBtn() {
     this.playButtonDiv.innerHTML = `<button class="btn btn-primary btn-lg btn-rounded px-4" type="button">Empezar a jugar!</button>`;
     this.playButtonDiv.addEventListener("click", this.playGame.bind(this));
@@ -4404,18 +4437,12 @@ class Room {
   }
 
   prepareGame() {
-    // Quitamos botón de play
     this.playButtonDiv.innerHTML = "";
-
-    // seteamos la room a close
     this.isOpen = false;
-
-    // deshabilitamos sala
     this.disableRoom(this.id);
   }
 
   async initGame(players, isCallWithEvent = false) {
-    // Inicializamos juego
     const gridSize = 2;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
     this.game = new _Game__WEBPACK_IMPORTED_MODULE_2__["default"](
@@ -4440,7 +4467,7 @@ class Room {
 
   generateBubble(user, usersLength) {
     let marginClass = usersLength > 3 ? "fit-avatar-list" : "";
-    return `<div class="a-avatar drag-item ${user.avatar} ${marginClass}" data-id="${user.id}" data-color="${user.avatar}" data-avatar="${user.avatar}"><i class="fas fa-user"></i></div>`;
+    return `<div class="a-avatar drag-item ${user.avatar} ${marginClass}" id="" draggable="true" data-id="${user.id}" data-color="${user.avatar}" data-avatar="${user.avatar}"><i class="fas fa-user"></i></div>`;
   }
 }
 

@@ -201,7 +201,6 @@ class Register {
         this.showSuccesMessage();
       }
     } catch (err) {
-      console.log("Error data", err.data);
       this.showErrorMessage(err.data.message);
     }
   }
