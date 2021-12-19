@@ -184,22 +184,17 @@ router.get("/rooms/:id", async (req, res, next) => {
   }
 });
 
-router.put("/rooms/:id/updateRoom", async (req, res, next) => {
-  const data = req.body;
+router.put("/rooms/:id/clearRoom", async (req, res, next) => {
   try {
-    await Game.findOneAndUpdate({roomId: req.params.id},
-    {$set: {
-        usersRoom: data,
-      },
-    });
+    const find = { id: req.params.id };
+    const update = { $set: { usersRoom: [] } };
+    await Room.findOneAndUpdate(find, update);
 
-    res.status(200).json({
+    res.status(200).send({
       code: "ok",
-      message: "Success",
+      message: `El jugador ${deletedPlayer.name} ha salido de la sala`,
+      data: deletedPlayer,
     });
-  } catch (error) {
-    next(error);
-  }
 });
 
 
@@ -271,6 +266,7 @@ router.delete("/games/:id", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+  
 });
 
 module.exports = router;

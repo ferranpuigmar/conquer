@@ -8,8 +8,8 @@ const addUserToRoom = (data) => {
   return apiClient("/rooms/adduser", data).post();
 };
 
-const putRoom = (data) => {
-  return apiClient(`/rooms/${data.roomId}/updateRoom`, data.players).put();
+const clearRoom = (data) => {
+  return apiClient(`/rooms/${data.roomId}/clearRoom`,).del();
 };
 
 const getSingleRoom = (data) => {
@@ -19,6 +19,6 @@ const getSingleRoom = (data) => {
 module.exports = {
   getRooms,
   addUserToRoom,
-  putRoom,
+  clearRoom,
   getSingleRoom,
 };
