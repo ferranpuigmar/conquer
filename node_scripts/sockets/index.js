@@ -8,7 +8,6 @@ const sockets = [];
 const loadSockets = (io) => {
   io.on("connection", (socket) => {
     socket.on("connectedToDashboard", (me) => {
-      console.log("socket.id: ", socket.id);
       const existUser = sockets.find(
         (userConnected) => userConnected.playerId === me.id
       );
@@ -22,8 +21,6 @@ const loadSockets = (io) => {
           }
         });
       }
-
-      console.log("sockets: ", sockets);
     });
 
     socket.on("addUserToRoom", async ({ roomId, newPlayer }) => {
@@ -41,12 +38,11 @@ const loadSockets = (io) => {
             (socket) => socket.playerId === newPlayer.id
           );
           existUser && existUser.socket.join(roomId);
-          !existUser && socket.join();
+          !existUser && socket.join(roomId);
         }
         io.emit("notifyUpdateUsertoRoom", room.data.usersRoom, roomId);
         !room.data.isOpen && io.emit("disableRoom", roomId);
       } catch (error) {
-        console.log("error: ", error);
         console.error(error);
       }
     });

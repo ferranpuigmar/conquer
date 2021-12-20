@@ -83,12 +83,17 @@ class Room {
   updatePlayers(usersRoom) {
     let me = this.storage.getLocalStorage("me", "session");
     this.updateRoomBox(usersRoom);
-    const existUserInRoom = usersRoom.find((user) => user.id === me.id);
+    const existUserInRoom = usersRoom.find((user) => user.id === me.id) ?? null;
+
     if (existUserInRoom) {
+      console.log("existUserInRoom: ", existUserInRoom);
       this.players = usersRoom;
       const listConnectedUSers = document.querySelector(
         "#roomConnectedMessage ul"
       );
+      document
+        .getElementById("roomConnectedMessageSubtitle")
+        .classList.remove("d-none");
       const connectedUsers = usersRoom.map((user) => `<li>${user.name}</li>`);
       listConnectedUSers.innerHTML = connectedUsers.join("");
       usersRoom.length > 1 && this.renderPlayBtn();
@@ -121,11 +126,6 @@ class Room {
     roomBoxDiv.querySelector("#roomTotalPlayers").innerHTML = userList.length;
 
     this.players = userList;
-    const listConnectedUSers = document.querySelector(
-      "#roomConnectedMessage ul"
-    );
-    const connectedUsers = userList.map((user) => `<li>${user.name}</li>`);
-    listConnectedUSers.innerHTML = connectedUsers.join("");
   }
 
   showRoomMessage(type, user) {

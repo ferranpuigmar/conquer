@@ -3,7 +3,7 @@ const { updateRanking, getSingleUser } = require("../../services/users.js");
 const { createGame, delGame } = require("../../services/games.js");
 const { clearRoom } = require("../../services/rooms.js");
 
-import LocalStorage, { getNewGameInfo } from "./utils";
+import LocalStorage from "./utils";
 
 class Game {
   colors = ["Purple", "Aquamarine", "CadetBlue", "DeepPink"];
@@ -442,8 +442,6 @@ class Game {
     if (!this.isMyTurn(this.round)) {
       this.showRoomMessage(MESSAGE_TYPES.WAITTING_TURN);
     }
-
-    console.log(this.players);
 
     const initNewGameToStorage = {
       grid: this.grid,
