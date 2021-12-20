@@ -3,9 +3,29 @@ const { addUserToRoom, getSingleRoom } = require("../../services/rooms.js");
 const { getUsers } = require("../../services/users.js");
 
 let rooms = [];
+const sockets = [];
 
 const loadSockets = (io) => {
   io.on("connection", (socket) => {
+    socket.on("connectedToDashboard", (me) => {
+      console.log("socket.id: ", socket.id);
+      const existUser = sockets.find(
+        (userConnected) => userConnected.playerId === me.id
+      );
+
+      if (!existUser) {
+        sockets.push({ playerId: me.id, socket });
+      } else {
+        sockets.forEach((user, index) => {
+          if (user.playerId === existUser.playerId) {
+            sockets[index].socket.id = socket.id;
+          }
+        });
+      }
+
+      console.log("sockets: ", sockets);
+    });
+
     socket.on("addUserToRoom", async ({ roomId, newPlayer }) => {
       try {
         let room = await getSingleRoom({ roomId });
@@ -16,7 +36,12 @@ const loadSockets = (io) => {
         if (!existUserInRoom) {
           const updateRoom = await addUserToRoom({ roomId, newPlayer });
           room = updateRoom;
-          socket.join(roomId);
+
+          const existUser = sockets.find(
+            (socket) => socket.playerId === newPlayer.id
+          );
+          existUser && existUser.socket.join(roomId);
+          !existUser && socket.join();
         }
         io.emit("notifyUpdateUsertoRoom", room.data.usersRoom, roomId);
         !room.data.isOpen && io.emit("disableRoom", roomId);

@@ -1,23 +1,29 @@
 import Room from "./Room";
 import LocalStorage from "./utils";
 import { io } from "socket.io-client";
+import { getRooms } from "../../services/rooms";
+import { getSingleGame } from "../../services/games";
 class Dashboard {
   roomsList = [];
   localStorage = new LocalStorage();
   avatarMobile;
   socket = io();
+  me = null;
 
   constructor(initData) {
     this.boxRooms = initData.boxRooms;
   }
 
   init() {
+    const me = this.localStorage.getLocalStorage("me", "session");
+    this.me = me;
+    this.socket.emit("connectedToDashboard", me);
+
     this.redirectToLogin();
     this.generateRooms();
     this.generatePlayerBox();
     this.generateLogout();
     this.avatarMobile = document.querySelector("#avatarMobile");
-    //this.avatarMobile = new D
     avatarMobile.addEventListener(
       "dragstart",
       this.dragIniciado.bind(this),
@@ -28,6 +34,8 @@ class Dashboard {
       this.dragFinalizado.bind(this),
       false
     );
+
+    this.reconnect();
   }
 
   dragIniciado(e) {
@@ -156,6 +164,31 @@ class Dashboard {
     if (!user) {
       window.location.href = "/";
     }
+  }
+
+  async reconnect() {
+    try {
+      let rooms = await getRooms();
+      const userWasInRoom = rooms.find((room) => {
+        const currentUsersInRoom = room.usersRoom.find(
+          (user) => user.id === this.me.id
+        );
+        if (currentUsersInRoom) return room;
+      });
+
+      if (userWasInRoom) {
+        const targetRoom = this.roomsList.find(
+          (room) => room.id === userWasInRoom.id
+        );
+        targetRoom.addToRoom(this.me);
+        document.querySelector(".m-user-item__image .image").innerHTML = "";
+
+        //! PENDIENTE DE IMPLEMENTAR PARA REENGANCHAR AL USUARIO AL JUEGO EN CASO DE REFRESH
+
+        //Is in game
+        // let game = await getSingleGame({ roomId: userWasInRoom.id });
+      }
+    } catch (error) {}
   }
 }
 

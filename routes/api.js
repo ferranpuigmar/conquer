@@ -60,23 +60,6 @@ router.put("/user/:id/updateRanking", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-
-  // try {
-  //   await User.findOneAndUpdate(id, {
-  //     $set: {
-  //       rankingStatus: {
-  //         cellsConquered: data.rankingStatus.cellsConquered,
-  //         wins: data.rankingStatus.wins,
-  //       },
-  //     },
-  //   });
-  //   res.status(200).json({
-  //     code: "ok",
-  //     message: "Success",
-  //   });
-  // } catch (error) {
-  //   next(error);
-  // }
 });
 
 router.get("/users", async (req, res) => {
@@ -217,6 +200,21 @@ router.get("/rooms/:id", async (req, res, next) => {
   }
 });
 
+router.put("/rooms/:id/clearRoom", async (req, res, next) => {
+  try {
+    const find = { roomId: req.params.id };
+    const update = { $set: { usersRoom: [] } };
+    await Room.findOneAndUpdate(find, update);
+
+    res.status(200).send({
+      code: "ok",
+      message: `La sala esta disponible`,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // RANKING
 router.get("/ranking", async (req, res, next) => {
   try {
@@ -234,6 +232,25 @@ router.get("/ranking", async (req, res, next) => {
 });
 
 // GAME
+
+router.get("/game/:roomId", async (req, res, next) => {
+  try {
+    const game = await Game.findOne({ roomId: req.params.roomId });
+
+    if (game) {
+      res.status(200).json({
+        code: "ok",
+        message: "Success",
+        data: game,
+      });
+    } else {
+      throw new ErrorHandler(status.NOT_FOUND, "Game is not found");
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post("/games/create", async (req, res, next) => {
   const data = req.body;
   try {
@@ -279,8 +296,11 @@ router.put("/games/:id/updateGame", async (req, res, next) => {
 router.delete("/games/:id", async (req, res, next) => {
   const data = req.body;
   try {
-    const _id = data.roomId;
-    Game.find({ id: _id }).remove().exec();
+    await Game.deleteMany({ roomId: req.params.id });
+    res.status(200).json({
+      code: "ok",
+      message: "Success",
+    });
   } catch (error) {
     next(error);
   }

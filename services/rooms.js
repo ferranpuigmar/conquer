@@ -12,6 +12,10 @@ const delUserFromRoom = (data) => {
   return apiClient(`/rooms/deleteUser/${data.playerId}`).del();
 };
 
+const clearRoom = (data) => {
+  return apiClient(`/rooms/${data.roomId}/clearRoom`).put();
+};
+
 const getSingleRoom = (data) => {
   return apiClient(`/rooms/${data.roomId}`).get();
 };
@@ -19,6 +23,7 @@ const getSingleRoom = (data) => {
 module.exports = {
   getRooms,
   addUserToRoom,
+  clearRoom,
   getSingleRoom,
   delUserFromRoom,
 };

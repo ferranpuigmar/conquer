@@ -1,5 +1,9 @@
 const { apiClient } = require("../config/apiClient.js");
 
+const getSingleGame = (data) => {
+  return apiClient(`/game/${data.roomId}`).get();
+};
+
 const createGame = (data) => {
   return apiClient("/games/create", data).post();
 };
@@ -16,4 +20,5 @@ module.exports = {
   createGame,
   putGame,
   delGame,
+  getSingleGame,
 };

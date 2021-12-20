@@ -31,11 +31,11 @@ if(this.players[0].id === me.id){
     this.handleEndGame();
 }
 // this.showRoomMessage(MESSAGE_TYPES.HAS_WON);
-// Darle los puntos restantes al jugador ganador
-// Actualizar en la base de datos los puntos de los jugadores que han perdido
-// Al que ha ganado se le tiene que actualizar los puntos y el win.
-// Listar información
-// Eliminar la partida.
+// -- Darle los puntos restantes al jugador ganador
+// -- Actualizar en la base de datos los puntos de los jugadores que han perdido
+// -- Al que ha ganado se le tiene que actualizar los puntos y el win.
+// -- Listar información
+// -- Eliminar la partida.
 // Eliminamos los jugadores de la room y quitar isFull (base de datos, del socked socket.leave(room) y el html).
 // Quitas el icono de la room y lo pones en el drag.
 // Quitar el isFull de la cajita de la room.

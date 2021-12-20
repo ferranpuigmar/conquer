@@ -7,7 +7,7 @@ class Room {
   isOpen = true;
   players = [];
   roomBox = "";
-  game = "";
+  game = null;
   storage = new LocalStorage();
   playButtonDiv = document.getElementById("playButton");
   gameTopPannelDiv = document.getElementById("gameTopPannel");
@@ -44,13 +44,12 @@ class Room {
 
   onDropPlayer(e) {
     const dragUser = this.storage.getLocalStorage("me", "session");
-    const avatarMobile = document.getElementById("avatarMobile");
-    if (this.currentAvatar === null) {
-      this.currentAvatar = avatarMobile;
-    }
-    document
-      .getElementById("avatarMobile")
-      .parentNode.removeChild(avatarMobile);
+    const avatarMobile = document.getElementById(
+      e.dataTransfer.getData("userAvatar")
+    );
+    this.currentAvatar = avatarMobile;
+    this.roomBox.innerHTML = this.currentAvatar.outerHTML;
+    avatarMobile.parentNode.removeChild(avatarMobile);
 
     if (this.players.length === this.capacity) {
       this.isOpen = false;
@@ -215,7 +214,8 @@ class Room {
   }
 
   async initGame(players, isCallWithEvent = false) {
-    const gridSize = 2;
+    // Inicializamos juego
+    const gridSize = 3;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
     this.game = new Game(
       this.id,

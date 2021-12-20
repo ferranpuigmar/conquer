@@ -2945,6 +2945,10 @@ module.exports = yeast;
 
 const { apiClient } = __webpack_require__(/*! ../config/apiClient.js */ "./config/apiClient.js");
 
+const getSingleGame = (data) => {
+  return apiClient(`/game/${data.roomId}`).get();
+};
+
 const createGame = (data) => {
   return apiClient("/games/create", data).post();
 };
@@ -2961,6 +2965,7 @@ module.exports = {
   createGame,
   putGame,
   delGame,
+  getSingleGame,
 };
 
 
@@ -2986,6 +2991,10 @@ const delUserFromRoom = (data) => {
   return apiClient(`/rooms/deleteUser/${data.playerId}`).del();
 };
 
+const clearRoom = (data) => {
+  return apiClient(`/rooms/${data.roomId}/clearRoom`).put();
+};
+
 const getSingleRoom = (data) => {
   return apiClient(`/rooms/${data.roomId}`).get();
 };
@@ -2993,6 +3002,7 @@ const getSingleRoom = (data) => {
 module.exports = {
   getRooms,
   addUserToRoom,
+  clearRoom,
   getSingleRoom,
   delUserFromRoom,
 };
@@ -3050,6 +3060,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 /* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/build/esm/index.js");
+/* harmony import */ var _services_rooms__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../services/rooms */ "./services/rooms.js");
+/* harmony import */ var _services_rooms__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_services_rooms__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _services_games__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../services/games */ "./services/games.js");
+/* harmony import */ var _services_games__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_services_games__WEBPACK_IMPORTED_MODULE_4__);
+
+
 
 
 
@@ -3058,18 +3074,22 @@ class Dashboard {
   localStorage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
   avatarMobile;
   socket = (0,socket_io_client__WEBPACK_IMPORTED_MODULE_2__.io)();
+  me = null;
 
   constructor(initData) {
     this.boxRooms = initData.boxRooms;
   }
 
   init() {
+    const me = this.localStorage.getLocalStorage("me", "session");
+    this.me = me;
+    this.socket.emit("connectedToDashboard", me);
+
     this.redirectToLogin();
     this.generateRooms();
     this.generatePlayerBox();
     this.generateLogout();
     this.avatarMobile = document.querySelector("#avatarMobile");
-    //this.avatarMobile = new D
     avatarMobile.addEventListener(
       "dragstart",
       this.dragIniciado.bind(this),
@@ -3080,6 +3100,8 @@ class Dashboard {
       this.dragFinalizado.bind(this),
       false
     );
+
+    this.reconnect();
   }
 
   dragIniciado(e) {
@@ -3209,6 +3231,31 @@ class Dashboard {
       window.location.href = "/";
     }
   }
+
+  async reconnect() {
+    try {
+      let rooms = await (0,_services_rooms__WEBPACK_IMPORTED_MODULE_3__.getRooms)();
+      const userWasInRoom = rooms.find((room) => {
+        const currentUsersInRoom = room.usersRoom.find(
+          (user) => user.id === this.me.id
+        );
+        if (currentUsersInRoom) return room;
+      });
+
+      if (userWasInRoom) {
+        const targetRoom = this.roomsList.find(
+          (room) => room.id === userWasInRoom.id
+        );
+        targetRoom.addToRoom(this.me);
+        document.querySelector(".m-user-item__image .image").innerHTML = "";
+
+        //! PENDIENTE DE IMPLEMENTAR PARA REENGANCHAR AL USUARIO AL JUEGO EN CASO DE REFRESH
+
+        //Is in game
+        // let game = await getSingleGame({ roomId: userWasInRoom.id });
+      }
+    } catch (error) {}
+  }
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Dashboard);
@@ -3228,7 +3275,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
 const { updateRanking, getSingleUser } = __webpack_require__(/*! ../../services/users.js */ "./services/users.js");
-const { createGame } = __webpack_require__(/*! ../../services/games.js */ "./services/games.js");
+const { createGame, delGame } = __webpack_require__(/*! ../../services/games.js */ "./services/games.js");
+const { clearRoom } = __webpack_require__(/*! ../../services/rooms.js */ "./services/rooms.js");
+
 
 
 class Game {
@@ -3291,6 +3340,20 @@ class Game {
     };
   }
 
+  getTableWinners() {
+    let playersForCount = this.players.concat(this.defeatedPlayers);
+    let orderedPlayers = playersForCount.sort(
+      (a, b) => (a.cellsConquered < b.cellsConquered && 1) || -1
+    );
+    let table = `<table>`;
+    table += `<tr><th>Jugador</th><th>Total</th></tr>`;
+    orderedPlayers.forEach((oplayer) => {
+      table += `<tr><td>${oplayer.name}</td><td>${oplayer.cellsConquered}</td></tr>`;
+    });
+    table += `</table>`;
+    return table;
+  }
+
   showRoomMessage(type) {
     let message;
     const messageDiv = document.querySelector("#roomMessage");
@@ -3302,7 +3365,13 @@ class Game {
         message = `Lo sentimos ${this.player.name}, te han dejado sin casillas. ¡Has perdido!`;
         break;
       case _constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.HAS_WON:
-        message = `Fin de la partida. El jugador ${this.players[0].name} ha ganado.`;
+        message = `Fin de la partida. <br>`;
+        message += `El jugador ${this.players[0].name} ha ganado.<br>`;
+        message += this.getTableWinners();
+        message += `<a href="/ranking" class="btn btn-primary btn-lg btn-rounded px-4" type="button">Ver ranking completo</a>`;
+        message += `<div class="mb-3 mt-3"><button type="button" class="btn btn-warning btn-rounded px-4" onClick="window.location.reload();">
+                      Salir del juego
+                    </button></div>`;
         break;
       default:
         return "";
@@ -3321,7 +3390,12 @@ class Game {
   }
 
   checkTurn(game) {
-    if (this.players.length == 1) {
+    if (
+      this.players.length == 1 ||
+      this.getTotalCellConquered() === this.totalCells
+    ) {
+      this.showRoomMessage(_constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.HAS_WON);
+      this.removeGame();
       return;
     } else {
       this.hideRoomMessage();
@@ -3366,7 +3440,7 @@ class Game {
     return validClick.some((el) => el.validCell);
   }
 
-  checkFillCell(e) {
+  async checkFillCell(e) {
     if (!this.isMyTurn(this.round)) return;
 
     const currentPlayerTurn = this.round.player;
@@ -3422,8 +3496,11 @@ class Game {
       this.checkTurn(updateGameToStorage);
       this.updateGame(updateGameToStorage);
     } else {
-      this.handleEndGame();
+      await this.handleEndGame();
       this.updateGame(updateGameToStorage);
+      this.checkTurn(updateGameToStorage);
+      await delGame({ roomId: this.roomId });
+      await clearRoom({ roomId: this.roomId });
     }
   }
 
@@ -3483,8 +3560,6 @@ class Game {
         this.players = this.players.filter(
           (oplayer) => oplayer.id !== player.id
         );
-        const newGameToStorage = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getNewGameInfo)(this);
-        this.notifySomeoneHasLost(newGameToStorage);
       });
 
       this.calculateTotalCellsToWin(this.totalCells, this.players);
@@ -3643,6 +3718,8 @@ class Game {
       this.showRoomMessage(_constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.WAITTING_TURN);
     }
 
+    console.log(this.players);
+
     const initNewGameToStorage = {
       grid: this.grid,
       players: this.players,
@@ -3695,11 +3772,12 @@ class Game {
 
   async handleEndGame() {
     const playersForCount = this.players.concat(this.defeatedPlayers);
+
     await Promise.all(
       playersForCount.map(async (p) => {
         if (this.players.length === 1 && p.id === this.players[0].id) {
-          p.rankingStatus.cellsConquered +=
-            p.cellsConquered + (this.totalCells - this.getTotalCellConquered());
+          p.cellsConquered += this.totalCells - this.getTotalCellConquered();
+          p.rankingStatus.cellsConquered += p.cellsConquered;
           p.rankingStatus.wins++;
         } else {
           p.rankingStatus.cellsConquered += p.cellsConquered;
@@ -3707,12 +3785,18 @@ class Game {
         await updateRanking(p);
       })
     );
-    this.socket.emit("updateUserSession", { roomId: this.roomId });
+
+    await this.socket.emit("updateUserSession", { roomId: this.roomId });
   }
 
   async updateLocalUser() {
     let actualPlayer = await getSingleUser({ id: this.player.id });
     this.storage.setLocalStorage("me", actualPlayer.data, "session");
+  }
+
+  removeGame() {
+    document.getElementById("gameTopPannel").classList.add("d-none");
+    document.getElementById("waittingTurn").classList.add("d-none");
   }
 }
 
@@ -4235,7 +4319,7 @@ class Room {
   isOpen = true;
   players = [];
   roomBox = "";
-  game = "";
+  game = null;
   storage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
   playButtonDiv = document.getElementById("playButton");
   gameTopPannelDiv = document.getElementById("gameTopPannel");
@@ -4272,13 +4356,12 @@ class Room {
 
   onDropPlayer(e) {
     const dragUser = this.storage.getLocalStorage("me", "session");
-    const avatarMobile = document.getElementById("avatarMobile");
-    if (this.currentAvatar === null) {
-      this.currentAvatar = avatarMobile;
-    }
-    document
-      .getElementById("avatarMobile")
-      .parentNode.removeChild(avatarMobile);
+    const avatarMobile = document.getElementById(
+      e.dataTransfer.getData("userAvatar")
+    );
+    this.currentAvatar = avatarMobile;
+    this.roomBox.innerHTML = this.currentAvatar.outerHTML;
+    avatarMobile.parentNode.removeChild(avatarMobile);
 
     if (this.players.length === this.capacity) {
       this.isOpen = false;
@@ -4443,7 +4526,8 @@ class Room {
   }
 
   async initGame(players, isCallWithEvent = false) {
-    const gridSize = 2;
+    // Inicializamos juego
+    const gridSize = 3;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
     this.game = new _Game__WEBPACK_IMPORTED_MODULE_2__["default"](
       this.id,

@@ -10,7 +10,6 @@ const playerSchema = {
 };
 
 const GameSchema = new Schema({
-  //_id: { type: Schema.Types.ObjectId, ref: "Room" },
   roomId: String,
   grid: [
     {
