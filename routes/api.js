@@ -1,3 +1,5 @@
+//https://dev.to/mikefmeyer/build-a-node-js-express-rest-api-with-mongodb-and-swagger-3de9
+
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
@@ -10,6 +12,23 @@ const { MAX_BY_ROOM } = require("../contants/rooms");
 const Game = require("../models/Game");
 
 // USER
+/**
+ * @swagger
+ * /user:
+ *   post:
+ *     parameters:
+ *      - in: body
+ *        name: userData
+ *        description: New user
+ *        schema:
+ *          type: object
+ *          properties:
+ *            password:
+ *              type: string
+ *     responses:
+ *       200:
+ *         description: Created
+ */
 router.post("/user", async (req, res) => {
   try {
     const userData = req.body;
@@ -26,6 +45,22 @@ router.post("/user", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /user/{id}:
+ *   get:
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        type: string
+ *        description: The user ID.
+ *     description: Get a user by id
+ *     responses:
+ *       200:
+ *         description: Returns the requested user
+ */
+
 router.get("/user/:id", async (req, res, next) => {
   try {
     const user = await User.findOne({id: req.params.id});
@@ -39,7 +74,53 @@ router.get("/user/:id", async (req, res, next) => {
   }
 });
 
-router.put("/user/:id/updateRanking", async (req, res, next) => {
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     description: All users
+ *     responses:
+ *       200:
+ *         description: Returns all the users
+ */
+
+router.get("/users", async (req, res) => {
+  try {
+    const users = await User.find();
+    if (!users) {
+      throw new ErrorHandler(status.NOT_FOUND, "No existen usuarios");
+    }
+    res.status(200).json(users);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * @swagger
+ * /user/{id}/updateRanking:
+ *   patch:
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        type: string
+ *        description: The user ID.
+ *      - in: body
+ *        name: user
+ *        description: Update ranking
+ *        schema:
+ *          type: object
+ *          properties:
+ *            roomId:
+ *              type: string
+ *            rankingStatus:
+ *              type: object
+ *     responses:
+ *       200:
+ *         description: Ranking updated
+ */
+ router.put("/user/:id/updateRanking", async (req, res, next) => {
   const id = req.params.id;
   const data = req.body;
 
@@ -58,19 +139,26 @@ router.put("/user/:id/updateRanking", async (req, res, next) => {
   }
 });
 
-router.get("/users", async (req, res) => {
-  try {
-    const users = await User.find();
-    if (!users) {
-      throw new ErrorHandler(status.NOT_FOUND, "No existen usuarios");
-    }
-    res.status(200).json(users);
-  } catch (error) {
-    next(error);
-  }
-});
-
 // AUTH
+/**
+ * @swagger
+ * /user/login:
+ *   post:
+ *     parameters:
+ *      - in: body
+ *        name: userData
+ *        description: Login user
+ *        schema:
+ *          type: object
+ *          properties:
+ *            email:
+ *              type: string
+ *            password:
+ *              type: string
+ *     responses:
+ *       200:
+ *         description: Login success
+ */
 router.post("/user/login", async (req, res, next) => {
   const userData = req.body;
   const userFromDb = await User.findOne({ email: userData.email });
@@ -90,6 +178,25 @@ router.post("/user/login", async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /user/register:
+ *   post:
+ *     parameters:
+ *      - in: body
+ *        name: userData
+ *        description: Register new user
+ *        schema:
+ *          type: object
+ *          properties:
+ *            email:
+ *              type: string
+ *            password:
+ *              type: string
+ *     responses:
+ *       200:
+ *         description: Register success
+ */
 router.post("/user/register", async (req, res, next) => {
   const userData = req.body;
   // encriptamos password usuario para la BD
@@ -111,7 +218,41 @@ router.post("/user/register", async (req, res, next) => {
   }
 });
 
+// RANKING
+/**
+ * @swagger
+ * /ranking:
+ *   get:
+ *     description: All users ordened by puntuation
+ *     responses:
+ *       200:
+ *         description: Returns all users ordened by puntuation
+ */
+router.get("/ranking", async (req, res, next) => {
+  try {
+    const users = await User.find(
+      {},
+      { avatar: 1, id: 1, name: 1, rankingStatus: 1 }
+    ).sort({
+      "rankingStatus.wins": -1,
+      "rankingStatus.cellsConquered": -1,
+    });
+    res.status(200).json(users);
+  } catch (error) {
+    next(error);
+  }
+});
+
 //ROOMS
+/**
+ * @swagger
+ * /rooms:
+ *   get:
+ *     description: All rooms
+ *     responses:
+ *       200:
+ *         description: Returns all the rooms
+ */
 router.get("/rooms", async (req, res, next) => {
   try {
     const rooms = await Room.find();
@@ -121,6 +262,25 @@ router.get("/rooms", async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /user/register:
+ *   post:
+ *     parameters:
+ *      - in: body
+ *        name: data
+ *        description: New user
+ *        schema:
+ *          type: object
+ *          properties:
+ *            email:
+ *              type: string
+ *            password:
+ *              type: string
+ *     responses:
+ *       200:
+ *         description: Register success
+ */
 router.post("/rooms/adduser", async (req, res, next) => {
   const data = req.body;
   try {
@@ -156,6 +316,22 @@ router.post("/rooms/adduser", async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /rooms/{id}:
+ *   get:
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        type: string
+ *        description: The room ID.
+ *     description: Get a room by id
+ *     responses:
+ *       200:
+ *         description: Returns the requested room
+ */
+
 router.get("/rooms/:id", async (req, res, next) => {
   try {
     const currentRoom = await Room.findOne({ id: req.params.id });
@@ -167,6 +343,20 @@ router.get("/rooms/:id", async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /rooms/{id}/clearRoom:
+ *   patch:
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        type: string
+ *        description: The user ID.
+ *     responses:
+ *       200:
+ *         description: Clear the users of the room
+ */
 router.put("/rooms/:id/clearRoom", async (req, res, next) => {
   try {
     const find = { roomId: req.params.id };
@@ -183,23 +373,29 @@ router.put("/rooms/:id/clearRoom", async (req, res, next) => {
 });
 
 
-// RANKING
-router.get("/ranking", async (req, res, next) => {
-  try {
-    const users = await User.find(
-      {},
-      { avatar: 1, id: 1, name: 1, rankingStatus: 1 }
-    ).sort({
-      "rankingStatus.wins": -1,
-      "rankingStatus.cellsConquered": -1,
-    });
-    res.status(200).json(users);
-  } catch (error) {
-    next(error);
-  }
-});
+
 
 // GAME
+/**
+ * @swagger
+ * /games/create:
+ *   post:
+ *     parameters:
+ *      - in: body
+ *        name: userData
+ *        description: Create new game
+ *        schema:
+ *          type: object
+ *          properties:
+ *            roomId:
+ *              type: string
+ *            game:
+ *              type: object
+ *                
+ *     responses:
+ *       200:
+ *         description: New Game created
+ */
 router.post("/games/create", async (req, res, next) => {
   const data = req.body;
   try {
@@ -216,6 +412,38 @@ router.post("/games/create", async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /games/{id}/updateGame:
+ *   patch:
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        type: string
+ *        description: The room ID.
+ *      - in: body
+ *        name: game
+ *        description: Update game
+ *        schema:
+ *          type: object
+ *          properties:
+ *            roomId:
+ *              type: string
+ *            defeatedPlayers:
+ *              type: object,
+ *            grid:
+ *              type: object,
+ *            players:
+ *               type: object,
+ *            round:
+ *              type: string
+ *            totalCellsToWin: 
+ *              type: number
+ *     responses:
+ *       200:
+ *         description: Game updated
+ */
 router.put("/games/:id/updateGame", async (req, res, next) => {
   const data = req.body;
 
@@ -239,6 +467,22 @@ router.put("/games/:id/updateGame", async (req, res, next) => {
     next(error);
   }
 });
+
+/**
+ * @swagger
+ * /games/{id}:
+ *   delete:
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        type: string
+ *        description: The room ID.
+ *     description: Delete a games by room id
+ *     responses:
+ *       200:
+ *         description: Success
+ */
 
 router.delete("/games/:id", async (req, res, next) => {
   const data = req.body;

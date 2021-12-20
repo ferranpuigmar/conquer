@@ -6,7 +6,8 @@
   "scripts": {
     "dev_m": "webpack -w & nodemon server.js",
     "dev_w": "webpack & nodemon server.js",
-    "build": "webpack --mode development & node server.js"
+    "build": "webpack --mode development & node server.js",
+    "swagger-autogen": "node ./swagger.js"
   },
   "keywords": [],
   "author": "",
@@ -39,6 +40,8 @@
     "path-browserify": "^1.0.1",
     "socket.io": "^4.3.2",
     "socket.io-client": "^4.3.2",
+    "swagger-jsdoc": "^6.0.0",
+    "swagger-ui-express": "^4.3.0",
     "util": "^0.12.4",
     "uuid": "^8.3.2"
   },

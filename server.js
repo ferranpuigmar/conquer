@@ -9,6 +9,10 @@ const path = require("path");
 // Configuración inicial
 const express = require("express");
 const { engine } = require("express-handlebars");
+const { myApi } = require("./routes/index");
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
 const app = express();
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
@@ -59,6 +63,23 @@ app.use("/api", api);
 app.use(function (err, req, res, next) {
   handleError(err, res);
 });
+
+
+const swaggerOptions = {
+  swaggerDefinition: {
+      info: {
+          title: 'Conquer REST API',
+          description: "A REST API built with Express and MongoDB. This API provides movie catchphrases and the context of the catchphrase in the movie."
+      },
+  },
+  apis: ["./routes/api.js"]
+}
+
+app.use('/doc', myApi)
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 
 // Iniciar servidor
 http.listen(port, () => {
