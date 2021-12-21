@@ -2,12 +2,11 @@
   "name": "sass-project",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "dev_m": "webpack -w & nodemon server.js",
     "dev_w": "webpack & nodemon server.js",
-    "build": "webpack --mode development & node server.js",
-    "swagger-autogen": "node ./swagger.js"
+    "build": "webpack --mode development & node server.js"
   },
   "keywords": [],
   "author": "",

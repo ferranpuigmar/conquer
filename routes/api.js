@@ -14,40 +14,7 @@ const Game = require("../models/Game");
 // USER
 /**
  * @swagger
- * /user:
- *   post:
- *     parameters:
- *      - in: body
- *        name: userData
- *        description: New user
- *        schema:
- *          type: object
- *          properties:
- *            password:
- *              type: string
- *     responses:
- *       200:
- *         description: Created
- */
-router.post("/user", async (req, res) => {
-  try {
-    const userData = req.body;
-    // encriptamos password usuario para la BD
-    const salt = bcrypt.genSaltSync(bcryptSalt);
-    const hashPass = bcrypt.hashSync(userData.password, salt);
-    userData.password = hashPass;
-
-    const user = new User(userData);
-    await user.save();
-    res.status(200).json(user);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * @swagger
- * /user/{id}:
+ * /api/user/{id}:
  *   get:
  *     parameters:
  *      - in: path
@@ -63,11 +30,11 @@ router.post("/user", async (req, res) => {
 
 router.get("/user/:id", async (req, res, next) => {
   try {
-    const user = await User.findOne({id: req.params.id});
+    const user = await User.findOne({ id: req.params.id });
     res.status(200).json({
       code: "ok",
       message: "Success",
-      data: user
+      data: user,
     });
   } catch (error) {
     next(error);
@@ -76,7 +43,7 @@ router.get("/user/:id", async (req, res, next) => {
 
 /**
  * @swagger
- * /users:
+ * /api/users:
  *   get:
  *     description: All users
  *     responses:
@@ -98,7 +65,7 @@ router.get("/users", async (req, res) => {
 
 /**
  * @swagger
- * /user/{id}/updateRanking:
+ * /api/user/{id}/updateRanking:
  *   patch:
  *     parameters:
  *      - in: path
@@ -120,16 +87,19 @@ router.get("/users", async (req, res) => {
  *       200:
  *         description: Ranking updated
  */
- router.put("/user/:id/updateRanking", async (req, res, next) => {
+router.put("/user/:id/updateRanking", async (req, res, next) => {
   const id = req.params.id;
   const data = req.body;
 
   try {
-    await User.findOneAndUpdate({id: req.params.id}, {
-      $set: {
-        rankingStatus: data.rankingStatus,
+    await User.findOneAndUpdate(
+      { id: req.params.id },
+      {
+        $set: {
+          rankingStatus: data.rankingStatus,
         },
-    });
+      }
+    );
     res.status(200).json({
       code: "ok",
       message: "Success",
@@ -142,7 +112,7 @@ router.get("/users", async (req, res) => {
 // AUTH
 /**
  * @swagger
- * /user/login:
+ * /api/user/login:
  *   post:
  *     parameters:
  *      - in: body
@@ -180,7 +150,7 @@ router.post("/user/login", async (req, res, next) => {
 
 /**
  * @swagger
- * /user/register:
+ * /api/user/register:
  *   post:
  *     parameters:
  *      - in: body
@@ -221,7 +191,7 @@ router.post("/user/register", async (req, res, next) => {
 // RANKING
 /**
  * @swagger
- * /ranking:
+ * /api/ranking:
  *   get:
  *     description: All users ordened by puntuation
  *     responses:
@@ -246,7 +216,7 @@ router.get("/ranking", async (req, res, next) => {
 //ROOMS
 /**
  * @swagger
- * /rooms:
+ * /api/rooms:
  *   get:
  *     description: All rooms
  *     responses:
@@ -264,7 +234,7 @@ router.get("/rooms", async (req, res, next) => {
 
 /**
  * @swagger
- * /user/register:
+ * /api/user/register:
  *   post:
  *     parameters:
  *      - in: body
@@ -292,8 +262,6 @@ router.post("/rooms/adduser", async (req, res, next) => {
     const find = { id: data.roomId };
     const update = { $push: { usersRoom: newPlayer } };
 
-
-
     if (!isFullRoom) {
       await Room.findOneAndUpdate(find, update);
       currentUsers++;
@@ -318,7 +286,7 @@ router.post("/rooms/adduser", async (req, res, next) => {
 
 /**
  * @swagger
- * /rooms/{id}:
+ * /api/rooms/{id}:
  *   get:
  *     parameters:
  *      - in: path
@@ -345,7 +313,7 @@ router.get("/rooms/:id", async (req, res, next) => {
 
 /**
  * @swagger
- * /rooms/{id}/clearRoom:
+ * /api/rooms/{id}/clearRoom:
  *   patch:
  *     parameters:
  *      - in: path
@@ -360,7 +328,7 @@ router.get("/rooms/:id", async (req, res, next) => {
 router.put("/rooms/:id/clearRoom", async (req, res, next) => {
   try {
     const find = { roomId: req.params.id };
-    const update = { $set: { usersRoom: [] }};
+    const update = { $set: { usersRoom: [] } };
     await Room.findOneAndUpdate(find, update);
 
     res.status(200).send({
@@ -372,13 +340,10 @@ router.put("/rooms/:id/clearRoom", async (req, res, next) => {
   }
 });
 
-
-
-
 // GAME
 /**
  * @swagger
- * /games/create:
+ * /api/games/create:
  *   post:
  *     parameters:
  *      - in: body
@@ -391,7 +356,7 @@ router.put("/rooms/:id/clearRoom", async (req, res, next) => {
  *              type: string
  *            game:
  *              type: object
- *                
+ *
  *     responses:
  *       200:
  *         description: New Game created
@@ -414,7 +379,7 @@ router.post("/games/create", async (req, res, next) => {
 
 /**
  * @swagger
- * /games/{id}/updateGame:
+ * /api/games/{id}/updateGame:
  *   patch:
  *     parameters:
  *      - in: path
@@ -438,7 +403,7 @@ router.post("/games/create", async (req, res, next) => {
  *               type: object,
  *            round:
  *              type: string
- *            totalCellsToWin: 
+ *            totalCellsToWin:
  *              type: number
  *     responses:
  *       200:
@@ -448,16 +413,18 @@ router.put("/games/:id/updateGame", async (req, res, next) => {
   const data = req.body;
 
   try {
-    await Game.findOneAndUpdate({roomId: req.params.id},
-    {
-      $set: {
-        defeatedPlayers: data.defeatedPlayers,
-        grid: data.grid,
-        players: data.players,
-        round: data.round,
-        totalCellsToWin: data.totalCellsToWin,
+    await Game.findOneAndUpdate(
+      { roomId: req.params.id },
+      {
+        $set: {
+          defeatedPlayers: data.defeatedPlayers,
+          grid: data.grid,
+          players: data.players,
+          round: data.round,
+          totalCellsToWin: data.totalCellsToWin,
+        },
       }
-    });
+    );
 
     res.status(200).json({
       code: "ok",
@@ -470,7 +437,7 @@ router.put("/games/:id/updateGame", async (req, res, next) => {
 
 /**
  * @swagger
- * /games/{id}:
+ * /api/games/{id}:
  *   delete:
  *     parameters:
  *      - in: path
@@ -495,7 +462,6 @@ router.delete("/games/:id", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-  
 });
 
 module.exports = router;
