@@ -1,3 +1,5 @@
+//https://dev.to/mikefmeyer/build-a-node-js-express-rest-api-with-mongodb-and-swagger-3de9
+
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
@@ -11,23 +13,45 @@ const Game = require("../models/Game");
 const { getRooms } = require("../services/rooms");
 
 // USER
-router.post("/user", async (req, res) => {
-  try {
-    const userData = req.body;
-    // encriptamos password usuario para la BD
-    const salt = bcrypt.genSaltSync(bcryptSalt);
-    const hashPass = bcrypt.hashSync(userData.password, salt);
-    userData.password = hashPass;
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     description: All users
+ *     responses:
+ *       200:
+ *         description: Returns all the users
+ */
 
-    const user = new User(userData);
-    await user.save();
-    res.status(200).json(user);
+router.get("/users", async (req, res) => {
+  try {
+    const users = await User.find();
+    if (!users) {
+      throw new ErrorHandler(status.NOT_FOUND, "No existen usuarios");
+    }
+    res.status(200).json(users);
   } catch (error) {
     next(error);
   }
 });
 
-router.get("/user/:id", async (req, res, next) => {
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        type: string
+ *        description: The user ID.
+ *     description: Get a user by id
+ *     responses:
+ *       200:
+ *         description: Returns the requested user
+ */
+
+router.get("/users/:id", async (req, res, next) => {
   try {
     const user = await User.findOne({ id: req.params.id });
     res.status(200).json({
@@ -40,7 +64,31 @@ router.get("/user/:id", async (req, res, next) => {
   }
 });
 
-router.put("/user/:id/updateRanking", async (req, res, next) => {
+/**
+ * @swagger
+ * /api/users/{id}/updateRanking:
+ *   patch:
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        type: string
+ *        description: The user ID.
+ *      - in: body
+ *        name: user
+ *        description: Update ranking
+ *        schema:
+ *          type: object
+ *          properties:
+ *            roomId:
+ *              type: string
+ *            rankingStatus:
+ *              type: object
+ *     responses:
+ *       200:
+ *         description: Ranking updated
+ */
+router.put("/users/:id/updateRanking", async (req, res, next) => {
   const id = req.params.id;
   const data = req.body;
 
@@ -62,20 +110,27 @@ router.put("/user/:id/updateRanking", async (req, res, next) => {
   }
 });
 
-router.get("/users", async (req, res) => {
-  try {
-    const users = await User.find();
-    if (!users) {
-      throw new ErrorHandler(status.NOT_FOUND, "No existen usuarios");
-    }
-    res.status(200).json(users);
-  } catch (error) {
-    next(error);
-  }
-});
-
 // AUTH
-router.post("/user/login", async (req, res, next) => {
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     parameters:
+ *      - in: body
+ *        name: userData
+ *        description: Login user
+ *        schema:
+ *          type: object
+ *          properties:
+ *            email:
+ *              type: string
+ *            password:
+ *              type: string
+ *     responses:
+ *       200:
+ *         description: Login success
+ */
+router.post("/auth/login", async (req, res, next) => {
   const userData = req.body;
   const userFromDb = await User.findOne({ email: userData.email });
 
@@ -94,7 +149,26 @@ router.post("/user/login", async (req, res, next) => {
   }
 });
 
-router.post("/user/register", async (req, res, next) => {
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     parameters:
+ *      - in: body
+ *        name: userData
+ *        description: Register new user
+ *        schema:
+ *          type: object
+ *          properties:
+ *            email:
+ *              type: string
+ *            password:
+ *              type: string
+ *     responses:
+ *       200:
+ *         description: Register success
+ */
+router.post("/auth/register", async (req, res, next) => {
   const userData = req.body;
   // encriptamos password usuario para la BD
   const salt = bcrypt.genSaltSync(bcryptSalt);
@@ -115,7 +189,41 @@ router.post("/user/register", async (req, res, next) => {
   }
 });
 
+// RANKING
+/**
+ * @swagger
+ * /api/ranking:
+ *   get:
+ *     description: All users ordened by puntuation
+ *     responses:
+ *       200:
+ *         description: Returns all users ordened by puntuation
+ */
+router.get("/ranking", async (req, res, next) => {
+  try {
+    const users = await User.find(
+      {},
+      { avatar: 1, id: 1, name: 1, rankingStatus: 1 }
+    ).sort({
+      "rankingStatus.wins": -1,
+      "rankingStatus.cellsConquered": -1,
+    });
+    res.status(200).json(users);
+  } catch (error) {
+    next(error);
+  }
+});
+
 //ROOMS
+/**
+ * @swagger
+ * /api/rooms:
+ *   get:
+ *     description: All rooms
+ *     responses:
+ *       200:
+ *         description: Returns all the rooms
+ */
 router.get("/rooms", async (req, res, next) => {
   try {
     const rooms = await Room.find();
@@ -125,6 +233,25 @@ router.get("/rooms", async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/rooms/addUser:
+ *   post:
+ *     parameters:
+ *      - in: body
+ *        name: data
+ *        description: New user
+ *        schema:
+ *          type: object
+ *          properties:
+ *            email:
+ *              type: string
+ *            password:
+ *              type: string
+ *     responses:
+ *       200:
+ *         description: Register success
+ */
 router.post("/rooms/addUser", async (req, res, next) => {
   const data = req.body;
   try {
@@ -158,6 +285,21 @@ router.post("/rooms/addUser", async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/rooms/deleteUser/{id}:
+ *   get:
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        type: string
+ *        description: The room ID.
+ *     description: Get a room by id
+ *     responses:
+ *       200:
+ *         description: Returns the requested room
+ */
 router.delete("/rooms/deleteUser/:playerId", async (req, res, next) => {
   const playerId = req.params.playerId;
   try {
@@ -185,6 +327,21 @@ router.delete("/rooms/deleteUser/:playerId", async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/rooms/{id}:
+ *   get:
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        type: string
+ *        description: The room ID.
+ *     description: Get a room by id
+ *     responses:
+ *       200:
+ *         description: Returns the requested room
+ */
 router.get("/rooms/:id", async (req, res, next) => {
   try {
     const currentRoom = await Room.findOne({ id: req.params.id });
@@ -200,6 +357,20 @@ router.get("/rooms/:id", async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/rooms/{id}/clearRoom:
+ *   patch:
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        type: string
+ *        description: The user ID.
+ *     responses:
+ *       200:
+ *         description: Clear the users of the room
+ */
 router.put("/rooms/:id/clearRoom", async (req, res, next) => {
   try {
     const find = { roomId: req.params.id };
@@ -216,6 +387,14 @@ router.put("/rooms/:id/clearRoom", async (req, res, next) => {
 });
 
 // RANKING
+/**
+ * @swagger
+ * /api/ranking:
+ *   get:
+ *     responses:
+ *       '200':
+ *         description: A list of users ordered by wins and cellsConquered
+ */
 router.get("/ranking", async (req, res, next) => {
   try {
     const users = await User.find(
@@ -232,8 +411,22 @@ router.get("/ranking", async (req, res, next) => {
 });
 
 // GAME
-
-router.get("/game/:roomId", async (req, res, next) => {
+/**
+ * @swagger
+ * /api/games/{roomId}:
+ *   get:
+ *     parameters:
+ *      - in: path
+ *        name: roomId
+ *        required: true
+ *        type: string
+ *        description: The room ID.
+ *
+ *     responses:
+ *       200:
+ *         description: return game
+ */
+router.get("/games/:roomId", async (req, res, next) => {
   try {
     const game = await Game.findOne({ roomId: req.params.roomId });
 
@@ -251,6 +444,26 @@ router.get("/game/:roomId", async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/games/create:
+ *   post:
+ *     parameters:
+ *      - in: body
+ *        name: userData
+ *        description: Create new game
+ *        schema:
+ *          type: object
+ *          properties:
+ *            roomId:
+ *              type: string
+ *            game:
+ *              type: object
+ *
+ *     responses:
+ *       200:
+ *         description: New Game created
+ */
 router.post("/games/create", async (req, res, next) => {
   const data = req.body;
   try {
@@ -267,6 +480,38 @@ router.post("/games/create", async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/games/{id}/updateGame:
+ *   patch:
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        type: string
+ *        description: The room ID.
+ *      - in: body
+ *        name: game
+ *        description: Update game
+ *        schema:
+ *          type: object
+ *          properties:
+ *            roomId:
+ *              type: string
+ *            defeatedPlayers:
+ *              type: object,
+ *            grid:
+ *              type: object,
+ *            players:
+ *               type: object,
+ *            round:
+ *              type: string
+ *            totalCellsToWin:
+ *              type: number
+ *     responses:
+ *       200:
+ *         description: Game updated
+ */
 router.put("/games/:id/updateGame", async (req, res, next) => {
   const data = req.body;
 
@@ -293,8 +538,23 @@ router.put("/games/:id/updateGame", async (req, res, next) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/games/{id}:
+ *   delete:
+ *     parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        type: string
+ *        description: The room ID.
+ *     description: Delete a games by room id
+ *     responses:
+ *       200:
+ *         description: Success
+ */
+
 router.delete("/games/:id", async (req, res, next) => {
-  const data = req.body;
   try {
     await Game.deleteMany({ roomId: req.params.id });
     res.status(200).json({

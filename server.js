@@ -4,11 +4,15 @@ const sassMiddleware = require("node-sass-middleware");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const { handleError } = require("./helpers/error");
+const swaggerUi = require("swagger-ui-express");
+const swaggerJsDoc = require("swagger-jsdoc");
+
 const path = require("path");
 
 // Configuración inicial
 const express = require("express");
 const { engine } = require("express-handlebars");
+
 const app = express();
 const http = require("http").Server(app);
 const io = require("socket.io")(http);
@@ -35,6 +39,18 @@ app.use(
   express.static(path.join(__dirname, "public"))
 );
 
+// Swagger
+const swaggerOptions = {
+  swaggerDefinition: {
+    info: {
+      title: "Conquer REST API",
+      description:
+        "Una Rest API desarrollada con Express and MongoDB. Esta API proporciona los endpoints necesarios para jugar a conquer.",
+    },
+  },
+  apis: ["./routes/api.js"],
+};
+
 // Motor de plantilla
 app.engine(
   "hbs",
@@ -55,6 +71,9 @@ app.use("/", index);
 
 const api = require("./routes/api");
 app.use("/api", api);
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use("/doc", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.use(function (err, req, res, next) {
   handleError(err, res);

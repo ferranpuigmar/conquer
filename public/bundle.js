@@ -2946,7 +2946,7 @@ module.exports = yeast;
 const { apiClient } = __webpack_require__(/*! ../config/apiClient.js */ "./config/apiClient.js");
 
 const getSingleGame = (data) => {
-  return apiClient(`/game/${data.roomId}`).get();
+  return apiClient(`/games/${data.roomId}`).get();
 };
 
 const createGame = (data) => {
@@ -3019,19 +3019,19 @@ module.exports = {
 const { apiClient } = __webpack_require__(/*! ../config/apiClient.js */ "./config/apiClient.js");
 
 const createUser = (data) => {
-  return apiClient("/user/register", data).post();
+  return apiClient("/auth/register", data).post();
 };
 
 const loginInUser = (data) => {
-  return apiClient("/user/login", data).post();
+  return apiClient("/auth/login", data).post();
 };
 
 const updateRanking = (data) => {
-  return apiClient(`/user/${data.id}/updateRanking`, data).put();
+  return apiClient(`/users/${data.id}/updateRanking`, data).put();
 };
 
 const getSingleUser = (data) => {
-  return apiClient(`/user/${data.id}`).get();
+  return apiClient(`/users/${data.id}`).get();
 };
 
 const getUsers = () => {

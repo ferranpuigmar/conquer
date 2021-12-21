@@ -1,19 +1,19 @@
 const { apiClient } = require("../config/apiClient.js");
 
 const createUser = (data) => {
-  return apiClient("/user/register", data).post();
+  return apiClient("/auth/register", data).post();
 };
 
 const loginInUser = (data) => {
-  return apiClient("/user/login", data).post();
+  return apiClient("/auth/login", data).post();
 };
 
 const updateRanking = (data) => {
-  return apiClient(`/user/${data.id}/updateRanking`, data).put();
+  return apiClient(`/users/${data.id}/updateRanking`, data).put();
 };
 
 const getSingleUser = (data) => {
-  return apiClient(`/user/${data.id}`).get();
+  return apiClient(`/users/${data.id}`).get();
 };
 
 const getUsers = () => {

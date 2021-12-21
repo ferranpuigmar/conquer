@@ -1,7 +1,7 @@
 const { apiClient } = require("../config/apiClient.js");
 
 const getSingleGame = (data) => {
-  return apiClient(`/game/${data.roomId}`).get();
+  return apiClient(`/games/${data.roomId}`).get();
 };
 
 const createGame = (data) => {
