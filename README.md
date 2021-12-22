@@ -68,3 +68,8 @@
 **postcss.config.js**: archivo que configura las preferencias de compilación del css resultante
 
 **webpack.config.js**: configuración de webpack
+
+## Documentación API Rest ##
+Hemos usado swagger para generar la documentación de la API mediante comentarios.
+
+Una vez levantado el proyecto poner la url http://localhost:3000/doc
