@@ -16,7 +16,7 @@
 
 2. Abrir la carpeta en Visual Studio Code
 
-3. Crear archivo ".env" y dentro del mismo poner lo siguiente:
+3. Crear archivo ".env" en la raíz y dentro del mismo poner lo siguiente:
    
    PORT=3000
    
