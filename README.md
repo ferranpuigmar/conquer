@@ -52,6 +52,9 @@
         - views: archivos de handlebars que componen las plantillas de las vistas de la aplicación
 
 **package.json**
+
 **server.js**: contiene la configuración de la aplicación de express
+
 **postcss.config.js**: archivo que configura las preferencias de compilación del css resultante
+
 **webpack.config.js**: configuración de webpack
