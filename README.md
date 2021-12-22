@@ -1,3 +1,13 @@
+#### Stack tecnológico de la aplicación ####
+
+- Javascript ES6
+- SASS
+- MongoDB
+- Node.js con Express
+- Webpack
+- MongoAtlas como servidor cloud
+
+
 #### Pasos a seguir para el correcto funcionamiento del repositorio
 
 1. Descargar el repositorio en local
@@ -15,7 +25,7 @@
     a. MacOS: debe introducir "npm run dev_m" en la terminal
     b. Windows: debe introducir "npm run dev_w" en la terminal
 
-6. La prueba de difetenes usuarios debe ser en diferentes navegadores
+6. La prueba de diferentes usuarios debe ser en diferentes navegadores
 
 ### Estructura del proyecto ###
 
