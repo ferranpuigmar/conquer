@@ -1,4 +1,6 @@
-#### Stack tecnológico de la aplicación ####
+# Aplicación Conquer #
+
+## Stack tecnológico de la aplicación ##
 
 - Javascript ES6
 - SASS
@@ -27,7 +29,27 @@
 
 6. La prueba de diferentes usuarios debe ser en diferentes navegadores
 
-### Estructura del proyecto ###
+
+## ¡Importante, seguir el "Happy path"! ##
+
+Debido a que el proyecto es complejo, hay muchas casuísticas que no las hemos podido depurar bien con lo que para que se pueda ver que hemos completado lo que se pedía se tendría que seguir el siguiente procedimiento:
+
+- **Registar usuario en almenos 2 navegadores y hacer su posterior login**. Hay usuarios existentes de ejemplo:
+   ivan@gmail.com / 123
+   dani@gmail.com / 123
+
+- **No actualizar el navegador durante el proceso, no está depurado**
+
+- Arrastrar usuario a la sala en ambos navegadores
+
+- Uno de los dos navegadores le dará al play
+
+- Jugar hasta que salga el resultado final
+
+- Se puede consultar el ranking de los usuarios existentes y los nuevos que hayan jugado
+
+
+## Estructura del proyecto ##
 
 - #### /config
     - configuración de axios a partir del apiClient
