@@ -12,6 +12,135 @@ const { MAX_BY_ROOM } = require("../contants/rooms");
 const Game = require("../models/Game");
 const { getRooms } = require("../services/rooms");
 
+//SCHEMAS
+
+/**
+ * @swagger
+ *  components:
+ *    definitions:
+ *      Player:
+ *        properties:
+ *          id:
+ *            type: string
+ *          name:
+ *            type: string
+ *          cellsConquered:
+ *            type: number
+ *          color:
+ *            type: string
+ *          hasLost:
+ *            type: boolean
+ *            default: false
+ *
+ *      RankingStatus:
+ *        properties:
+ *          cellsConquered:
+ *            type: number
+ *          wins:
+ *            type: number
+ *
+ *    schemas:
+ *      Game:
+ *        type: object
+ *        properties:
+ *          roomId:
+ *            type: string
+ *          grid:
+ *            type: array
+ *            items:
+ *              type: object
+ *              properties:
+ *                id:
+ *                  type: string
+ *                row:
+ *                  type: number
+ *                cell:
+ *                  type: number
+ *                cell_x:
+ *                  type: number
+ *                cell_y:
+ *                  type: number
+ *                playerId:
+ *                  type: string
+ *                  default: null
+ *                color:
+ *                  type: string
+ *                  default: null
+ *          players:
+ *            type: array
+ *            items:
+ *              $ref: '#/components/definitions/Player'
+ *          defeatedPlayers:
+ *            type: array
+ *            items:
+ *              type: object
+ *              properties:
+ *                id:
+ *                  type: string
+ *                name:
+ *                  type: string
+ *                cellsConquered:
+ *                  type: number
+ *          totalCellsToWin:
+ *            type: number
+ *          round:
+ *            type: object
+ *            properties:
+ *              turn:
+ *                type: number
+ *              roundNumber:
+ *                type: number
+ *              player:
+ *                type: object
+ *                $ref: '#components/definitions/Player'
+ *
+ *      User:
+ *        type: object
+ *        properties:
+ *          id:
+ *            type: string
+ *          name:
+ *            type: string
+ *          email:
+ *            type: string
+ *          password:
+ *            type: string
+ *          avatar:
+ *            type: string
+ *          favouriteRoom:
+ *            type: string
+ *          color:
+ *            type: string
+ *          rankingStatus:
+ *            $ref: '#components/definitions/RankingStatus'
+ *
+ *      Room:
+ *        type: object
+ *        properties:
+ *          id:
+ *            type: string
+ *          name:
+ *            type: string
+ *          color:
+ *            type: string
+ *          usersRoom:
+ *            type: array
+ *            items:
+ *              type: object
+ *              properties:
+ *                id:
+ *                  type: string
+ *                name:
+ *                  type: string
+ *                avatar:
+ *                  type: string
+ *                rankingStatus:
+ *                  $ref: '#components/definitions/RankingStatus'
+ *          isOpne:
+ *            type: boolean
+ *            default: true
+ */
+
 // USER
 /**
  * @swagger
@@ -20,7 +149,25 @@ const { getRooms } = require("../services/rooms");
  *     description: All users
  *     responses:
  *       200:
- *         description: Returns all the users
+ *         description: Devuelve todos los users
+ *         schema:
+ *           type: array
+ *           items:
+ *            $ref: '#components/schemas/User'
+ *
+ *       404:
+ *         description: User not found
+ *         schema:
+ *           type: object
+ *           properties:
+ *              status:
+ *                type: string,
+ *                default: "error"
+ *              statusCode:
+ *                type: number
+ *                default: 404
+ *              messaje:
+ *                type: string
  */
 
 router.get("/users", async (req, res) => {
@@ -48,17 +195,36 @@ router.get("/users", async (req, res) => {
  *     description: Get a user by id
  *     responses:
  *       200:
- *         description: Returns the requested user
+ *         description: Devuelve el usuario
+ *         schema:
+ *           $ref: '#components/schemas/User'
+ *       404:
+ *         description: User not found
+ *         schema:
+ *           type: object
+ *           properties:
+ *              status:
+ *                type: string,
+ *                default: "error"
+ *              statusCode:
+ *                type: number
+ *                default: 404
+ *              messaje:
+ *                type: string
  */
 
 router.get("/users/:id", async (req, res, next) => {
   try {
     const user = await User.findOne({ id: req.params.id });
-    res.status(200).json({
-      code: "ok",
-      message: "Success",
-      data: user,
-    });
+    if (user) {
+      res.status(200).json({
+        code: "ok",
+        message: "Success",
+        data: user,
+      });
+    } else {
+      throw new ErrorHandler(status.NOT_FOUND, "User not found");
+    }
   } catch (error) {
     next(error);
   }
@@ -83,7 +249,7 @@ router.get("/users/:id", async (req, res, next) => {
  *            roomId:
  *              type: string
  *            rankingStatus:
- *              type: object
+ *              $ref: '#components/definitions/RankingStatus'
  *     responses:
  *       200:
  *         description: Ranking updated
@@ -129,6 +295,34 @@ router.put("/users/:id/updateRanking", async (req, res, next) => {
  *     responses:
  *       200:
  *         description: Login success
+ *         schema:
+ *            $ref: '#components/schemas/User'
+ *       400:
+ *         description: Password is not correct
+ *         schema:
+ *           type: object
+ *           properties:
+ *              status:
+ *                type: string,
+ *                default: "error"
+ *              statusCode:
+ *                type: number
+ *                default: 400
+ *              messaje:
+ *                type: string
+ *       404:
+ *         description: User not found
+ *         schema:
+ *           type: object
+ *           properties:
+ *              status:
+ *                type: string,
+ *                default: "error"
+ *              statusCode:
+ *                type: number
+ *                default: 404
+ *              messaje:
+ *                type: string
  */
 router.post("/auth/login", async (req, res, next) => {
   const userData = req.body;
@@ -167,6 +361,22 @@ router.post("/auth/login", async (req, res, next) => {
  *     responses:
  *       200:
  *         description: Register success
+ *         schema:
+ *          $ref: '#components/schemas/User'
+ *
+ *       404:
+ *         description: User not found
+ *         schema:
+ *           type: object
+ *           properties:
+ *              status:
+ *                type: string,
+ *                default: "error"
+ *              statusCode:
+ *                type: number
+ *                default: 404
+ *              messaje:
+ *                type: string
  */
 router.post("/auth/register", async (req, res, next) => {
   const userData = req.body;
@@ -189,32 +399,9 @@ router.post("/auth/register", async (req, res, next) => {
   }
 });
 
-// RANKING
-/**
- * @swagger
- * /api/ranking:
- *   get:
- *     description: All users ordened by puntuation
- *     responses:
- *       200:
- *         description: Returns all users ordened by puntuation
- */
-router.get("/ranking", async (req, res, next) => {
-  try {
-    const users = await User.find(
-      {},
-      { avatar: 1, id: 1, name: 1, rankingStatus: 1 }
-    ).sort({
-      "rankingStatus.wins": -1,
-      "rankingStatus.cellsConquered": -1,
-    });
-    res.status(200).json(users);
-  } catch (error) {
-    next(error);
-  }
-});
+/////////////////////////////////////////////////////////////
+// ROOMS
 
-//ROOMS
 /**
  * @swagger
  * /api/rooms:
@@ -223,6 +410,10 @@ router.get("/ranking", async (req, res, next) => {
  *     responses:
  *       200:
  *         description: Returns all the rooms
+ *         schema:
+ *           type: array
+ *           items:
+ *            $ref: '#components/schemas/Room'
  */
 router.get("/rooms", async (req, res, next) => {
   try {
@@ -251,6 +442,36 @@ router.get("/rooms", async (req, res, next) => {
  *     responses:
  *       200:
  *         description: Register success
+ *         schema:
+ *           type: object
+ *           properties:
+ *            code:
+ *              type: string,
+ *              default: "ok"
+ *            message:
+ *              type: string
+ *            data:
+ *              type: object
+ *              properties:
+ *                usersRoom:
+ *                  type: array
+ *                  items:
+ *                    $ref: '#/components/schema/User'
+ *                isOpen:
+ *                  type: boolean
+ *       409:
+ *         description: Devuelve mensaje "La sala está cerrada"
+ *         schema:
+ *           type: object
+ *           properties:
+ *              status:
+ *                type: string,
+ *                default: "error"
+ *              statusCode:
+ *                type: number
+ *                default: 409
+ *              messaje:
+ *                type: string
  */
 router.post("/rooms/addUser", async (req, res, next) => {
   const data = req.body;
@@ -298,7 +519,20 @@ router.post("/rooms/addUser", async (req, res, next) => {
  *     description: Get a room by id
  *     responses:
  *       200:
- *         description: Returns the requested room
+ *         description: Returns rest users
+ *         schema:
+ *          type: object
+ *          properties:
+ *            code:
+ *              type: string,
+ *              default: "ok"
+ *            message:
+ *              type: string
+ *            data:
+ *              type: array
+ *              items:
+ *                $ref: '#/components/schemas/User'
+ *
  */
 router.delete("/rooms/deleteUser/:playerId", async (req, res, next) => {
   const playerId = req.params.playerId;
@@ -341,6 +575,8 @@ router.delete("/rooms/deleteUser/:playerId", async (req, res, next) => {
  *     responses:
  *       200:
  *         description: Returns the requested room
+ *         schema:
+ *            $ref: '#components/schemas/Room'
  */
 router.get("/rooms/:id", async (req, res, next) => {
   try {
@@ -386,7 +622,9 @@ router.put("/rooms/:id/clearRoom", async (req, res, next) => {
   }
 });
 
+/////////////////////////////////////////////////////////////
 // RANKING
+
 /**
  * @swagger
  * /api/ranking:
@@ -394,6 +632,20 @@ router.put("/rooms/:id/clearRoom", async (req, res, next) => {
  *     responses:
  *       '200':
  *         description: A list of users ordered by wins and cellsConquered
+ *         schema:
+ *            type: array
+ *            items:
+ *              type: object
+ *              properties:
+ *                id:
+ *                  type: string
+ *                name:
+ *                  type: string
+ *                avatar:
+ *                  type: string
+ *                rankingStatus:
+ *                  $ref: '#components/definitions/RankingStatus'
+ *
  */
 router.get("/ranking", async (req, res, next) => {
   try {
@@ -410,7 +662,9 @@ router.get("/ranking", async (req, res, next) => {
   }
 });
 
+/////////////////////////////////////////////////////////////
 // GAME
+
 /**
  * @swagger
  * /api/games/{roomId}:
@@ -425,6 +679,21 @@ router.get("/ranking", async (req, res, next) => {
  *     responses:
  *       200:
  *         description: return game
+ *         schema:
+ *          $ref: '#/components/schemas/Game'
+ *       404:
+ *         description: return 404
+ *         schema:
+ *           type: object
+ *           properties:
+ *              status:
+ *                type: string,
+ *                default: "error"
+ *              statusCode:
+ *                type: number
+ *                default: 404
+ *              messaje:
+ *                type: string
  */
 router.get("/games/:roomId", async (req, res, next) => {
   try {
@@ -453,12 +722,7 @@ router.get("/games/:roomId", async (req, res, next) => {
  *        name: userData
  *        description: Create new game
  *        schema:
- *          type: object
- *          properties:
- *            roomId:
- *              type: string
- *            game:
- *              type: object
+ *          $ref: '#/components/schemas/Game'
  *
  *     responses:
  *       200:
@@ -494,23 +758,11 @@ router.post("/games/create", async (req, res, next) => {
  *        name: game
  *        description: Update game
  *        schema:
- *          type: object
- *          properties:
- *            roomId:
- *              type: string
- *            defeatedPlayers:
- *              type: object,
- *            grid:
- *              type: object,
- *            players:
- *               type: object,
- *            round:
- *              type: string
- *            totalCellsToWin:
- *              type: number
+ *          $ref: '#components/schemas/Game'
  *     responses:
  *       200:
  *         description: Game updated
+ *
  */
 router.put("/games/:id/updateGame", async (req, res, next) => {
   const data = req.body;

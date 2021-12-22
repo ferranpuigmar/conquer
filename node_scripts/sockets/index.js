@@ -1,4 +1,4 @@
-const { putGame, delGame } = require("../../services/games.js");
+const { putGame } = require("../../services/games.js");
 const { addUserToRoom, getSingleRoom } = require("../../services/rooms.js");
 const { getUsers } = require("../../services/users.js");
 

@@ -42,6 +42,8 @@ app.use(
 // Swagger
 const swaggerOptions = {
   swaggerDefinition: {
+    definitions: {},
+    components: {},
     info: {
       title: "Conquer REST API",
       description:
