@@ -17,6 +17,7 @@
 2. Abrir la carpeta en Visual Studio Code
 
 3. Crear archivo ".env" y dentro del mismo poner lo siguiente:
+   
    PORT=3000
    
    MONGODB_URI=mongodb+srv://admin:esfuture@cluster0.njbl5.mongodb.net/conquer
