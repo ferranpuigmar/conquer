@@ -1,5 +1,5 @@
 require("dotenv").config();
-const sockets = require("./node_scripts/sockets");
+const sockets = require("./sockets");
 const sassMiddleware = require("node-sass-middleware");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
