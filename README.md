@@ -18,7 +18,9 @@
 
 3. Crear archivo ".env" y dentro del mismo poner lo siguiente:
    PORT=3000
+   
    MONGODB_URI=mongodb+srv://admin:esfuture@cluster0.njbl5.mongodb.net/conquer
+   
    API_URL=http://localhost:3000/api
    
 4. Hacer npm install en la terminal
