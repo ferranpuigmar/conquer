@@ -10,6 +10,16 @@ const RoomSchema = new Schema({
       name: String,
       avatar: String,
       id: String,
+      rankingStatus: {
+        cellsConquered: {
+          type: Number,
+          default: 0,
+        },
+        wins: {
+          type: Number,
+          default: 0,
+        },
+      },
     },
   ],
   isOpen: Boolean,

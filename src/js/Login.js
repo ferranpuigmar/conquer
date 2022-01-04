@@ -1,4 +1,4 @@
-import { loginInUser } from "../../services/users/users";
+import { loginInUser } from "../../services/users";
 import LocalStorage from "./utils";
 class Login {
   fields = {};

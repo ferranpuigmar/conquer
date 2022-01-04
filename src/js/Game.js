@@ -1,20 +1,27 @@
-import { EVENT_TYPES, MESSAGE_TYPES } from "./constants";
-import LocalStorage, { getNewGameInfo } from "./utils";
+import { MESSAGE_TYPES } from "./constants";
+const { updateRanking, getSingleUser } = require("../../services/users.js");
+const { createGame, delGame } = require("../../services/games.js");
+const { clearRoom } = require("../../services/rooms.js");
+
+import LocalStorage from "./utils";
 
 class Game {
   colors = ["Purple", "Aquamarine", "CadetBlue", "DeepPink"];
   grid = [];
   defeatedPlayers = [];
-  wrapper = document.getElementById("grid");
   totalCellsToWin = 0;
   storage = new LocalStorage();
-  waittingDiv = document.querySelector("#roomMessage"); // Div del mensaje de espera
   roomsList;
-  roundTitle = document.getElementById("roundTitle"); // Número del Round
-  pannelInfo = document.getElementById("roomPannelInfo");
   canvas = document.getElementById("game");
   cells = [];
   eventCheckFillCellHandler = this.checkFillCell.bind(this);
+  wrapper = document.getElementById("grid");
+  waittingDiv = document.querySelector("#roomMessage"); // Div del mensaje de espera
+  roundTitle = document.getElementById("roundTitle"); // Número del Round
+  pannelInfo = document.getElementById("roomPannelInfo");
+  gameInfo = document.querySelector(".m-game__info");
+  cellsToWinInfo = document.getElementById("cellsToWinInfo");
+  conqueredCellsInfo = document.getElementById("conqueredCellsInfo");
 
   constructor(roomId, playerInfo, players, socket, gameSize) {
     this.player = playerInfo;
@@ -58,6 +65,20 @@ class Game {
     };
   }
 
+  getTableWinners() {
+    let playersForCount = this.players.concat(this.defeatedPlayers);
+    let orderedPlayers = playersForCount.sort(
+      (a, b) => (a.cellsConquered < b.cellsConquered && 1) || -1
+    );
+    let table = `<table>`;
+    table += `<tr><th>Jugador</th><th>Total</th></tr>`;
+    orderedPlayers.forEach((oplayer) => {
+      table += `<tr><td>${oplayer.name}</td><td>${oplayer.cellsConquered}</td></tr>`;
+    });
+    table += `</table>`;
+    return table;
+  }
+
   showRoomMessage(type) {
     let message;
     const messageDiv = document.querySelector("#roomMessage");
@@ -67,6 +88,15 @@ class Game {
         break;
       case MESSAGE_TYPES.HAS_LOST:
         message = `Lo sentimos ${this.player.name}, te han dejado sin casillas. ¡Has perdido!`;
+        break;
+      case MESSAGE_TYPES.HAS_WON:
+        message = `Fin de la partida. <br>`;
+        message += `El jugador ${this.players[0].name} ha ganado.<br>`;
+        message += this.getTableWinners();
+        message += `<a href="/ranking" class="btn btn-primary btn-lg btn-rounded px-4" type="button">Ver ranking completo</a>`;
+        message += `<div class="mb-3 mt-3"><button type="button" class="btn btn-warning btn-rounded px-4" onClick="window.location.reload();">
+                      Salir del juego
+                    </button></div>`;
         break;
       default:
         return "";
@@ -85,6 +115,17 @@ class Game {
   }
 
   checkTurn(game) {
+    if (
+      this.players.length == 1 ||
+      this.getTotalCellConquered() === this.totalCells
+    ) {
+      this.showRoomMessage(MESSAGE_TYPES.HAS_WON);
+      this.removeGame();
+      return;
+    } else {
+      this.hideRoomMessage();
+    }
+
     if (this.round.player.id !== this.player.id) {
       this.showRoomMessage(MESSAGE_TYPES.WAITTING_TURN);
     } else {
@@ -92,6 +133,9 @@ class Game {
     }
 
     this.roundTitle.querySelector("span").innerHTML = game.round.roundNumber;
+    this.conqueredCellsInfo.innerHTML = this.players.find(
+      (player) => player.id === this.player.id
+    ).cellsConquered;
   }
 
   checkValidCellClick(cellObj, id) {
@@ -121,7 +165,7 @@ class Game {
     return validClick.some((el) => el.validCell);
   }
 
-  checkFillCell(e) {
+  async checkFillCell(e) {
     if (!this.isMyTurn(this.round)) return;
 
     const currentPlayerTurn = this.round.player;
@@ -170,8 +214,19 @@ class Game {
       totalCellsToWin: this.totalCellsToWin,
     };
 
-    this.checkTurn(updateGameToStorage);
-    this.updateGame(updateGameToStorage);
+    if (
+      this.players.length > 1 &&
+      this.getTotalCellConquered() !== this.totalCells
+    ) {
+      this.checkTurn(updateGameToStorage);
+      this.updateGame(updateGameToStorage);
+    } else {
+      await this.handleEndGame();
+      this.updateGame(updateGameToStorage);
+      this.checkTurn(updateGameToStorage);
+      await delGame({ roomId: this.roomId });
+      await clearRoom({ roomId: this.roomId });
+    }
   }
 
   fillCell(cell, color) {
@@ -189,7 +244,17 @@ class Game {
     this.context.stroke();
   }
 
+  getTotalCellConquered() {
+    let playersForCount = this.players.concat(this.defeatedPlayers);
+    const reducer = playersForCount.reduce((a, b) => ({
+      cellsConquered: a.cellsConquered + b.cellsConquered,
+    }));
+    return reducer.cellsConquered;
+  }
+
   checkOtherPlayerLoss(currentPlayerId) {
+    if (this.getTotalCellConquered() === this.totalCells) return;
+
     let otherPlayers = this.players.filter(
       (otherPlayer) => otherPlayer.id !== currentPlayerId
     );
@@ -220,8 +285,6 @@ class Game {
         this.players = this.players.filter(
           (oplayer) => oplayer.id !== player.id
         );
-        const newGameToStorage = getNewGameInfo(this);
-        this.notifySomeoneHasLost(newGameToStorage);
       });
 
       this.calculateTotalCellsToWin(this.totalCells, this.players);
@@ -249,21 +312,9 @@ class Game {
   defeatPlayer(player) {
     this.defeatedPlayers.push(player);
     this.players = this.players.filter((oplayer) => oplayer.id !== player.id);
-    //console.log(`El jugador ${player.name} ha perdido!!!`);
   }
 
-  // takeOutFromGame(player) {
-  //   let is_in = this.players.find(
-  //     (current_player) => current_player.id === player.id
-  //   );
-  //   if (!!is_in) {
-  //     this.defeatPlayer(player);
-  //     this.calculateTotalCellsToWin(this.totalCells, this.players);
-  //   }
-  // }
-
   generateCanvas() {
-    console.log("generating canvas...");
     this.clearCanvas();
 
     let colCounter = 0;
@@ -350,11 +401,13 @@ class Game {
       cellsConquered: 0,
       color: this.colors[index],
       hasLost: false,
+      rankingStatus: {
+        cellsConquered: player.rankingStatus.cellsConquered,
+        wins: player.rankingStatus.wins,
+      },
     }));
   }
 
-  // Método que calcula el total de celdas que tiene
-  // que rellenar un jugador para ganar
   calculateTotalCellsToWin(totalCells, players) {
     const numPlayers = players.length;
     let totalDefeatedCells = 0;
@@ -368,7 +421,6 @@ class Game {
       Math.floor((totalCells - totalDefeatedCells) / numPlayers) + 1;
   }
 
-  //Evento para notificar que alguien ha perdido
   notifySomeoneHasLost(newGameInfo) {
     const roomListUpdate = {
       roomEventId: this.roomId,
@@ -378,7 +430,7 @@ class Game {
     this.socket.emit("updatePlayerLost", roomListUpdate);
   }
 
-  init() {
+  async init(isCallWithEvent) {
     this.generateCanvas();
     this.initCanvasEvents();
     this.calculateTotalCellsToWin(this.totalCells, this.players);
@@ -392,13 +444,18 @@ class Game {
     }
 
     const initNewGameToStorage = {
-      defeatedPlayers: this.defeatedPlayers,
       grid: this.grid,
       players: this.players,
-      round: this.round,
+      defeatedPlayers: this.defeatedPlayers,
       totalCellsToWin: this.totalCellsToWin,
+      round: this.round,
     };
-    this.updateGame(initNewGameToStorage);
+
+    if (isCallWithEvent) {
+      await createGame({ roomId: this.roomId, initNewGameToStorage });
+    }
+    this.gameInfo.classList.remove("d-none");
+    this.cellsToWinInfo.innerHTML = this.totalCellsToWin;
   }
 
   updateGame(newGameInfo) {
@@ -419,35 +476,50 @@ class Game {
     this.socket.on("notifySomeoneLost", (data) => {
       !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);
     });
+    this.socket.on("notifyUserSession", ({ roomId }) => {
+      if (this.roomId === roomId) {
+        this.updateLocalUser();
+      }
+    });
   }
 
   handleUpdateEventGame(game) {
     this.grid = game.grid;
     this.round = game.round;
     this.totalCellsToWin = game.totalCellsToWin;
+    this.defeatedPlayers = game.defeatedPlayers;
     this.players = game.players;
     this.generateCanvas();
     this.checkTurn(game);
   }
 
-  handleSomeoneHasLostEvent(roomsList) {
-    // // Si la sala no es la que tiene el evento no hacemos nada
-    // if (roomsList.roomEventId !== this.roomId) return;
+  async handleEndGame() {
+    const playersForCount = this.players.concat(this.defeatedPlayers);
 
-    // const currentRoom = roomsList.rooms.find(
-    //   (room) => roomsList.roomEventId === room.id
-    // );
-
-    // Sacamos las id que hay dentro de los array de jugadores que han perdido
-    const defeatedPlayersId = currentRoom.game.defeatedPlayers.map(
-      (defeatedPlayer) => defeatedPlayer.id
+    await Promise.all(
+      playersForCount.map(async (p) => {
+        if (this.players.length === 1 && p.id === this.players[0].id) {
+          p.cellsConquered += this.totalCells - this.getTotalCellConquered();
+          p.rankingStatus.cellsConquered += p.cellsConquered;
+          p.rankingStatus.wins++;
+        } else {
+          p.rankingStatus.cellsConquered += p.cellsConquered;
+        }
+        await updateRanking(p);
+      })
     );
 
-    if (defeatedPlayersId.includes(this.player.id)) {
-      this.showRoomMessage(MESSAGE_TYPES.HAS_LOST);
-      this.player.hasLost = true;
-      this.createLegend(currentRoom.game.players);
-    }
+    await this.socket.emit("updateUserSession", { roomId: this.roomId });
+  }
+
+  async updateLocalUser() {
+    let actualPlayer = await getSingleUser({ id: this.player.id });
+    this.storage.setLocalStorage("me", actualPlayer.data, "session");
+  }
+
+  removeGame() {
+    document.getElementById("gameTopPannel").classList.add("d-none");
+    document.getElementById("waittingTurn").classList.add("d-none");
   }
 }
 

@@ -38,18 +38,21 @@ const apiClient = (url, data, requestHeader) => {
     const res = await client.post(url, prepareDataToDB(data), { headers });
     return res.data;
   };
+  const put = async () => {
+    const res = await client.put(url, prepareDataToDB(data), { headers });
+    return res.data;
+  };
 
-  // const put = () => {
-  //   return client.put(url, data, {headers});
-  // }
-
-  // const del = () => {
-  //   return client.delete(url, {headers});
-  // }
+  const del = async () => {
+    const res = await client.delete(url, { headers });
+    return res.data;
+  };
 
   return {
     get,
     post,
+    put,
+    del,
   };
 };
 

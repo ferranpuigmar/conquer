@@ -1,6 +1,6 @@
 const express = require("express");
-const { getRanking } = require("../services/users/ranking");
-const { getRooms } = require("../services/users/rooms");
+const { getRanking } = require("../services/ranking");
+const { getRooms } = require("../services/rooms");
 const router = express.Router();
 
 router.get("/", (req, res) => {

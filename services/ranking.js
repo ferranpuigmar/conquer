@@ -1,4 +1,4 @@
-const { apiClient } = require("../../config/apiClient");
+const { apiClient } = require("../config/apiClient");
 
 const getRanking = () => {
   return apiClient("/ranking").get();

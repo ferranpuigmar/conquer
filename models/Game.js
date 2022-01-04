@@ -10,41 +10,41 @@ const playerSchema = {
 };
 
 const GameSchema = new Schema({
-  roomId: { type: Schema.Types.ObjectId, ref: "Room" },
-  // grid: [
-  //   {
-  //     id: String,
-  //     row: Number,
-  //     cell: Number,
-  //     cell_x: Number,
-  //     cell_y: Number,
-  //     playerId: {
-  //       type: String,
-  //       default: null,
-  //     },
-  //     color: {
-  //       type: String,
-  //       default: null,
-  //     },
-  //   },
-  // ],
+  roomId: String,
+  grid: [
+    {
+      id: String,
+      row: Number,
+      cell: Number,
+      cell_x: Number,
+      cell_y: Number,
+      playerId: {
+        type: String,
+        default: null,
+      },
+      color: {
+        type: String,
+        default: null,
+      },
+    },
+  ],
   players: [playerSchema],
-  // defeatedPlaters: [
-  //   {
-  //     id: String,
-  //     name: String,
-  //     cellsConquered: Number,
-  //   },
-  // ],
-  // totalCellsToWin: Number,
-  // round: {
-  //   turn: Number,
-  //   roundNumber: Number,
-  //   player: {
-  //     type: playerSchema,
-  //     default: null,
-  //   },
-  // },
+  defeatedPlayers: [
+    {
+      id: String,
+      name: String,
+      cellsConquered: Number,
+    },
+  ],
+  totalCellsToWin: Number,
+  round: {
+    turn: Number,
+    roundNumber: Number,
+    player: {
+      type: playerSchema,
+      default: null,
+    },
+  },
 });
 
 GameSchema.set("timestamps", true);
