@@ -48,18 +48,21 @@ const apiClient = (url, data, requestHeader) => {
     const res = await client.post(url, prepareDataToDB(data), { headers });
     return res.data;
   };
+  const put = async () => {
+    const res = await client.put(url, prepareDataToDB(data), { headers });
+    return res.data;
+  };
 
-  // const put = () => {
-  //   return client.put(url, data, {headers});
-  // }
-
-  // const del = () => {
-  //   return client.delete(url, {headers});
-  // }
+  const del = async () => {
+    const res = await client.delete(url, { headers });
+    return res.data;
+  };
 
   return {
     get,
     post,
+    put,
+    del,
   };
 };
 
@@ -2934,20 +2937,101 @@ module.exports = yeast;
 
 /***/ }),
 
-/***/ "./services/users/users.js":
-/*!*********************************!*\
-  !*** ./services/users/users.js ***!
-  \*********************************/
+/***/ "./services/games.js":
+/*!***************************!*\
+  !*** ./services/games.js ***!
+  \***************************/
 /***/ (function(module, __unused_webpack_exports, __webpack_require__) {
 
-const { apiClient } = __webpack_require__(/*! ../../config/apiClient.js */ "./config/apiClient.js");
+const { apiClient } = __webpack_require__(/*! ../config/apiClient.js */ "./config/apiClient.js");
+
+const getSingleGame = (data) => {
+  return apiClient(`/games/${data.roomId}`).get();
+};
+
+const createGame = (data) => {
+  return apiClient("/games/create", data).post();
+};
+
+const putGame = (data) => {
+  return apiClient(`/games/${data.roomId}/updateGame`, data.newGameInfo).put();
+};
+
+const delGame = (data) => {
+  return apiClient(`/games/${data.roomId}`).del();
+};
+
+module.exports = {
+  createGame,
+  putGame,
+  delGame,
+  getSingleGame,
+};
+
+
+/***/ }),
+
+/***/ "./services/rooms.js":
+/*!***************************!*\
+  !*** ./services/rooms.js ***!
+  \***************************/
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+const { apiClient } = __webpack_require__(/*! ../config/apiClient.js */ "./config/apiClient.js");
+
+const getRooms = () => {
+  return apiClient("/rooms").get();
+};
+
+const addUserToRoom = (data) => {
+  return apiClient("/rooms/addUser", data).post();
+};
+
+const delUserFromRoom = (data) => {
+  return apiClient(`/rooms/deleteUser/${data.playerId}`).del();
+};
+
+const clearRoom = (data) => {
+  return apiClient(`/rooms/${data.roomId}/clearRoom`).put();
+};
+
+const getSingleRoom = (data) => {
+  return apiClient(`/rooms/${data.roomId}`).get();
+};
+
+module.exports = {
+  getRooms,
+  addUserToRoom,
+  clearRoom,
+  getSingleRoom,
+  delUserFromRoom,
+};
+
+
+/***/ }),
+
+/***/ "./services/users.js":
+/*!***************************!*\
+  !*** ./services/users.js ***!
+  \***************************/
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+const { apiClient } = __webpack_require__(/*! ../config/apiClient.js */ "./config/apiClient.js");
 
 const createUser = (data) => {
-  return apiClient("/user/register", data).post();
+  return apiClient("/auth/register", data).post();
 };
 
 const loginInUser = (data) => {
-  return apiClient("/user/login", data).post();
+  return apiClient("/auth/login", data).post();
+};
+
+const updateRanking = (data) => {
+  return apiClient(`/users/${data.id}/updateRanking`, data).put();
+};
+
+const getSingleUser = (data) => {
+  return apiClient(`/users/${data.id}`).get();
 };
 
 const getUsers = () => {
@@ -2957,7 +3041,9 @@ const getUsers = () => {
 module.exports = {
   createUser,
   getUsers,
+  getSingleUser,
   loginInUser,
+  updateRanking,
 };
 
 
@@ -2974,6 +3060,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Room__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Room */ "./src/js/Room.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 /* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/build/esm/index.js");
+/* harmony import */ var _services_rooms__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../services/rooms */ "./services/rooms.js");
+/* harmony import */ var _services_rooms__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_services_rooms__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _services_games__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../services/games */ "./services/games.js");
+/* harmony import */ var _services_games__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_services_games__WEBPACK_IMPORTED_MODULE_4__);
+
+
 
 
 
@@ -2982,18 +3074,22 @@ class Dashboard {
   localStorage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
   avatarMobile;
   socket = (0,socket_io_client__WEBPACK_IMPORTED_MODULE_2__.io)();
+  me = null;
 
   constructor(initData) {
     this.boxRooms = initData.boxRooms;
   }
 
   init() {
+    const me = this.localStorage.getLocalStorage("me", "session");
+    this.me = me;
+    this.socket.emit("connectedToDashboard", me);
+
     this.redirectToLogin();
     this.generateRooms();
     this.generatePlayerBox();
     this.generateLogout();
     this.avatarMobile = document.querySelector("#avatarMobile");
-    //this.avatarMobile = new D
     avatarMobile.addEventListener(
       "dragstart",
       this.dragIniciado.bind(this),
@@ -3004,6 +3100,8 @@ class Dashboard {
       this.dragFinalizado.bind(this),
       false
     );
+
+    this.reconnect();
   }
 
   dragIniciado(e) {
@@ -3079,20 +3177,32 @@ class Dashboard {
       } else {
         avatarDiv.classList.remove("hidden");
       }
-    } else {
-      // Aquí va la redicción si el usuario no esta conectado;
-      //console.log("usuario no conectado");
     }
   }
 
   generateLogout() {
     const logoutBtn = document.getElementById("logout");
-    const player = this.localStorage.getLocalStorage("me", "session");
+    const user = this.localStorage.getLocalStorage("me", "session");
 
-    logoutBtn.addEventListener("click", function () {
-      this.rooms.takeOutFromRoom(player);
-      this.localStorage.setLocalStorage("me", null, "session");
-      this.redirectToLogin();
+    logoutBtn.addEventListener("click", async () => {
+      let targetRoom = null;
+      let exitUser = null;
+      this.roomsList.forEach((room) => {
+        const currentRoomPlayers = room.players;
+        const userInRoom = currentRoomPlayers.find(
+          (player) => player.id === user.id
+        );
+        if (userInRoom) {
+          targetRoom = room;
+          exitUser = userInRoom;
+        }
+      });
+      if (targetRoom) {
+        await targetRoom.logOut(exitUser);
+      } else {
+        this.localStorage.setLocalStorage("me", null, "session");
+        this.redirectToLogin();
+      }
     });
   }
 
@@ -3121,6 +3231,31 @@ class Dashboard {
       window.location.href = "/";
     }
   }
+
+  async reconnect() {
+    try {
+      let rooms = await (0,_services_rooms__WEBPACK_IMPORTED_MODULE_3__.getRooms)();
+      const userWasInRoom = rooms.find((room) => {
+        const currentUsersInRoom = room.usersRoom.find(
+          (user) => user.id === this.me.id
+        );
+        if (currentUsersInRoom) return room;
+      });
+
+      if (userWasInRoom) {
+        const targetRoom = this.roomsList.find(
+          (room) => room.id === userWasInRoom.id
+        );
+        targetRoom.addToRoom(this.me);
+        document.querySelector(".m-user-item__image .image").innerHTML = "";
+
+        //! PENDIENTE DE IMPLEMENTAR PARA REENGANCHAR AL USUARIO AL JUEGO EN CASO DE REFRESH
+
+        //Is in game
+        // let game = await getSingleGame({ roomId: userWasInRoom.id });
+      }
+    } catch (error) {}
+  }
 }
 
 /* harmony default export */ __webpack_exports__["default"] = (Dashboard);
@@ -3139,22 +3274,29 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/js/constants.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
+const { updateRanking, getSingleUser } = __webpack_require__(/*! ../../services/users.js */ "./services/users.js");
+const { createGame, delGame } = __webpack_require__(/*! ../../services/games.js */ "./services/games.js");
+const { clearRoom } = __webpack_require__(/*! ../../services/rooms.js */ "./services/rooms.js");
+
 
 
 class Game {
   colors = ["Purple", "Aquamarine", "CadetBlue", "DeepPink"];
   grid = [];
   defeatedPlayers = [];
-  wrapper = document.getElementById("grid");
   totalCellsToWin = 0;
   storage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
-  waittingDiv = document.querySelector("#roomMessage"); // Div del mensaje de espera
   roomsList;
-  roundTitle = document.getElementById("roundTitle"); // Número del Round
-  pannelInfo = document.getElementById("roomPannelInfo");
   canvas = document.getElementById("game");
   cells = [];
   eventCheckFillCellHandler = this.checkFillCell.bind(this);
+  wrapper = document.getElementById("grid");
+  waittingDiv = document.querySelector("#roomMessage"); // Div del mensaje de espera
+  roundTitle = document.getElementById("roundTitle"); // Número del Round
+  pannelInfo = document.getElementById("roomPannelInfo");
+  gameInfo = document.querySelector(".m-game__info");
+  cellsToWinInfo = document.getElementById("cellsToWinInfo");
+  conqueredCellsInfo = document.getElementById("conqueredCellsInfo");
 
   constructor(roomId, playerInfo, players, socket, gameSize) {
     this.player = playerInfo;
@@ -3198,6 +3340,20 @@ class Game {
     };
   }
 
+  getTableWinners() {
+    let playersForCount = this.players.concat(this.defeatedPlayers);
+    let orderedPlayers = playersForCount.sort(
+      (a, b) => (a.cellsConquered < b.cellsConquered && 1) || -1
+    );
+    let table = `<table>`;
+    table += `<tr><th>Jugador</th><th>Total</th></tr>`;
+    orderedPlayers.forEach((oplayer) => {
+      table += `<tr><td>${oplayer.name}</td><td>${oplayer.cellsConquered}</td></tr>`;
+    });
+    table += `</table>`;
+    return table;
+  }
+
   showRoomMessage(type) {
     let message;
     const messageDiv = document.querySelector("#roomMessage");
@@ -3207,6 +3363,15 @@ class Game {
         break;
       case _constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.HAS_LOST:
         message = `Lo sentimos ${this.player.name}, te han dejado sin casillas. ¡Has perdido!`;
+        break;
+      case _constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.HAS_WON:
+        message = `Fin de la partida. <br>`;
+        message += `El jugador ${this.players[0].name} ha ganado.<br>`;
+        message += this.getTableWinners();
+        message += `<a href="/ranking" class="btn btn-primary btn-lg btn-rounded px-4" type="button">Ver ranking completo</a>`;
+        message += `<div class="mb-3 mt-3"><button type="button" class="btn btn-warning btn-rounded px-4" onClick="window.location.reload();">
+                      Salir del juego
+                    </button></div>`;
         break;
       default:
         return "";
@@ -3225,6 +3390,17 @@ class Game {
   }
 
   checkTurn(game) {
+    if (
+      this.players.length == 1 ||
+      this.getTotalCellConquered() === this.totalCells
+    ) {
+      this.showRoomMessage(_constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.HAS_WON);
+      this.removeGame();
+      return;
+    } else {
+      this.hideRoomMessage();
+    }
+
     if (this.round.player.id !== this.player.id) {
       this.showRoomMessage(_constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.WAITTING_TURN);
     } else {
@@ -3232,6 +3408,9 @@ class Game {
     }
 
     this.roundTitle.querySelector("span").innerHTML = game.round.roundNumber;
+    this.conqueredCellsInfo.innerHTML = this.players.find(
+      (player) => player.id === this.player.id
+    ).cellsConquered;
   }
 
   checkValidCellClick(cellObj, id) {
@@ -3261,7 +3440,7 @@ class Game {
     return validClick.some((el) => el.validCell);
   }
 
-  checkFillCell(e) {
+  async checkFillCell(e) {
     if (!this.isMyTurn(this.round)) return;
 
     const currentPlayerTurn = this.round.player;
@@ -3310,8 +3489,19 @@ class Game {
       totalCellsToWin: this.totalCellsToWin,
     };
 
-    this.checkTurn(updateGameToStorage);
-    this.updateGame(updateGameToStorage);
+    if (
+      this.players.length > 1 &&
+      this.getTotalCellConquered() !== this.totalCells
+    ) {
+      this.checkTurn(updateGameToStorage);
+      this.updateGame(updateGameToStorage);
+    } else {
+      await this.handleEndGame();
+      this.updateGame(updateGameToStorage);
+      this.checkTurn(updateGameToStorage);
+      await delGame({ roomId: this.roomId });
+      await clearRoom({ roomId: this.roomId });
+    }
   }
 
   fillCell(cell, color) {
@@ -3329,7 +3519,17 @@ class Game {
     this.context.stroke();
   }
 
+  getTotalCellConquered() {
+    let playersForCount = this.players.concat(this.defeatedPlayers);
+    const reducer = playersForCount.reduce((a, b) => ({
+      cellsConquered: a.cellsConquered + b.cellsConquered,
+    }));
+    return reducer.cellsConquered;
+  }
+
   checkOtherPlayerLoss(currentPlayerId) {
+    if (this.getTotalCellConquered() === this.totalCells) return;
+
     let otherPlayers = this.players.filter(
       (otherPlayer) => otherPlayer.id !== currentPlayerId
     );
@@ -3360,8 +3560,6 @@ class Game {
         this.players = this.players.filter(
           (oplayer) => oplayer.id !== player.id
         );
-        const newGameToStorage = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.getNewGameInfo)(this);
-        this.notifySomeoneHasLost(newGameToStorage);
       });
 
       this.calculateTotalCellsToWin(this.totalCells, this.players);
@@ -3389,21 +3587,9 @@ class Game {
   defeatPlayer(player) {
     this.defeatedPlayers.push(player);
     this.players = this.players.filter((oplayer) => oplayer.id !== player.id);
-    //console.log(`El jugador ${player.name} ha perdido!!!`);
   }
 
-  // takeOutFromGame(player) {
-  //   let is_in = this.players.find(
-  //     (current_player) => current_player.id === player.id
-  //   );
-  //   if (!!is_in) {
-  //     this.defeatPlayer(player);
-  //     this.calculateTotalCellsToWin(this.totalCells, this.players);
-  //   }
-  // }
-
   generateCanvas() {
-    console.log("generating canvas...");
     this.clearCanvas();
 
     let colCounter = 0;
@@ -3490,11 +3676,13 @@ class Game {
       cellsConquered: 0,
       color: this.colors[index],
       hasLost: false,
+      rankingStatus: {
+        cellsConquered: player.rankingStatus.cellsConquered,
+        wins: player.rankingStatus.wins,
+      },
     }));
   }
 
-  // Método que calcula el total de celdas que tiene
-  // que rellenar un jugador para ganar
   calculateTotalCellsToWin(totalCells, players) {
     const numPlayers = players.length;
     let totalDefeatedCells = 0;
@@ -3508,7 +3696,6 @@ class Game {
       Math.floor((totalCells - totalDefeatedCells) / numPlayers) + 1;
   }
 
-  //Evento para notificar que alguien ha perdido
   notifySomeoneHasLost(newGameInfo) {
     const roomListUpdate = {
       roomEventId: this.roomId,
@@ -3518,7 +3705,7 @@ class Game {
     this.socket.emit("updatePlayerLost", roomListUpdate);
   }
 
-  init() {
+  async init(isCallWithEvent) {
     this.generateCanvas();
     this.initCanvasEvents();
     this.calculateTotalCellsToWin(this.totalCells, this.players);
@@ -3532,13 +3719,18 @@ class Game {
     }
 
     const initNewGameToStorage = {
-      defeatedPlayers: this.defeatedPlayers,
       grid: this.grid,
       players: this.players,
-      round: this.round,
+      defeatedPlayers: this.defeatedPlayers,
       totalCellsToWin: this.totalCellsToWin,
+      round: this.round,
     };
-    this.updateGame(initNewGameToStorage);
+
+    if (isCallWithEvent) {
+      await createGame({ roomId: this.roomId, initNewGameToStorage });
+    }
+    this.gameInfo.classList.remove("d-none");
+    this.cellsToWinInfo.innerHTML = this.totalCellsToWin;
   }
 
   updateGame(newGameInfo) {
@@ -3559,35 +3751,50 @@ class Game {
     this.socket.on("notifySomeoneLost", (data) => {
       !this.player.hasLost && this.handleSomeoneHasLostEvent(roomsList);
     });
+    this.socket.on("notifyUserSession", ({ roomId }) => {
+      if (this.roomId === roomId) {
+        this.updateLocalUser();
+      }
+    });
   }
 
   handleUpdateEventGame(game) {
     this.grid = game.grid;
     this.round = game.round;
     this.totalCellsToWin = game.totalCellsToWin;
+    this.defeatedPlayers = game.defeatedPlayers;
     this.players = game.players;
     this.generateCanvas();
     this.checkTurn(game);
   }
 
-  handleSomeoneHasLostEvent(roomsList) {
-    // // Si la sala no es la que tiene el evento no hacemos nada
-    // if (roomsList.roomEventId !== this.roomId) return;
+  async handleEndGame() {
+    const playersForCount = this.players.concat(this.defeatedPlayers);
 
-    // const currentRoom = roomsList.rooms.find(
-    //   (room) => roomsList.roomEventId === room.id
-    // );
-
-    // Sacamos las id que hay dentro de los array de jugadores que han perdido
-    const defeatedPlayersId = currentRoom.game.defeatedPlayers.map(
-      (defeatedPlayer) => defeatedPlayer.id
+    await Promise.all(
+      playersForCount.map(async (p) => {
+        if (this.players.length === 1 && p.id === this.players[0].id) {
+          p.cellsConquered += this.totalCells - this.getTotalCellConquered();
+          p.rankingStatus.cellsConquered += p.cellsConquered;
+          p.rankingStatus.wins++;
+        } else {
+          p.rankingStatus.cellsConquered += p.cellsConquered;
+        }
+        await updateRanking(p);
+      })
     );
 
-    if (defeatedPlayersId.includes(this.player.id)) {
-      this.showRoomMessage(_constants__WEBPACK_IMPORTED_MODULE_0__.MESSAGE_TYPES.HAS_LOST);
-      this.player.hasLost = true;
-      this.createLegend(currentRoom.game.players);
-    }
+    await this.socket.emit("updateUserSession", { roomId: this.roomId });
+  }
+
+  async updateLocalUser() {
+    let actualPlayer = await getSingleUser({ id: this.player.id });
+    this.storage.setLocalStorage("me", actualPlayer.data, "session");
+  }
+
+  removeGame() {
+    document.getElementById("gameTopPannel").classList.add("d-none");
+    document.getElementById("waittingTurn").classList.add("d-none");
   }
 }
 
@@ -3604,8 +3811,8 @@ class Game {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _services_users_users__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../services/users/users */ "./services/users/users.js");
-/* harmony import */ var _services_users_users__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_services_users_users__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _services_users__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../services/users */ "./services/users.js");
+/* harmony import */ var _services_users__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_services_users__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 
 
@@ -3708,7 +3915,7 @@ class Login {
   async loginUser(data) {
     const newUser = data;
     try {
-      const loginUSer = await (0,_services_users_users__WEBPACK_IMPORTED_MODULE_0__.loginInUser)(newUser);
+      const loginUSer = await (0,_services_users__WEBPACK_IMPORTED_MODULE_0__.loginInUser)(newUser);
       if (loginUSer) {
         this.storage.setLocalStorage("me", loginUSer, "session");
         window.location.href = "/rooms";
@@ -3788,8 +3995,8 @@ class Login {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _services_users_users__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../services/users/users */ "./services/users/users.js");
-/* harmony import */ var _services_users_users__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_services_users_users__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _services_users__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../services/users */ "./services/users.js");
+/* harmony import */ var _services_users__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_services_users__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 /* harmony import */ var uuid__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! uuid */ "./node_modules/uuid/dist/esm-browser/v4.js");
 /* harmony import */ var socket_io_client__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! socket.io-client */ "./node_modules/socket.io-client/build/esm/index.js");
@@ -3990,14 +4197,12 @@ class Register {
 
   async saveUser(data) {
     const newUser = data;
-    try{
-      const createdUser = await (0,_services_users_users__WEBPACK_IMPORTED_MODULE_0__.createUser)(newUser);
-      if(createdUser){
+    try {
+      const createdUser = await (0,_services_users__WEBPACK_IMPORTED_MODULE_0__.createUser)(newUser);
+      if (createdUser) {
         this.showSuccesMessage();
       }
-
-    }catch(err){
-      console.log("Error data", err.data);
+    } catch (err) {
       this.showErrorMessage(err.data.message);
     }
   }
@@ -4101,6 +4306,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/js/constants.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 /* harmony import */ var _Game__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Game */ "./src/js/Game.js");
+/* harmony import */ var _services_rooms__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../services/rooms */ "./services/rooms.js");
+/* harmony import */ var _services_rooms__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_services_rooms__WEBPACK_IMPORTED_MODULE_3__);
+
 
 
 
@@ -4109,11 +4317,12 @@ class Room {
   isOpen = true;
   players = [];
   roomBox = "";
-  game = "";
+  game = null;
   storage = new _utils__WEBPACK_IMPORTED_MODULE_1__["default"]();
   playButtonDiv = document.getElementById("playButton");
+  gameTopPannelDiv = document.getElementById("gameTopPannel");
   roomBox;
-  currentAvatar;
+  currentAvatar = null;
 
   constructor(id, name, capacity, socket) {
     this.id = id;
@@ -4144,7 +4353,7 @@ class Room {
   }
 
   onDropPlayer(e) {
-    const dragUSer = this.storage.getLocalStorage("me", "session");
+    const dragUser = this.storage.getLocalStorage("me", "session");
     const avatarMobile = document.getElementById(
       e.dataTransfer.getData("userAvatar")
     );
@@ -4155,22 +4364,17 @@ class Room {
     if (this.players.length === this.capacity) {
       this.isOpen = false;
       this.disableRoom(this.id);
-      //console.log("sala llena!");
       return;
     }
 
-    if (this.players.length > this.capacity || !this.isOpen) {
-      //   console.log("La sala no acepta más jugadores");
-      return;
-    }
-
-    this.addToRoom(dragUSer);
+    this.addToRoom(dragUser);
   }
 
   addToRoom(user) {
     const draggedPlayer = {
       name: user.name,
       avatar: user.avatar,
+      rankingStatus: user.rankingStatus,
       id: user.id,
     };
 
@@ -4179,28 +4383,59 @@ class Room {
       newPlayer: draggedPlayer,
     });
 
-    const gameTopPannelDiv = document.getElementById("gameTopPannel");
-    gameTopPannelDiv.classList.remove("d-none");
-    setTimeout(() => gameTopPannelDiv.classList.add("has-players"), 1000);
-    gameTopPannelDiv.querySelector(
+    this.gameTopPannelDiv.classList.remove("d-none");
+    setTimeout(() => this.gameTopPannelDiv.classList.add("has-players"), 1000);
+    this.gameTopPannelDiv.querySelector(
       ".m-game__title strong"
     ).innerHTML = `${this.name}`;
   }
 
   updatePlayers(usersRoom) {
-    const roomBoxDiv = document.getElementById(this.id);
-    roomBoxDiv.querySelector(".m-room-drop-item__total span").innerHTML =
-      usersRoom.length;
+    let me = this.storage.getLocalStorage("me", "session");
+    this.updateRoomBox(usersRoom);
+    const existUserInRoom = usersRoom.find((user) => user.id === me.id) ?? null;
 
-    const listConnectedUSers = document.querySelector(
-      "#roomConnectedMessage ul"
-    );
-    const connectedUsers = usersRoom.map((user) => `<li>${user.name}</li>`);
-    listConnectedUSers.innerHTML = connectedUsers.join("");
+    if (existUserInRoom) {
+      console.log("existUserInRoom: ", existUserInRoom);
+      this.players = usersRoom;
+      const listConnectedUSers = document.querySelector(
+        "#roomConnectedMessage ul"
+      );
+      document
+        .getElementById("roomConnectedMessageSubtitle")
+        .classList.remove("d-none");
+      const connectedUsers = usersRoom.map((user) => `<li>${user.name}</li>`);
+      listConnectedUSers.innerHTML = connectedUsers.join("");
+      usersRoom.length > 1 && this.renderPlayBtn();
+    }
+  }
 
+  updateWhenLeftRoom(usersRoom, exitUserId) {
+    this.updateRoomBox(usersRoom);
+    const me = this.storage.getLocalStorage("me", "session");
     if (usersRoom.length > 1) {
       this.renderPlayBtn();
+    } else {
+      this.playButtonDiv.innerHTML = "";
+      this.gameTopPannelDiv.classList.add("d-none");
     }
+    if (exitUserId === me.id) {
+      const avatarUserBox = document.querySelector(
+        ".m-user-item__image .image"
+      );
+      avatarUserBox.innerHTML = this.currentAvatar.outerHTML;
+    }
+  }
+
+  updateRoomBox(userList) {
+    const bubbles = userList.map((user) => {
+      return this.generateBubble(user, userList.length);
+    });
+    this.roomBox.innerHTML = bubbles.join("");
+    const roomBoxDiv = document.getElementById(this.id);
+    roomBoxDiv.querySelector("#roomTotalPlayers").innerHTML = userList.length;
+
+    this.players = userList;
   }
 
   showRoomMessage(type, user) {
@@ -4224,44 +4459,54 @@ class Room {
   disableRoom(id) {
     const roomDivElement = document.getElementById(id);
     roomDivElement.classList.add("isFull");
-
-    // quitamos mensaje conectados del panel de juego
-    document.getElementById("roomConnectedMessage").innerHTML = "";
   }
 
-  takeOutFromRoom(player) {
-    let is_in = this.players.find(
-      (room_player) => room_player.id === player.id
-    );
-    handleEventPlayGamehandleEventPlayGame;
-    if (!!is_in) {
-      this.game.takeOutFromGame(player);
-      //this.players = this.players.filter((room_player)=> room_player.id !== player.id);
+  async logOut(player) {
+    try {
+      const newPlayerList = await (0,_services_rooms__WEBPACK_IMPORTED_MODULE_3__.delUserFromRoom)({
+        playerId: player.id,
+      });
+      //   // Si hay un juego en  curso
+      if (this.game !== "") {
+      } else {
+        this.socket.emit("userLeftRoom", {
+          roomId: this.id,
+          usersRoom: newPlayerList.data,
+          exitUser: player.id,
+        });
+      }
+      this.storage.setLocalStorage("me", null, "session");
+      window.location.href = "/";
+    } catch (error) {
+      console.log(error);
     }
   }
 
   initSocketEvents() {
-    this.socket.on("notifyNewUsertoRoom", (data, roomId) => {
+    this.socket.on("notifyUpdateUsertoRoom", (data, roomId) => {
       if (this.id === roomId) {
         this.updatePlayers(data);
       }
     });
+
+    this.socket.on("notifyLeftUsertoRoom", (data, roomId, exitUser) => {
+      if (this.id === roomId) {
+        this.updateWhenLeftRoom(data, exitUser);
+      }
+    });
+
     this.socket.on("notifyPlayGame", (data, roomId, userId) => {
       if (this.id === roomId) {
-        console.log("hello");
         this.initGame(data);
       }
     });
-  }
 
-  // handleEventPlayGame(roomsList) {
-  //   // Si la sala no es la que tiene el evento no hacemos nada
-  //   if (roomsList.roomEventId !== this.id) return;
-  //   const currentRoom = roomsList.rooms.find(
-  //     (room) => room.id === roomsList.roomEventId
-  //   );
-  //   this.initGame(currentRoom.usersRoom, true);
-  // }
+    this.socket.on("disableRoom", (roomId) => {
+      if (this.id === roomId) {
+        this.disableRoom(roomId);
+      }
+    });
+  }
 
   renderPlayBtn() {
     this.playButtonDiv.innerHTML = `<button class="btn btn-primary btn-lg btn-rounded px-4" type="button">Empezar a jugar!</button>`;
@@ -4269,25 +4514,18 @@ class Room {
   }
 
   playGame() {
-    const user = this.storage.getLocalStorage("me", "session");
-    this.socket.emit("playGame", { roomId: this.id, userId: user.id });
+    this.initGame(this.players, true);
   }
 
   prepareGame() {
-    // Quitamos botón de play
     this.playButtonDiv.innerHTML = "";
-
-    // seteamos la room a close
     this.isOpen = false;
-
-    // deshabilitamos sala
     this.disableRoom(this.id);
   }
 
-  initGame(players, isCallWithEvent = false) {
-    this.prepareGame(players);
+  async initGame(players, isCallWithEvent = false) {
     // Inicializamos juego
-    const gridSize = 8;
+    const gridSize = 3;
     const currentPlayerInfo = this.storage.getLocalStorage("me", "session");
     this.game = new _Game__WEBPACK_IMPORTED_MODULE_2__["default"](
       this.id,
@@ -4296,7 +4534,22 @@ class Room {
       this.socket,
       gridSize
     );
+
+    document.getElementById("roomConnectedMessage").innerHTML = "";
+    this.prepareGame(players);
     this.game.init(isCallWithEvent);
+
+    if (isCallWithEvent) {
+      this.socket.emit("playGame", {
+        roomId: this.id,
+        userId: currentPlayerInfo.id,
+      });
+    }
+  }
+
+  generateBubble(user, usersLength) {
+    let marginClass = usersLength > 3 ? "fit-avatar-list" : "";
+    return `<div class="a-avatar drag-item ${user.avatar} ${marginClass}" id="" draggable="true" data-id="${user.id}" data-color="${user.avatar}" data-avatar="${user.avatar}"><i class="fas fa-user"></i></div>`;
   }
 }
 

@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 #### Stack tecnológico de la aplicación ####
+=======
+# Aplicación Conquer #
+
+## Stack tecnológico de la aplicación ##
+>>>>>>> develop
 
 - Javascript ES6
 - SASS
@@ -14,9 +20,18 @@
 
 2. Abrir la carpeta en Visual Studio Code
 
+<<<<<<< HEAD
 3. Crear archivo ".env" y dentro del mismo poner lo siguiente:
    PORT=3000
    MONGODB_URI=mongodb+srv://admin:esfuture@cluster0.njbl5.mongodb.net/conquer
+=======
+3. Crear archivo ".env" en la raíz y dentro del mismo poner lo siguiente:
+   
+   PORT=3000
+   
+   MONGODB_URI=mongodb+srv://admin:esfuture@cluster0.njbl5.mongodb.net/conquer
+   
+>>>>>>> develop
    API_URL=http://localhost:3000/api
    
 4. Hacer npm install en la terminal
@@ -27,7 +42,31 @@
 
 6. La prueba de diferentes usuarios debe ser en diferentes navegadores
 
+<<<<<<< HEAD
 ### Estructura del proyecto ###
+=======
+
+## ¡Importante, seguir el "Happy path"! ##
+
+Debido a que el proyecto es complejo, hay muchas casuísticas que no las hemos podido depurar bien con lo que para que se pueda ver que hemos completado lo que se pedía se tendría que seguir el siguiente procedimiento:
+
+- **Registar usuario en almenos 2 navegadores y hacer su posterior login**. Hay usuarios existentes de ejemplo:
+   ivan@gmail.com / 123
+   dani@gmail.com / 123
+
+- **No actualizar el navegador durante el proceso, no está depurado**
+
+- Arrastrar usuario a la sala en ambos navegadores
+
+- Uno de los dos navegadores le dará al play
+
+- Jugar hasta que salga el resultado final
+
+- Se puede consultar el ranking de los usuarios existentes y los nuevos que hayan jugado
+
+
+## Estructura del proyecto ##
+>>>>>>> develop
 
 - #### /config
     - configuración de axios a partir del apiClient
@@ -68,8 +107,11 @@
 **postcss.config.js**: archivo que configura las preferencias de compilación del css resultante
 
 **webpack.config.js**: configuración de webpack
+<<<<<<< HEAD
 
 ## Documentación API Rest ##
 Hemos usado swagger para generar la documentación de la API mediante comentarios.
 
 Una vez levantado el proyecto poner la url http://localhost:3000/doc
+=======
+>>>>>>> develop
